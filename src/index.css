@@ -21,3 +21,10 @@
 body {
   font-family: 'Poppins', sans-serif;
 }
+
+@utility scrollbar-hide {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}

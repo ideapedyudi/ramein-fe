@@ -16,13 +16,13 @@ function Navbar() {
             <span className="text-4xl font-extrabold leading-none text-white">Ramein</span>
           </Link>
 
-          <nav className="flex w-full items-center gap-2 overflow-x-auto rounded-full bg-[#58b59f]/70 px-2 py-1 md:w-auto">
+          <nav className="scrollbar-hide flex w-full items-center gap-1 overflow-x-auto rounded-full bg-[#58b59f]/70 px-1 py-1 md:w-auto md:gap-2 md:px-2">
             {navMenus.map((menu) => (
               <NavLink
                 key={menu.to}
                 to={menu.to}
                 className={({ isActive }) =>
-                  `shrink-0 rounded-full px-5 py-2 text-sm font-semibold transition ${
+                  `shrink-0 rounded-full px-3 py-2 text-xs font-semibold transition sm:text-sm md:px-5 ${
                     isActive ? 'bg-white/15 text-white' : 'text-white/95 hover:bg-white/10'
                   }`
                 }
