@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import {
   FaBookOpen,
   FaBriefcase,
@@ -32,8 +33,9 @@ function CategoryCard({ category }) {
   const Icon = categoryIconMap[category.icon] ?? FaRegStar
 
   return (
-    <article
-      className="rounded-3xl px-6 py-7 text-white shadow-[0_4px_14px_rgba(0,0,0,0.12)]"
+    <Link
+      to={`/jelajahi?category=${encodeURIComponent(category.name)}`}
+      className="block rounded-3xl px-6 py-7 text-white shadow-[0_4px_14px_rgba(0,0,0,0.12)] transition hover:-translate-y-0.5 hover:shadow-[0_8px_22px_rgba(0,0,0,0.18)]"
       style={{
         background: `linear-gradient(140deg, ${category.from} 0%, ${category.to} 100%)`,
       }}
@@ -42,7 +44,7 @@ function CategoryCard({ category }) {
         <Icon />
       </div>
       <p className="mt-8 text-3xl font-semibold">{category.name}</p>
-    </article>
+    </Link>
   )
 }
 

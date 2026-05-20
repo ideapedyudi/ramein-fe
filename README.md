@@ -13,10 +13,24 @@ Frontend aplikasi **Ramein**, platform pemesanan tiket event untuk membantu user
 - Halaman autentikasi:
 - Login (`/login`)
 - Register (`/register`)
-- Placeholder page untuk menu:
-- Jelajah (`/jelajah`)
-- Untuk Kamu (`/untuk-kamu`)
-- Buat Event (`/buat-event`)
+- Halaman jelajah & rekomendasi:
+- Jelajahi Event dengan filter kategori/wilayah (`/jelajahi`)
+- Untuk Kamu — rekomendasi personal (`/untuk-kamu`)
+- Detail event (`/event/:eventId`)
+- Alur pembelian tiket:
+- Checkout (`/checkout`)
+- Order Success (`/order/success`)
+- Buat & kelola event (organizer):
+- Pilih tipe event (`/buat-event`)
+- Festival / Ticketing (`/buat-event/festival`)
+- Meetup / Gathering (`/buat-event/gathering`)
+- Event Kamu — list event organizer (`/event-kamu`)
+- Detail event organizer (`/event-kamu/:eventId`)
+- Halaman informasi:
+- Tentang Kami (`/about`)
+- Kontak (`/contact`)
+- Syarat & Ketentuan (`/terms`)
+- Kebijakan Privasi (`/privacy`)
 
 ## Tech Stack
 
@@ -30,8 +44,9 @@ Frontend aplikasi **Ramein**, platform pemesanan tiket event untuk membantu user
 
 ```bash
 src/
-  components/      # Komponen UI reusable (Navbar, EventCard, HeroSlideshow, dst)
-  pages/           # Halaman utama aplikasi
+  components/      # Komponen UI reusable (Navbar, EventCard, HeroSlideshow, PageHeader, EventCardPreview, dst)
+  pages/           # Halaman utama aplikasi (Home, Login, Register, Jelajahi, UntukKamu, EventDetail, Checkout, OrderSuccess, BuatEvent*, EventKamu*, About, Contact, Terms, Privacy)
+  lib/             # Helper (api dummy + format Rupiah/angka)
   data/            # Dummy/mock data untuk homepage
   assets/          # Asset gambar/banner
 ```
@@ -62,13 +77,26 @@ npm run lint
 
 - `/` -> redirect ke `/home`
 - `/home` -> halaman utama
-- `/jelajah` -> placeholder
-- `/untuk-kamu` -> placeholder
-- `/buat-event` -> placeholder
+- `/jelajah` -> redirect ke `/jelajahi`
+- `/jelajahi` -> halaman jelajah event + filter
+- `/untuk-kamu` -> rekomendasi personal
+- `/event/:eventId` -> detail event publik
+- `/checkout` -> halaman pembayaran
+- `/order/success` -> konfirmasi pesanan
+- `/buat-event` -> pilih tipe event
+- `/buat-event/festival` -> form Festival / Ticketing
+- `/buat-event/gathering` -> form Meetup / Gathering
+- `/event-kamu` -> list event milik organizer
+- `/event-kamu/:eventId` -> detail & statistik event organizer
+- `/about` -> tentang Ramein
+- `/contact` -> hubungi tim
+- `/terms` -> syarat & ketentuan
+- `/privacy` -> kebijakan privasi
 - `/login` -> login page
 - `/register` -> register page
 
 ## Catatan
 
-- Data event saat ini masih memakai mock data lokal (`src/data/homeData.js`).
+- Data event saat ini masih memakai dummy/mock di `src/lib/api.js` (event catalog, organizer my-events, carousel, kategori, wilayah) dan `src/data/homeData.js` (untuk homepage lama).
+- API dummy mengembalikan Promise sehingga halaman seperti `Jelajahi`, `UntukKamu`, `EventDetail`, dan `EventKamu` siap diganti dengan integrasi backend tanpa restrukturisasi besar.
 - Integrasi backend (auth, booking, payment, order history) belum diaktifkan di repo frontend ini.
