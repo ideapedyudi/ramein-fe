@@ -23,12 +23,12 @@ function HomePage() {
         <div className="mx-auto w-full max-w-370 px-2 md:px-3">
           <section className="mt-16">
             <SectionTitle
-              title="Trending Events"
+              title="Trending"
               subtitle="Event populer yang lagi ramai saat ini"
               action={
                 <button
                   type="button"
-                  className="rounded-xl border border-[#e2e2e2] px-4 py-2 text-lg font-semibold text-[#373737] hover:bg-white"
+                  className="rounded-xl border border-[#e2e2e2] px-4 py-2 text-lg font-semibold text-[#373737] hover:bg-green"
                 >
                   Lihat Semua
                 </button>
