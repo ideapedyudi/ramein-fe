@@ -1,8 +1,10 @@
-function FooterColumn({ title, items }) {
+import brandLogo from '../assets/logo.png'
+
+function FooterColumn({ title, items }) { 
   return (
     <div>
       <h5 className="text-2xl font-semibold text-[#202020]">{title}</h5>
-      <ul className="mt-4 space-y-2 text-md text-[#6f6f6f]">
+      <ul className="mt-4 space-y-2 text-lg text-[#6f6f6f]">
         {items.map((item) => (
           <li key={item}>{item}</li>
         ))}
@@ -17,9 +19,7 @@ function SiteFooter() {
       <div className="mx-auto grid w-full max-w-[1480px] gap-10 px-2 py-12 md:grid-cols-4 md:px-3">
         <div>
           <div className="flex items-center gap-2">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#2ea387] text-xl font-bold text-white">
-              R
-            </div>
+              <img src={brandLogo} alt="Ramein Logo" className="w-10" />
             <span className="text-4xl font-bold text-[#2ea387]">Ramein</span>
           </div>
           <p className="mt-4 max-w-xs text-lg leading-relaxed text-[#6b6b6b]">
