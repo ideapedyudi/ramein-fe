@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import AdminLayout from '../components/AdminLayout'
 
 function TicketIcon({ className }) {
   return (
@@ -226,57 +227,46 @@ function GatheringCard() {
 
 function BuatEventPage() {
   return (
-    <div className="min-h-screen bg-[var(--color-page)]">
-      <div className="border-b border-black/5 bg-white">
-        <div className="mx-auto flex max-w-[1280px] items-center justify-between gap-3 px-4 py-4 sm:px-6 lg:px-8">
-          <Link
-            to="/home"
-            className="inline-flex items-center gap-1 text-sm text-gray-600 transition hover:text-brand-600"
-          >
-            ← Kembali
-          </Link>
-          <Link
-            to="/event-kamu"
-            className="rounded-lg border border-gray-200 px-3 py-2 text-xs font-medium hover:bg-gray-50 sm:px-4 sm:text-sm"
-          >
-            Event Kamu
-          </Link>
-        </div>
+    <AdminLayout
+      title="Buat Event"
+      subtitle="Pilih tipe event yang ingin kamu buat"
+      actions={
+        <Link
+          to="/event-kamu"
+          className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs font-medium hover:bg-gray-50 sm:px-4 sm:text-sm"
+        >
+          Event Saya
+        </Link>
+      }
+    >
+      <div className="max-w-2xl">
+        <h2 className="text-2xl font-bold leading-tight tracking-tight text-gray-900 sm:text-3xl">
+          Mau bikin event seperti apa?
+        </h2>
+        <p className="mt-2 text-sm text-gray-600 sm:text-base">
+          Pilih tipe yang paling pas. Ramein mendukung dua model — penjualan tiket berjenjang ala festival,
+          atau RSVP cepat ala meetup komunitas.
+        </p>
       </div>
 
-      <div className="mx-auto max-w-[1100px] px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
-        <div className="max-w-2xl">
-          <p className="text-xs font-medium uppercase tracking-[0.18em] text-brand-600 sm:text-sm">
-            Buat Event
-          </p>
-          <h1 className="mt-3 text-3xl font-bold leading-tight tracking-tight text-gray-900 sm:text-4xl md:text-5xl">
-            Mau bikin event seperti apa?
-          </h1>
-          <p className="mt-3 text-sm text-gray-600 sm:mt-4 sm:text-base">
-            Pilih tipe yang paling pas. Ramein mendukung dua model — penjualan tiket berjenjang ala festival,
-            atau RSVP cepat ala meetup komunitas.
-          </p>
-        </div>
-
-        <div className="mt-8 grid gap-6 sm:mt-12 lg:grid-cols-2">
-          <FestivalCard />
-          <GatheringCard />
-        </div>
-
-        <div className="mt-8 flex flex-col gap-3 rounded-2xl border border-gray-200 bg-white p-5 sm:mt-10 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
-          <div>
-            <p className="text-sm font-medium text-gray-900">Bingung pilih yang mana?</p>
-            <p className="mt-0.5 text-sm text-gray-600">
-              Festival cocok untuk acara 100+ peserta dengan tiket berbayar. Meetup cocok untuk komunitas,
-              workshop, dan online event.
-            </p>
-          </div>
-          <Link to="/jelajahi" className="text-sm font-medium text-brand-600 hover:underline">
-            Lihat contoh event →
-          </Link>
-        </div>
+      <div className="mt-6 grid gap-6 sm:mt-8 lg:grid-cols-2">
+        <FestivalCard />
+        <GatheringCard />
       </div>
-    </div>
+
+      <div className="mt-6 flex flex-col gap-3 rounded-2xl border border-gray-200 bg-white p-5 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+        <div>
+          <p className="text-sm font-medium text-gray-900">Bingung pilih yang mana?</p>
+          <p className="mt-0.5 text-sm text-gray-600">
+            Festival cocok untuk acara 100+ peserta dengan tiket berbayar. Meetup cocok untuk komunitas,
+            workshop, dan online event.
+          </p>
+        </div>
+        <Link to="/jelajahi" className="text-sm font-medium text-brand-600 hover:underline">
+          Lihat contoh event →
+        </Link>
+      </div>
+    </AdminLayout>
   )
 }
 

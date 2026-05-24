@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
+import AdminLayout from '../components/AdminLayout'
 import { api } from '../lib/api'
 import { formatIDR, formatNumber } from '../lib/format'
 
@@ -61,48 +62,49 @@ function EventKamuDetailPage() {
 
   if (notFound) {
     return (
-      <div className="mx-auto max-w-[1280px] px-4 py-20 text-center">
-        <h1 className="text-2xl font-bold text-gray-900">Event tidak ditemukan</h1>
-        <Link to="/event-kamu" className="mt-4 inline-block text-brand-600 hover:underline">
-          ← Kembali ke Event Kamu
-        </Link>
-      </div>
+      <AdminLayout title="Event tidak ditemukan">
+        <div className="rounded-2xl border border-dashed border-gray-300 bg-white p-12 text-center">
+          <h2 className="text-xl font-bold text-gray-900">Event tidak ditemukan</h2>
+          <Link to="/event-kamu" className="mt-4 inline-block text-brand-600 hover:underline">
+            ← Kembali ke Event Saya
+          </Link>
+        </div>
+      </AdminLayout>
     )
   }
 
   if (!event) {
-    return <div className="mx-auto max-w-[1280px] px-4 py-20 text-center text-gray-500">Memuat...</div>
+    return (
+      <AdminLayout title="Memuat…">
+        <p className="text-sm text-gray-500">Memuat detail event…</p>
+      </AdminLayout>
+    )
   }
 
   return (
-    <div className="min-h-screen bg-[var(--color-page)]">
-      <div className="border-b border-black/5 bg-white">
-        <div className="mx-auto max-w-[1280px] px-4 py-4 sm:px-6 lg:px-8">
-          <Link to="/event-kamu" className="text-sm text-gray-600 hover:text-brand-600">
-            ← Kembali
-          </Link>
-        </div>
-      </div>
+    <AdminLayout
+      title={event.name}
+      subtitle={`${event.dateLabel} • ${event.city}`}
+      actions={
+        <>
+          <button className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs font-medium hover:bg-gray-50 sm:text-sm">
+            Share Link
+          </button>
+          <button className="rounded-lg bg-brand-600 px-3 py-2 text-xs font-semibold text-white hover:bg-brand-700 sm:text-sm">
+            📷 Scan QR
+          </button>
+        </>
+      }
+    >
+      <Link
+        to="/event-kamu"
+        className="mb-4 inline-block text-sm text-gray-600 hover:text-brand-600"
+      >
+        ← Kembali ke Event Saya
+      </Link>
 
-      <div className="mx-auto max-w-[1280px] px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
-        <div className="flex flex-wrap items-start justify-between gap-3 sm:gap-4">
-          <div className="min-w-0">
-            <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">{event.name}</h1>
-            <p className="mt-1 text-sm text-gray-600 sm:text-base">
-              {event.dateLabel} • {event.city}
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <button className="rounded-lg border border-gray-200 px-3 py-2 text-xs font-medium hover:bg-gray-50 sm:text-sm">
-              Share Link Event
-            </button>
-            <button className="rounded-lg bg-brand-600 px-3 py-2 text-xs font-semibold text-white hover:bg-brand-700 sm:text-sm">
-              📷 Scan QR
-            </button>
-          </div>
-        </div>
-
-        <div className="mt-6 -mx-4 overflow-x-auto border-b border-gray-200 px-4 sm:mx-0 sm:px-0">
+      <div>
+        <div className="-mx-4 overflow-x-auto border-b border-gray-200 px-4 sm:mx-0 sm:px-0">
           <div className="flex min-w-max gap-6 sm:gap-8">
             {[
               { key: 'detail', label: 'Detail Event' },
@@ -130,7 +132,7 @@ function EventKamuDetailPage() {
               <Card>
                 <CardHeader title="Informasi Event" />
                 <div
-                  className={`relative mb-5 h-44 overflow-hidden rounded-xl bg-gradient-to-br sm:h-56 md:h-64 ${event.bannerHue ?? 'from-brand-400 to-brand-600'}`}
+                  className={`relative mb-5 h-44 overflow-hidden rounded-xl bg-linear-to-br sm:h-56 md:h-64 ${event.bannerHue ?? 'from-brand-400 to-brand-600'}`}
                 >
                   {event.imageUrl && (
                     <img
@@ -139,7 +141,7 @@ function EventKamuDetailPage() {
                       className="absolute inset-0 h-full w-full object-cover"
                     />
                   )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+                  <div className="absolute inset-0 bg-linear-to-t from-black/30 to-transparent" />
                 </div>
                 <div className="grid gap-4 sm:grid-cols-2">
                   <Info label="Tanggal" value={`${event.dateLabel}, 18:00 WIB`} />
@@ -180,7 +182,7 @@ function EventKamuDetailPage() {
             <Card>
               <CardHeader title="Daftar Pendaftar" />
               <div className="-mx-4 overflow-x-auto sm:mx-0">
-                <div className="min-w-[560px] overflow-hidden border-y border-gray-100 sm:rounded-xl sm:border">
+                <div className="min-w-140 overflow-hidden border-y border-gray-100 sm:rounded-xl sm:border">
                   <table className="w-full text-left text-sm">
                     <thead className="bg-gray-50 text-xs uppercase text-gray-500">
                       <tr>
@@ -225,7 +227,7 @@ function EventKamuDetailPage() {
           )}
         </div>
       </div>
-    </div>
+    </AdminLayout>
   )
 }
 
