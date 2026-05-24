@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react'
-import { NavLink, Link, useLocation, useNavigate } from 'react-router-dom'
+import { useState } from 'react'
+import { NavLink, Link, useNavigate } from 'react-router-dom'
 import { FaBars, FaTimes } from 'react-icons/fa'
+import brandLogo from '../assets/logobrand2.png'
 import { navMenus } from '../data/homeData'
 import { useAuth } from '../context/AuthContext'
 import Container from './Container'
@@ -9,12 +10,8 @@ import ProfileMenu from './ProfileMenu'
 function Navbar() {
   const { user, isAuthenticated, isAdmin, logout } = useAuth()
   const navigate = useNavigate()
-  const location = useLocation()
   const [mobileOpen, setMobileOpen] = useState(false)
-
-  useEffect(() => {
-    setMobileOpen(false)
-  }, [location.pathname])
+  const closeMobile = () => setMobileOpen(false)
 
   const visibleMenus = navMenus.filter((m) => {
     if (m.to.startsWith('/buat-event')) return isAdmin
@@ -31,15 +28,11 @@ function Navbar() {
       <div className="bg-[#0d7f74] py-2 text-center text-xs font-medium text-white sm:text-sm">
         Hari mu ngebosenin? #Rameinaja
       </div>
-      <div className="bg-[#32a08c]">
-        <Container className="flex items-center justify-between gap-3 py-3 md:h-16 md:py-0">
-          <Link to="/home" className="flex shrink-0 items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white text-base font-bold text-[#2ea387] md:h-10 md:w-10 md:text-lg">
-              R
-            </div>
-            <span className="text-2xl font-extrabold leading-none text-white md:text-3xl">
-              Ramein
-            </span>
+      <div className="bg-[rgb(50,160,140)]">
+        <div className="mx-auto flex w-full max-w-[1480px] flex-col gap-3 px-2 py-3 md:h-16 md:flex-row md:items-center md:justify-between md:px-3 md:py-0">
+          <Link to="/home" className="flex items-center gap-2"> 
+              <img src={brandLogo } alt="brand logo" className="w-10" />          
+            <span className="text-4xl font-extrabold leading-none text-white">Ramein</span>
           </Link>
 
           <nav className="scrollbar-hide hidden items-center gap-1 rounded-full bg-[#58b59f]/70 px-1 py-1 md:flex md:gap-2 md:px-2">
@@ -88,7 +81,7 @@ function Navbar() {
           >
             {mobileOpen ? <FaTimes className="text-xl" /> : <FaBars className="text-xl" />}
           </button>
-        </Container>
+        </div>
 
         {mobileOpen && (
           <div className="border-t border-white/10 bg-[#32a08c] md:hidden">
@@ -98,6 +91,7 @@ function Navbar() {
                   <NavLink
                     key={menu.to}
                     to={menu.to}
+                    onClick={closeMobile}
                     className={({ isActive }) =>
                       `rounded-lg px-3 py-2.5 text-sm font-semibold transition ${
                         isActive ? 'bg-white/15 text-white' : 'text-white/95 hover:bg-white/10'
@@ -120,12 +114,14 @@ function Navbar() {
                     <div className="flex flex-col gap-2">
                       <Link
                         to="/login"
+                        onClick={closeMobile}
                         className="rounded-xl border border-white/30 px-4 py-2.5 text-center text-sm font-semibold text-white transition hover:bg-white/10"
                       >
                         Masuk
                       </Link>
                       <Link
                         to="/register"
+                        onClick={closeMobile}
                         className="rounded-xl bg-white px-4 py-2.5 text-center text-sm font-semibold text-[#2ea387] transition hover:bg-emerald-50"
                       >
                         Daftar

@@ -1,21 +1,21 @@
-import Carousel from '../components/Carousel'
-import CategoryCard from '../components/CategoryCard'
-import Container from '../components/Container'
-import EventCard from '../components/EventCard'
-import HeroSlideshow from '../components/HeroSlideshow'
-import RegionCard from '../components/RegionCard'
-import SectionTitle from '../components/SectionTitle'
-import SiteFooter from '../components/SiteFooter'
-import SiteLayout from '../components/SiteLayout'
+import Carousel from "../components/Carousel";
+import CategoryCard from "../components/CategoryCard";
+import Container from "../components/Container";
+import EventCard from "../components/EventCard";
+import HeroSlideshow from "../components/HeroSlideshow";
+import RegionCard from "../components/RegionCard";
+import SectionTitle from "../components/SectionTitle";
+import SiteFooter from "../components/SiteFooter";
+import SiteLayout from "../components/SiteLayout";
 import {
   categories,
   heroSlides,
   recommendedEvents,
   regions,
   trendingEvents,
-} from '../data/homeData'
+} from "../data/homeData";
 
-const eventItemsPerView = { base: 2, sm: 3, md: 4, lg: 5, xl: 6 }
+const eventItemsPerView = { base: 2, sm: 3, md: 4, lg: 5, xl: 6 };
 
 function HomePage() {
   return (
@@ -42,7 +42,7 @@ function HomePage() {
         <Container className="mt-12">
           <section>
             <SectionTitle
-              title="Trending Events"
+              title="Trending"
               subtitle="Event populer yang lagi ramai saat ini"
               action={
                 <button
@@ -81,7 +81,10 @@ function HomePage() {
 
         <Container className="mt-16">
           <section>
-            <SectionTitle title="Browse by Region" subtitle="Jelajahi event di wilayah Indonesia" />
+            <SectionTitle
+              title="Browse by Region"
+              subtitle="Jelajahi event di wilayah Indonesia"
+            />
             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
               {regions.map((region) => (
                 <RegionCard key={region.id} region={region} />
@@ -92,7 +95,7 @@ function HomePage() {
       </main>
       <SiteFooter />
     </SiteLayout>
-  )
+  );
 }
 
-export default HomePage
+export default HomePage;
