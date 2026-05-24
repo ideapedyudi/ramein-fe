@@ -2,7 +2,7 @@ function FooterColumn({ title, items }) {
   return (
     <div>
       <h5 className="text-2xl font-semibold text-[#202020]">{title}</h5>
-      <ul className="mt-4 space-y-2 text-lg text-[#6f6f6f]">
+      <ul className="mt-4 space-y-2 text-md text-[#6f6f6f]">
         {items.map((item) => (
           <li key={item}>{item}</li>
         ))}
