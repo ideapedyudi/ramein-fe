@@ -1,4 +1,4 @@
-import brandLogo from '../assets/logo.png'
+import brandLogo from '../assets/logobrand.png'
 
 function FooterColumn({ title, items }) { 
   return (
