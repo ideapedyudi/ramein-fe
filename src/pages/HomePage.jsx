@@ -21,9 +21,7 @@ function HomePage() {
   return (
     <SiteLayout>
       <main className="pb-10">
-        <Container>
-          <HeroSlideshow slides={heroSlides} />
-        </Container>
+        <HeroSlideshow slides={heroSlides} />
 
         <Container className="mt-12">
           <section>

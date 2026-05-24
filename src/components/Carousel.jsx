@@ -140,27 +140,36 @@ function Carousel({
   const onPointerDown = (e) => {
     if (!dragEnabled || itemCount < 2) return
     if (e.button != null && e.button !== 0) return
-    dragStartRef.current = { x: e.clientX }
-    dragMovedRef.current = false
-    setIsDragging(true)
-    setIsTransitionEnabled(false)
-    try {
-      e.currentTarget.setPointerCapture?.(e.pointerId)
-    } catch {
-      // ignore
+    dragStartRef.current = {
+      x: e.clientX,
+      pointerId: e.pointerId,
+      target: e.currentTarget,
     }
+    dragMovedRef.current = false
   }
 
   const onPointerMove = (e) => {
-    if (!isDragging || !dragStartRef.current) return
-    const dx = e.clientX - dragStartRef.current.x
-    if (Math.abs(dx) > 5) dragMovedRef.current = true
+    const start = dragStartRef.current
+    if (!start) return
+    const dx = e.clientX - start.x
+    if (!dragMovedRef.current) {
+      if (Math.abs(dx) <= 5) return
+      dragMovedRef.current = true
+      setIsDragging(true)
+      setIsTransitionEnabled(false)
+      try {
+        start.target.setPointerCapture?.(start.pointerId)
+      } catch {
+        // ignore
+      }
+    }
     setDragOffset(dx)
   }
 
   const finishDrag = (clientX) => {
-    if (!dragStartRef.current) return
-    const dx = clientX - dragStartRef.current.x
+    const start = dragStartRef.current
+    if (!start) return
+    const dx = clientX - start.x
     const threshold = Math.min(slideWidth * 0.2, 60)
     setIsDragging(false)
     setDragOffset(0)
@@ -173,16 +182,21 @@ function Carousel({
   }
 
   const onPointerUp = (e) => {
-    if (!isDragging) return
-    finishDrag(e.clientX)
+    if (!dragStartRef.current) return
+    if (dragMovedRef.current) {
+      finishDrag(e.clientX)
+    } else {
+      dragStartRef.current = null
+    }
   }
 
   const onPointerCancel = () => {
-    if (!isDragging) return
+    if (!dragStartRef.current) return
     setIsDragging(false)
     setDragOffset(0)
     setIsTransitionEnabled(true)
     dragStartRef.current = null
+    dragMovedRef.current = false
   }
 
   const onClickCapture = (e) => {
