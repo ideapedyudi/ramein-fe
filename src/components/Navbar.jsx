@@ -1,4 +1,4 @@
-import brandLogo from '../assets/logobrand.png'
+import brandLogo from '../assets/logobrand2.png'
 import { NavLink, Link } from 'react-router-dom'
 import { navMenus } from '../data/homeData'
 
@@ -11,7 +11,9 @@ function Navbar() {
       <div className="bg-[#32a08c]">
         <div className="mx-auto flex w-full max-w-[1480px] flex-col gap-3 px-2 py-3 md:h-16 md:flex-row md:items-center md:justify-between md:px-3 md:py-0">
           <Link to="/home" className="flex items-center gap-2">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-lg font-bold text-[#2ea387]">
               <img src={brandLogo } alt="brand logo" className="w-10" />          
+            </div>
             <span className="text-4xl font-extrabold leading-none text-white">Ramein</span>
           </Link>
 
