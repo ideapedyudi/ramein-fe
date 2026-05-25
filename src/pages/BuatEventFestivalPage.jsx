@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import AdminLayout from '../components/AdminLayout'
 import EventCardPreview from '../components/EventCardPreview'
 import { api, apiCategories, apiRegions } from '../lib/api'
 import { formatIDR } from '../lib/format'
@@ -113,26 +114,24 @@ function BuatEventFestivalPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--color-page)]">
-      <div className="border-b border-black/5 bg-white">
-        <div className="mx-auto flex max-w-[1280px] flex-wrap items-center justify-between gap-2 px-4 py-4 sm:px-6 lg:px-8">
-          <Link to="/buat-event" className="text-sm text-gray-600 hover:text-brand-600">
-            ← Pilih tipe event lain
-          </Link>
-          <span className="inline-flex items-center gap-2 rounded-full bg-rose-50 px-3 py-1 text-xs font-semibold text-rose-700">
-            🎟️ Festival & Ticketing
-          </span>
-        </div>
-      </div>
+    <AdminLayout
+      title="Buat Event Festival / Ticketing"
+      subtitle="Cocok untuk konser, festival, dan seminar berbayar — tiket berjenjang & validasi QR"
+      actions={
+        <span className="inline-flex items-center gap-2 rounded-full bg-rose-50 px-3 py-1 text-xs font-semibold text-rose-700">
+          🎟️ Festival
+        </span>
+      }
+    >
+      <Link
+        to="/buat-event"
+        className="mb-4 inline-block text-sm text-gray-600 hover:text-brand-600"
+      >
+        ← Pilih tipe event lain
+      </Link>
 
-      <div className="mx-auto max-w-[1100px] px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
-        <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">Buat Event Festival / Ticketing</h1>
-        <p className="mt-1 text-sm text-gray-600 sm:text-base">
-          Cocok untuk konser, festival, dan seminar berbayar. Pendapatan via tiket berjenjang dengan validasi
-          QR Code.
-        </p>
-
-        <form onSubmit={handleSubmit} className="mt-6 grid gap-6 sm:mt-8 md:grid-cols-[1fr_320px]">
+      <div>
+        <form onSubmit={handleSubmit} className="grid gap-6 md:grid-cols-[1fr_320px]">
           <div className="space-y-6">
             <Card>
               <CardHeader title="Informasi Event" />
@@ -368,7 +367,7 @@ function BuatEventFestivalPage() {
           </aside>
         </form>
       </div>
-    </div>
+    </AdminLayout>
   )
 }
 

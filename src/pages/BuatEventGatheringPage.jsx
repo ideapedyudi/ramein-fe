@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import AdminLayout from '../components/AdminLayout'
 import EventCardPreview from '../components/EventCardPreview'
 import { api, apiCategories, apiRegions } from '../lib/api'
 import { formatIDR } from '../lib/format'
@@ -153,26 +154,23 @@ function BuatEventGatheringPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--color-page)]">
-      <div className="border-b border-black/5 bg-white">
-        <div className="mx-auto flex max-w-[1280px] flex-wrap items-center justify-between gap-2 px-4 py-4 sm:px-6 lg:px-8">
-          <Link to="/buat-event" className="text-sm text-gray-600 hover:text-brand-600">
-            ← Pilih tipe event lain
-          </Link>
-          <span className="inline-flex items-center gap-2 rounded-full bg-brand-50 px-3 py-1 text-xs font-semibold text-brand-700">
-            ✨ Meetup & Gathering
-          </span>
-        </div>
-      </div>
+    <AdminLayout
+      title="Buat Meetup / Gathering"
+      subtitle="Cocok untuk komunitas, workshop, webinar — link akses dikirim otomatis"
+      actions={
+        <span className="inline-flex items-center gap-2 rounded-full bg-brand-50 px-3 py-1 text-xs font-semibold text-brand-700">
+          ✨ Meetup
+        </span>
+      }
+    >
+      <Link
+        to="/buat-event"
+        className="mb-4 inline-block text-sm text-gray-600 hover:text-brand-600"
+      >
+        ← Pilih tipe event lain
+      </Link>
 
-      <form onSubmit={handleSubmit} className="mx-auto max-w-[1100px] px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
-        <div className="max-w-[680px]">
-          <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">Buat Meetup / Gathering</h1>
-          <p className="mt-2 text-sm text-gray-600">
-            Cocok untuk komunitas, workshop, webinar, atau diskusi kecil. Cepat dibuat dan link akses dikirim
-            otomatis.
-          </p>
-        </div>
+      <form onSubmit={handleSubmit}>
 
         <div className="mt-6 grid gap-6 sm:mt-8 sm:gap-8 md:grid-cols-[1fr_340px]">
           <div className="min-w-0 space-y-6">
@@ -399,7 +397,7 @@ function BuatEventGatheringPage() {
           </aside>
         </div>
       </form>
-    </div>
+    </AdminLayout>
   )
 }
 

@@ -1,4 +1,5 @@
-import { Link } from 'react-router-dom'
+import { Link } from "react-router-dom";
+import AdminLayout from "../components/AdminLayout";
 
 function TicketIcon({ className }) {
   return (
@@ -14,7 +15,7 @@ function TicketIcon({ className }) {
       <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v2Z" />
       <path d="M13 5v2M13 17v2M13 11v2" />
     </svg>
-  )
+  );
 }
 
 function SparkleIcon({ className }) {
@@ -30,7 +31,7 @@ function SparkleIcon({ className }) {
     >
       <path d="M12 3v3M12 18v3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M3 12h3M18 12h3M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1" />
     </svg>
-  )
+  );
 }
 
 function CheckIcon({ className }) {
@@ -46,7 +47,7 @@ function CheckIcon({ className }) {
     >
       <path d="M20 6 9 17l-5-5" />
     </svg>
-  )
+  );
 }
 
 function ArrowRight({ className }) {
@@ -62,7 +63,7 @@ function ArrowRight({ className }) {
     >
       <path d="M5 12h14M13 5l7 7-7 7" />
     </svg>
-  )
+  );
 }
 
 function BroadcastIcon({ className }) {
@@ -79,15 +80,15 @@ function BroadcastIcon({ className }) {
       <circle cx="12" cy="12" r="2" />
       <path d="M16.24 7.76a6 6 0 0 1 0 8.49M7.76 16.24a6 6 0 0 1 0-8.49" />
     </svg>
-  )
+  );
 }
 
 function FestivalCard() {
   const tiers = [
-    { name: 'Regular', price: 'Rp 500.000', available: 150 },
-    { name: 'VIP', price: 'Rp 1.500.000', available: 50 },
-    { name: 'VVIP', price: 'Rp 3.000.000', available: 20 },
-  ]
+    { name: "Regular", price: "Rp 500.000", available: 150 },
+    { name: "VIP", price: "Rp 1.500.000", available: 50 },
+    { name: "VVIP", price: "Rp 3.000.000", available: 20 },
+  ];
 
   return (
     <Link
@@ -103,14 +104,18 @@ function FestivalCard() {
             01 — Festival
           </span>
         </div>
-        <h2 className="mt-5 text-2xl font-bold tracking-tight text-gray-900">Festival & Ticketing</h2>
+        <h2 className="mt-5 text-2xl font-bold tracking-tight text-gray-900">
+          Festival & Ticketing
+        </h2>
         <p className="mt-1 text-sm text-gray-600">
           Untuk konser, festival, dan seminar berbayar dengan tiket berjenjang.
         </p>
       </div>
 
       <div className="flex-1 p-6">
-        <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">Tier tiket</p>
+        <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">
+          Tier tiket
+        </p>
         <ul className="mt-3 space-y-2">
           {tiers.map((t) => (
             <li
@@ -122,19 +127,25 @@ function FestivalCard() {
                   {t.name.slice(0, 3)}
                 </span>
                 <div>
-                  <p className="text-sm font-semibold text-gray-900">{t.name}</p>
-                  <p className="text-[11px] text-gray-500">{t.available} tickets available</p>
+                  <p className="text-sm font-semibold text-gray-900">
+                    {t.name}
+                  </p>
+                  <p className="text-[11px] text-gray-500">
+                    {t.available} tickets available
+                  </p>
                 </div>
               </div>
-              <span className="text-sm font-bold text-gray-900 tabular-nums">{t.price}</span>
+              <span className="text-sm font-bold text-gray-900 tabular-nums">
+                {t.price}
+              </span>
             </li>
           ))}
         </ul>
         <ul className="mt-5 space-y-1.5 text-sm text-gray-700">
           {[
-            'Validasi QR Code di gerbang',
-            'Dashboard penjualan real-time',
-            'Pencairan dana H+3 setelah event',
+            "Validasi QR Code di gerbang",
+            "Dashboard penjualan real-time",
+            "Pencairan dana H+3 setelah event",
           ].map((f) => (
             <li key={f} className="flex items-start gap-2">
               <CheckIcon className="mt-0.5 h-4 w-4 shrink-0 text-rose-500" />
@@ -149,7 +160,7 @@ function FestivalCard() {
         <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
       </div>
     </Link>
-  )
+  );
 }
 
 function GatheringCard() {
@@ -167,14 +178,19 @@ function GatheringCard() {
             02 — Meetup
           </span>
         </div>
-        <h2 className="mt-5 text-2xl font-bold tracking-tight text-gray-900">Meetup & Gathering</h2>
+        <h2 className="mt-5 text-2xl font-bold tracking-tight text-gray-900">
+          Meetup & Gathering
+        </h2>
         <p className="mt-1 text-sm text-gray-600">
-          Untuk komunitas, workshop, webinar, atau online event dengan RSVP cepat.
+          Untuk komunitas, workshop, webinar, atau online event dengan RSVP
+          cepat.
         </p>
       </div>
 
       <div className="flex-1 p-6">
-        <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">Tampilan RSVP</p>
+        <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">
+          Tampilan RSVP
+        </p>
         <div className="mt-3 overflow-hidden rounded-xl border border-gray-100 bg-white">
           <div className="grid grid-cols-[64px_1fr] gap-3 p-4">
             <div className="overflow-hidden rounded-lg bg-brand-50 text-center">
@@ -182,11 +198,17 @@ function GatheringCard() {
                 Sab
               </div>
               <div className="py-1.5 text-xl font-bold text-brand-700">23</div>
-              <div className="pb-1 text-[10px] uppercase text-brand-700">Mei</div>
+              <div className="pb-1 text-[10px] uppercase text-brand-700">
+                Mei
+              </div>
             </div>
             <div>
-              <p className="text-sm font-semibold text-gray-900">React Jakarta Monthly Meetup</p>
-              <p className="mt-0.5 text-[11px] text-gray-500">19:00 · Online via Zoom</p>
+              <p className="text-sm font-semibold text-gray-900">
+                React Jakarta Monthly Meetup
+              </p>
+              <p className="mt-0.5 text-[11px] text-gray-500">
+                19:00 · Online via Zoom
+              </p>
               <div className="mt-2 inline-flex items-center gap-1.5 rounded-md bg-brand-50 px-2 py-1 text-[11px] font-medium text-brand-700">
                 <BroadcastIcon className="h-3 w-3" /> Online · Free RSVP
               </div>
@@ -204,9 +226,9 @@ function GatheringCard() {
         </div>
         <ul className="mt-5 space-y-1.5 text-sm text-gray-700">
           {[
-            'Link Zoom otomatis ke peserta',
-            'Publik atau private invite-only',
-            'Cocok untuk komunitas & online event',
+            "Link Zoom otomatis ke peserta",
+            "Publik atau private invite-only",
+            "Cocok untuk komunitas & online event",
           ].map((f) => (
             <li key={f} className="flex items-start gap-2">
               <CheckIcon className="mt-0.5 h-4 w-4 shrink-0 text-brand-500" />
@@ -221,63 +243,29 @@ function GatheringCard() {
         <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
       </div>
     </Link>
-  )
+  );
 }
 
 function BuatEventPage() {
   return (
-    <div className="min-h-screen bg-[var(--color-page)]">
-      <div className="border-b border-black/5 bg-white">
-        <div className="mx-auto flex max-w-[1280px] items-center justify-between gap-3 px-4 py-4 sm:px-6 lg:px-8">
-          <Link
-            to="/home"
-            className="inline-flex items-center gap-1 text-sm text-gray-600 transition hover:text-brand-600"
-          >
-            ← Kembali
-          </Link>
-          <Link
-            to="/event-kamu"
-            className="rounded-lg border border-gray-200 px-3 py-2 text-xs font-medium hover:bg-gray-50 sm:px-4 sm:text-sm"
-          >
-            Event Kamu
-          </Link>
-        </div>
+    <AdminLayout
+      title="Buat Event"
+      subtitle="Pilih tipe event yang ingin kamu buat"
+      actions={
+        <Link
+          to="/event-kamu"
+          className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs font-medium hover:bg-gray-50 sm:px-4 sm:text-sm"
+        >
+          Event Saya
+        </Link>
+      }
+    >
+      <div className="mt-6 grid gap-6 sm:mt-8 lg:grid-cols-2">
+        <FestivalCard />
+        <GatheringCard />
       </div>
-
-      <div className="mx-auto max-w-[1100px] px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
-        <div className="max-w-2xl">
-          <p className="text-xs font-medium uppercase tracking-[0.18em] text-brand-600 sm:text-sm">
-            Buat Event
-          </p>
-          <h1 className="mt-3 text-3xl font-bold leading-tight tracking-tight text-gray-900 sm:text-4xl md:text-5xl">
-            Mau bikin event seperti apa?
-          </h1>
-          <p className="mt-3 text-sm text-gray-600 sm:mt-4 sm:text-base">
-            Pilih tipe yang paling pas. Ramein mendukung dua model — penjualan tiket berjenjang ala festival,
-            atau RSVP cepat ala meetup komunitas.
-          </p>
-        </div>
-
-        <div className="mt-8 grid gap-6 sm:mt-12 lg:grid-cols-2">
-          <FestivalCard />
-          <GatheringCard />
-        </div>
-
-        <div className="mt-8 flex flex-col gap-3 rounded-2xl border border-gray-200 bg-white p-5 sm:mt-10 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
-          <div>
-            <p className="text-sm font-medium text-gray-900">Bingung pilih yang mana?</p>
-            <p className="mt-0.5 text-sm text-gray-600">
-              Festival cocok untuk acara 100+ peserta dengan tiket berbayar. Meetup cocok untuk komunitas,
-              workshop, dan online event.
-            </p>
-          </div>
-          <Link to="/jelajahi" className="text-sm font-medium text-brand-600 hover:underline">
-            Lihat contoh event →
-          </Link>
-        </div>
-      </div>
-    </div>
-  )
+    </AdminLayout>
+  );
 }
 
-export default BuatEventPage
+export default BuatEventPage;

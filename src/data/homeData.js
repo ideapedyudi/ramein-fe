@@ -36,8 +36,8 @@ const toCardEvent = (e) => ({
 
 const publicCatalog = eventCatalog.filter((e) => e.visibility === 'public')
 
-export const trendingEvents = publicCatalog.slice(0, 4).map(toCardEvent)
-export const recommendedEvents = publicCatalog.slice(4, 7).map(toCardEvent)
+export const trendingEvents = publicCatalog.map(toCardEvent)
+export const recommendedEvents = [...publicCatalog].reverse().map(toCardEvent)
 
 const categoryStyleByName = {
   Konser: { icon: 'music', from: '#ff1f8f', to: '#f9427f' },
