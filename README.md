@@ -73,6 +73,19 @@ npm run build
 npm run lint
 ```
 
+## Konfigurasi SEO
+
+1. Buat file `.env` dari `.env.example`.
+2. Isi `VITE_SITE_URL` dengan domain production kamu.
+
+Contoh:
+```bash
+VITE_SITE_URL=https://www.ramein.fun
+```
+
+Catatan:
+- `public/sitemap.xml` dan `public/robots.txt` saat ini memakai domain `https://www.ramein.fun`; sesuaikan jika domain production berbeda.
+
 ## Routing
 
 - `/` -> redirect ke `/home`

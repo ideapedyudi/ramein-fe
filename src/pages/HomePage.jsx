@@ -21,6 +21,7 @@ function HomePage() {
   return (
     <SiteLayout>
       <main className="pb-10">
+        <h1 className="sr-only">Ramein - Platform Tiket Event Indonesia</h1>
         <HeroSlideshow slides={heroSlides} />
 
         <Container className="mt-12">

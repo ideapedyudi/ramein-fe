@@ -26,7 +26,7 @@ const sections = [
   },
   {
     title: '6. Hak Pengguna',
-    body: 'Kamu berhak meminta akses, perbaikan, atau penghapusan data pribadi kamu kapan saja. Kirim permintaan melalui email halo@ramein.id, dan kami akan memproses dalam 30 hari kerja.',
+    body: 'Kamu berhak meminta akses, perbaikan, atau penghapusan data pribadi kamu kapan saja. Kirim permintaan melalui email halo@ramein.fun, dan kami akan memproses dalam 30 hari kerja.',
   },
   {
     title: '7. Penyimpanan Data',
