@@ -4,6 +4,7 @@ import SiteFooter from '../components/SiteFooter'
 import SiteLayout from '../components/SiteLayout'
 import { api } from '../lib/api'
 import { formatIDR, formatNumber } from '../lib/format'
+import { toAbsoluteUrl, usePageSeo } from '../lib/seo'
 
 function Card({ children }) {
   return (
@@ -34,6 +35,61 @@ function EventDetailPage() {
   const [selectedTier, setSelectedTier] = useState('')
   const [quantity, setQuantity] = useState(1)
   const [notFound, setNotFound] = useState(false)
+  const canonicalPath = `/event/${eventId}`
+
+  const eventJsonLd =
+    event && event.visibility !== 'private'
+      ? {
+          '@context': 'https://schema.org',
+          '@type': 'Event',
+          name: event.name,
+          description: event.description,
+          startDate: event.date,
+          eventStatus: 'https://schema.org/EventScheduled',
+          eventAttendanceMode: event.isOnline
+            ? 'https://schema.org/OnlineEventAttendanceMode'
+            : 'https://schema.org/OfflineEventAttendanceMode',
+          image: event.imageUrl ? [toAbsoluteUrl(event.imageUrl)] : undefined,
+          location: event.isOnline
+            ? {
+                '@type': 'VirtualLocation',
+                url: event.attachmentUrl ?? toAbsoluteUrl(canonicalPath),
+              }
+            : {
+                '@type': 'Place',
+                name: event.location,
+                address: event.city,
+              },
+          organizer: {
+            '@type': 'Organization',
+            name: event.organizer?.name ?? 'Ramein',
+          },
+          offers: event.tiers.map((tier) => ({
+            '@type': 'Offer',
+            url: toAbsoluteUrl(canonicalPath),
+            price: tier.price,
+            priceCurrency: 'IDR',
+            availability:
+              tier.quotaAvailable > 0
+                ? 'https://schema.org/InStock'
+                : 'https://schema.org/SoldOut',
+            category: tier.name,
+          })),
+        }
+      : null
+
+  usePageSeo({
+    title: notFound ? 'Event Tidak Ditemukan' : event?.name ?? 'Detail Event',
+    description: notFound
+      ? 'Event yang kamu cari tidak tersedia atau sudah dihapus.'
+      : event?.description ?? 'Informasi detail event, jadwal, lokasi, dan tiket.',
+    canonicalPath,
+    image: event?.imageUrl,
+    type: 'event',
+    noIndex: notFound || event?.visibility === 'private',
+    jsonLd: eventJsonLd,
+    jsonLdId: 'ramein-event-jsonld',
+  })
 
   useEffect(() => {
     let cancelled = false

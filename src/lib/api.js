@@ -9,14 +9,14 @@ import foodImg from "../assets/eventtest.png";
 import ticketImg from "../assets/eventtest.png";
 
 // Region images — swap any individual source by changing one import below.
-import sumatraImg from "../assets/banner1.png";
-import jakartaImg from "../assets/banner2.png";
-import jabarImg from "../assets/banner3.png";
-import diyjatengImg from "../assets/banner4.png";
-import jatimImg from "../assets/banner1.png";
-import kalimantanImg from "../assets/banner2.png";
-import sulawesiImg from "../assets/banner3.png";
-import indtimurImg from "../assets/banner4.png";
+import sumatraImg from "../assets/sumatra.png";
+import jakartaImg from "../assets/jakarta.png";
+import jabarImg from "../assets/jabar.png";
+import diyjatengImg from "../assets/jateng.png";
+import jatimImg from "../assets/jatim.png";
+import kalimantanImg from "../assets/kalimantan.png";
+import sulawesiImg from "../assets/sulawesi.png";
+import indtimurImg from "../assets/bali.png";
 
 const eventImages = {
   jazz: jazzImg,

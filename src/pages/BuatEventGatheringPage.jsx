@@ -288,7 +288,7 @@ function BuatEventGatheringPage() {
                   </p>
                 </div>
               )}
-              <div className="mt-3 grid gap-3 sm:grid-cols-2">
+              <div className={`mt-3 grid gap-3 ${isOnline ? '' : 'sm:grid-cols-2'}`}>
                 <SmallSelect label="Kategori" name="category" value={category} onChange={setCategory}>
                   {apiCategories.map((c) => (
                     <option key={c.category} value={c.category}>
@@ -296,13 +296,15 @@ function BuatEventGatheringPage() {
                     </option>
                   ))}
                 </SmallSelect>
-                <SmallSelect label="Wilayah" name="region" value={region} onChange={setRegion}>
-                  {apiRegions.map((r) => (
-                    <option key={r.region} value={r.region}>
-                      {r.region}
-                    </option>
-                  ))}
-                </SmallSelect>
+                {!isOnline && (
+                  <SmallSelect label="Wilayah" name="region" value={region} onChange={setRegion}>
+                    {apiRegions.map((r) => (
+                      <option key={r.region} value={r.region}>
+                        {r.region}
+                      </option>
+                    ))}
+                  </SmallSelect>
+                )}
               </div>
             </div>
 

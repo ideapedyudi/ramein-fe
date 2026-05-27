@@ -4,7 +4,7 @@ import SiteFooter from '../components/SiteFooter'
 import SiteLayout from '../components/SiteLayout'
 
 const channels = [
-  { icon: '📧', label: 'Email', value: 'halo@ramein.id', href: 'mailto:halo@ramein.id' },
+  { icon: '📧', label: 'Email', value: 'halo@ramein.fun', href: 'mailto:halo@ramein.fun' },
   { icon: '💬', label: 'WhatsApp', value: '+62 812 0000 0000', href: 'https://wa.me/6281200000000' },
   { icon: '📍', label: 'Alamat', value: 'Jakarta, Indonesia', href: null },
 ]

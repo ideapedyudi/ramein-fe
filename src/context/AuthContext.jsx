@@ -3,7 +3,7 @@ import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 const STORAGE_KEY = 'ramein.auth'
 
 const DUMMY_ADMIN = {
-  email: 'admin@ramein.id',
+  email: 'admin@ramein.fun',
   password: 'admin123',
   name: 'Internal Staff',
   role: 'admin',

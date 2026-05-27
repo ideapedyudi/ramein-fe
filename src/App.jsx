@@ -1,5 +1,6 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 import ProtectedRoute from './components/ProtectedRoute'
+import RouteSeo from './components/RouteSeo'
 import AboutPage from './pages/AboutPage'
 import BuatEventFestivalPage from './pages/BuatEventFestivalPage'
 import BuatEventGatheringPage from './pages/BuatEventGatheringPage'
@@ -27,22 +28,24 @@ import AdminOrganizerPage from './pages/admin/AdminOrganizerPage'
 
 function App() {
   return (
-    <Routes>
-      <Route path="/" element={<Navigate to="/home" replace />} />
-      <Route path="/home" element={<HomePage />} />
+    <>
+      <RouteSeo />
+      <Routes>
+        <Route path="/" element={<Navigate to="/home" replace />} />
+        <Route path="/home" element={<HomePage />} />
 
-      <Route path="/jelajah" element={<Navigate to="/jelajahi" replace />} />
-      <Route path="/jelajahi" element={<JelajahiPage />} />
-      <Route path="/untuk-kamu" element={<UntukKamuPage />} />
-      <Route path="/event/:eventId" element={<EventDetailPage />} />
+        <Route path="/jelajah" element={<Navigate to="/jelajahi" replace />} />
+        <Route path="/jelajahi" element={<JelajahiPage />} />
+        <Route path="/untuk-kamu" element={<UntukKamuPage />} />
+        <Route path="/event/:eventId" element={<EventDetailPage />} />
 
-      <Route path="/about" element={<AboutPage />} />
-      <Route path="/contact" element={<ContactPage />} />
-      <Route path="/terms" element={<TermsPage />} />
-      <Route path="/privacy" element={<PrivacyPage />} />
+        <Route path="/about" element={<AboutPage />} />
+        <Route path="/contact" element={<ContactPage />} />
+        <Route path="/terms" element={<TermsPage />} />
+        <Route path="/privacy" element={<PrivacyPage />} />
 
-      <Route path="/checkout" element={<CheckoutPage />} />
-      <Route path="/order/success" element={<OrderSuccessPage />} />
+        <Route path="/checkout" element={<CheckoutPage />} />
+        <Route path="/order/success" element={<OrderSuccessPage />} />
 
       {/* Dashboard — admin only (overview of master data) */}
       <Route
@@ -150,7 +153,8 @@ function App() {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="*" element={<Navigate to="/home" replace />} />
-    </Routes>
+      </Routes>
+    </>
   )
 }
 
