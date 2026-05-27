@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import AdminLayout from '../components/AdminLayout'
 import EventCardPreview from '../components/EventCardPreview'
+import { useAuth } from '../context/AuthContext'
 import { api, apiCategories, apiRegions } from '../lib/api'
 import { formatIDR } from '../lib/format'
 
@@ -105,6 +106,7 @@ function Visibility({ icon, title, desc, selected, onClick }) {
 
 function BuatEventGatheringPage() {
   const navigate = useNavigate()
+  const { isAdmin } = useAuth()
   const [submitting, setSubmitting] = useState(false)
 
   const [name, setName] = useState('')
@@ -121,6 +123,24 @@ function BuatEventGatheringPage() {
   const [visibility, setVisibility] = useState('public')
   const [attachmentLabel, setAttachmentLabel] = useState('')
   const [attachmentUrl, setAttachmentUrl] = useState('')
+  const [organizers, setOrganizers] = useState([])
+  const [organizerId, setOrganizerId] = useState('')
+
+  useEffect(() => {
+    if (!isAdmin) return undefined
+    let cancelled = false
+    api.getMasterOrganizers().then((res) => {
+      if (cancelled) return
+      setOrganizers(res)
+      if (res.length && !organizerId) setOrganizerId(res[0].id)
+    })
+    return () => {
+      cancelled = true
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAdmin])
+
+  const selectedOrganizer = organizers.find((o) => o.id === organizerId)
 
   const previewPrice = priceMode === 'free' ? 0 : price === '' ? undefined : Number(price)
   const previewDateLabel = formatDateLabel(date)
@@ -139,6 +159,8 @@ function BuatEventGatheringPage() {
       description,
       visibility,
       isOnline,
+      organizerId: organizerId || undefined,
+      onBehalfOf: isAdmin && selectedOrganizer ? selectedOrganizer.name : null,
       attachmentLabel: attachmentLabel.trim() || undefined,
       attachmentUrl: attachmentUrl.trim() || undefined,
       tiers: [
@@ -244,6 +266,28 @@ function BuatEventGatheringPage() {
                   }
                 />
               </div>
+              {isAdmin && (
+                <div className="mt-3">
+                  <SmallSelect
+                    label="Atas Nama Organizer"
+                    name="organizerId"
+                    value={organizerId}
+                    onChange={setOrganizerId}
+                  >
+                    {organizers.length === 0 && (
+                      <option value="">Belum ada organizer terdaftar</option>
+                    )}
+                    {organizers.map((o) => (
+                      <option key={o.id} value={o.id}>
+                        {o.name}
+                      </option>
+                    ))}
+                  </SmallSelect>
+                  <p className="mt-1 text-xs text-[#6d6d6d]">
+                    Event akan tampil atas nama organizer ini.
+                  </p>
+                </div>
+              )}
               <div className="mt-3 grid gap-3 sm:grid-cols-2">
                 <SmallSelect label="Kategori" name="category" value={category} onChange={setCategory}>
                   {apiCategories.map((c) => (

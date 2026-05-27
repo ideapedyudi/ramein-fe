@@ -596,6 +596,47 @@ const toSummary = (e) => ({
 const publicCatalog = () =>
   eventCatalog.filter((e) => e.visibility === "public");
 
+// ──────────────────────────────────────────────────────────────────────────
+// Admin master data (categories, cities, organizers)
+// Mirrors the /master/* endpoints from the BE API doc.
+// ──────────────────────────────────────────────────────────────────────────
+let masterCategories = [
+  { id: "cat-1", name: "Music", createdAt: "2026-04-01" },
+  { id: "cat-2", name: "Sport", createdAt: "2026-04-02" },
+  { id: "cat-3", name: "Workshop", createdAt: "2026-04-05" },
+  { id: "cat-4", name: "Festival", createdAt: "2026-04-12" },
+];
+
+let masterCities = [
+  { id: "city-1", name: "Jakarta", createdAt: "2026-04-01" },
+  { id: "city-2", name: "Bandung", createdAt: "2026-04-01" },
+  { id: "city-3", name: "Surabaya", createdAt: "2026-04-03" },
+  { id: "city-4", name: "Yogyakarta", createdAt: "2026-04-05" },
+];
+
+let masterOrganizers = [
+  {
+    id: "org-1",
+    name: "Promotor Ramein",
+    description: "Organizer resmi konser",
+    contactName: "Tim Promotor",
+    contactEmail: "promotor@demo.com",
+    contactPhone: "08123456789",
+    createdAt: "2026-04-02",
+  },
+  {
+    id: "org-2",
+    name: "Indonesia Festival Co",
+    description: "Penyelenggara festival nasional",
+    contactName: "Adi Pratama",
+    contactEmail: "festival@demo.com",
+    contactPhone: "08129988111",
+    createdAt: "2026-04-10",
+  },
+];
+
+const nextId = (prefix) => `${prefix}-${Date.now()}`;
+
 export const api = {
   getCarousel: () => delay(carousel),
   getTrendingEvents: () => delay(publicCatalog().slice(0, 4).map(toSummary)),
@@ -632,7 +673,67 @@ export const api = {
   getMyTransactions: () => delay(userMyTransactions),
   getMyTransaction: (id) =>
     delay(userMyTransactions.find((t) => t.id === id) ?? null),
+
+  // Admin master-data CRUD
+  getMasterCategories: () => delay(masterCategories),
+  createMasterCategory: ({ name }) => {
+    const row = {
+      id: nextId("cat"),
+      name,
+      createdAt: new Date().toISOString().slice(0, 10),
+    };
+    masterCategories = [row, ...masterCategories];
+    return delay(row);
+  },
+  deleteMasterCategory: (id) => {
+    masterCategories = masterCategories.filter((c) => c.id !== id);
+    return delay({ id });
+  },
+
+  getMasterCities: () => delay(masterCities),
+  createMasterCity: ({ name }) => {
+    const row = {
+      id: nextId("city"),
+      name,
+      createdAt: new Date().toISOString().slice(0, 10),
+    };
+    masterCities = [row, ...masterCities];
+    return delay(row);
+  },
+  deleteMasterCity: (id) => {
+    masterCities = masterCities.filter((c) => c.id !== id);
+    return delay({ id });
+  },
+
+  getMasterOrganizers: () => delay(masterOrganizers),
+  createMasterOrganizer: (payload) => {
+    const row = {
+      id: nextId("org"),
+      name: payload.name,
+      description: payload.description ?? "",
+      contactName: payload.contactName ?? "",
+      contactEmail: payload.contactEmail ?? "",
+      contactPhone: payload.contactPhone ?? "",
+      createdAt: new Date().toISOString().slice(0, 10),
+    };
+    masterOrganizers = [row, ...masterOrganizers];
+    return delay(row);
+  },
+  deleteMasterOrganizer: (id) => {
+    masterOrganizers = masterOrganizers.filter((o) => o.id !== id);
+    return delay({ id });
+  },
   createEvent: (payload) => {
+    const partner = payload.organizerId
+      ? masterOrganizers.find((o) => o.id === payload.organizerId)
+      : null;
+    const organizer = partner
+      ? {
+          id: partner.id,
+          name: partner.name,
+          initial: partner.name.charAt(0).toUpperCase(),
+        }
+      : { id: "me", name: "Kamu", initial: "K" };
     const newEvent = {
       id: `evt-${Date.now()}`,
       name: payload.name,
@@ -642,7 +743,8 @@ export const api = {
       date: payload.date,
       dateLabel: payload.date,
       startingPrice: payload.tiers[0]?.price ?? 0,
-      organizer: { id: "me", name: "Kamu", initial: "K" },
+      organizer,
+      onBehalfOf: payload.onBehalfOf ?? null,
       badges: [
         payload.category,
         ...(payload.visibility === "private" ? ["Private"] : []),

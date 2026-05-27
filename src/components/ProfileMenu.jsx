@@ -35,15 +35,23 @@ function ProfileMenu({ user, isAdmin, onLogout, variant = "desktop" }) {
     };
   }, [open]);
 
-  const items = [
-    { label: "Dashboard", to: "/dashboard", icon: FaTachometerAlt },
-    { label: "Tiket Saya", to: "/tiket-saya", icon: FaTicketAlt },
-    { label: "Transaksi", to: "/transaksi", icon: FaReceipt },
-    ...(isAdmin
-      ? [{ label: "Event Saya", to: "/event-kamu", icon: FaCalendarAlt }]
-      : []),
-    { label: "Pengaturan", to: "/pengaturan", icon: FaCog },
-  ];
+  const items = isAdmin
+    ? [
+        { label: "Dashboard", to: "/dashboard", icon: FaTachometerAlt },
+        { label: "Kategori", to: "/admin/kategori", icon: FaReceipt },
+        { label: "Kota", to: "/admin/kota", icon: FaReceipt },
+        { label: "Organizer", to: "/admin/organizer", icon: FaCalendarAlt },
+        { label: "Event Dikelola", to: "/event-kamu", icon: FaCalendarAlt },
+        { label: "Buat Event", to: "/buat-event", icon: FaTicketAlt },
+        { label: "Pengaturan", to: "/pengaturan", icon: FaCog },
+      ]
+    : [
+        { label: "Tiket Saya", to: "/tiket-saya", icon: FaTicketAlt },
+        { label: "Transaksi", to: "/transaksi", icon: FaReceipt },
+        { label: "Event Saya", to: "/event-kamu", icon: FaCalendarAlt },
+        { label: "Buat Event", to: "/buat-event", icon: FaTicketAlt },
+        { label: "Pengaturan", to: "/pengaturan", icon: FaCog },
+      ];
 
   if (variant === "mobile") {
     return (

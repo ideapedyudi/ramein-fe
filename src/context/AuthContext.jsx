@@ -5,6 +5,15 @@ const STORAGE_KEY = 'ramein.auth'
 const DUMMY_ADMIN = {
   email: 'admin@ramein.id',
   password: 'admin123',
+  name: 'Internal Staff',
+  role: 'admin',
+}
+
+const DUMMY_USER = {
+  email: 'user@ramein.id',
+  password: 'user123',
+  name: 'User Demo',
+  role: 'user',
 }
 
 const AuthContext = createContext(null)
@@ -16,6 +25,16 @@ function readStored() {
   } catch {
     return null
   }
+}
+
+function matchCredentials(email, password) {
+  if (email === DUMMY_ADMIN.email && password === DUMMY_ADMIN.password) {
+    return DUMMY_ADMIN
+  }
+  if (email === DUMMY_USER.email && password === DUMMY_USER.password) {
+    return DUMMY_USER
+  }
+  return null
 }
 
 export function AuthProvider({ children }) {
@@ -31,14 +50,19 @@ export function AuthProvider({ children }) {
       user,
       isAuthenticated: Boolean(user),
       isAdmin: user?.role === 'admin',
+      isUser: user?.role === 'user',
       login: ({ email, password }) => {
-        const isAdmin =
-          email === DUMMY_ADMIN.email && password === DUMMY_ADMIN.password
+        const match = matchCredentials(email, password)
+        // Unknown credentials default to a regular user account so demo flows still work.
+        const profile = match ?? {
+          name: email?.split('@')[0] ?? 'User',
+          role: 'user',
+        }
         const next = {
-          id: isAdmin ? 'admin-1' : `user-${Date.now()}`,
-          name: isAdmin ? 'Admin' : (email?.split('@')[0] ?? 'User'),
+          id: profile.role === 'admin' ? 'admin-1' : `user-${Date.now()}`,
+          name: profile.name,
           email,
-          role: isAdmin ? 'admin' : 'user',
+          role: profile.role,
         }
         setUser(next)
         return next
@@ -57,4 +81,7 @@ export function useAuth() {
   return ctx
 }
 
-export const DUMMY_CREDENTIALS = DUMMY_ADMIN
+export const DUMMY_CREDENTIALS = {
+  admin: { email: DUMMY_ADMIN.email, password: DUMMY_ADMIN.password },
+  user: { email: DUMMY_USER.email, password: DUMMY_USER.password },
+}

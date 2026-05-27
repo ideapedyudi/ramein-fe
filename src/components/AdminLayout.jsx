@@ -3,8 +3,11 @@ import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
 import {
   FaArrowLeft,
   FaBars,
+  FaBuilding,
   FaCalendarAlt,
+  FaCity,
   FaCog,
+  FaListUl,
   FaPlusCircle,
   FaReceipt,
   FaSignOutAlt,
@@ -20,14 +23,22 @@ function initialsOf(name = '') {
   return parts.map((p) => p[0]?.toUpperCase() ?? '').join('') || '?'
 }
 
-const baseNav = [
-  { to: '/dashboard', label: 'Dashboard', icon: FaTachometerAlt, exact: true },
+// Regular user navigation — buying tickets, hosting RSVP/private events.
+const userNav = [
   { to: '/tiket-saya', label: 'Tiket Saya', icon: FaTicketAlt },
   { to: '/transaksi', label: 'Transaksi', icon: FaReceipt },
+  { to: '/event-kamu', label: 'Event Saya', icon: FaCalendarAlt },
+  { to: '/buat-event', label: 'Buat Event', icon: FaPlusCircle },
 ]
 
+// Internal staff (admin) — manages master data and can create events
+// on behalf of registered organizers.
 const adminNav = [
-  { to: '/event-kamu', label: 'Event Saya', icon: FaCalendarAlt },
+  { to: '/dashboard', label: 'Dashboard', icon: FaTachometerAlt, exact: true },
+  { to: '/admin/kategori', label: 'Kategori', icon: FaListUl },
+  { to: '/admin/kota', label: 'Kota', icon: FaCity },
+  { to: '/admin/organizer', label: 'Organizer', icon: FaBuilding },
+  { to: '/event-kamu', label: 'Event Dikelola', icon: FaCalendarAlt },
   { to: '/buat-event', label: 'Buat Event', icon: FaPlusCircle },
 ]
 
@@ -59,7 +70,7 @@ function SidebarLinks({ items, onNavigate }) {
 }
 
 function SidebarContent({ user, isAdmin, onLogout, onNavigate }) {
-  const mainNav = [...baseNav, ...(isAdmin ? adminNav : [])]
+  const mainNav = isAdmin ? adminNav : userNav
   return (
     <div className="flex h-full flex-col">
       <Link
@@ -73,7 +84,7 @@ function SidebarContent({ user, isAdmin, onLogout, onNavigate }) {
         <div className="flex flex-col leading-tight">
           <span className="text-base font-extrabold text-[#1f1f1f]">Ramein</span>
           <span className="text-[10px] font-semibold uppercase tracking-wider text-[#2ea387]">
-            {isAdmin ? 'Admin Console' : 'My Account'}
+            {isAdmin ? 'Admin · Master Data' : 'My Account'}
           </span>
         </div>
       </Link>

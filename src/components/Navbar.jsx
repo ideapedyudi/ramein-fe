@@ -14,7 +14,9 @@ function Navbar() {
   const closeMobile = () => setMobileOpen(false)
 
   const visibleMenus = navMenus.filter((m) => {
-    if (m.to.startsWith('/buat-event')) return isAdmin
+    // Buat Event is for any authenticated user — admins create events
+    // on behalf of registered organizers, users host their own.
+    if (m.to.startsWith('/buat-event')) return isAuthenticated
     return true
   })
 

@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import AdminLayout from '../components/AdminLayout'
 import EventCardPreview from '../components/EventCardPreview'
+import { useAuth } from '../context/AuthContext'
 import { api, apiCategories, apiRegions } from '../lib/api'
 import { formatIDR } from '../lib/format'
 
@@ -69,6 +70,7 @@ function formatDateLabel(iso) {
 
 function BuatEventFestivalPage() {
   const navigate = useNavigate()
+  const { isAdmin } = useAuth()
   const [submitting, setSubmitting] = useState(false)
 
   const [name, setName] = useState('')
@@ -78,9 +80,26 @@ function BuatEventFestivalPage() {
   const [description, setDescription] = useState('')
   const [category, setCategory] = useState('Konser')
   const [region, setRegion] = useState('JABODETABEK')
+  const [organizers, setOrganizers] = useState([])
+  const [organizerId, setOrganizerId] = useState('')
   const [tiers, setTiers] = useState([
     { id: 1, name: 'Regular', price: '150000', quota: '500', perks: 'Standing Area, Event Merchandise' },
   ])
+
+  useEffect(() => {
+    let cancelled = false
+    api.getMasterOrganizers().then((res) => {
+      if (cancelled) return
+      setOrganizers(res)
+      if (res.length && !organizerId) setOrganizerId(res[0].id)
+    })
+    return () => {
+      cancelled = true
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  const selectedOrganizer = organizers.find((o) => o.id === organizerId)
 
   const totalQuota = tiers.reduce((sum, t) => sum + (Number(t.quota) || 0), 0)
   const prices = tiers.map((t) => Number(t.price)).filter((n) => !Number.isNaN(n) && n > 0)
@@ -100,6 +119,8 @@ function BuatEventFestivalPage() {
       description,
       visibility: 'public',
       isOnline: false,
+      organizerId: organizerId || undefined,
+      onBehalfOf: isAdmin && selectedOrganizer ? selectedOrganizer.name : null,
       tiers: tiers.map((t) => ({
         name: t.name,
         price: Number(t.price) || 0,
@@ -143,6 +164,32 @@ function BuatEventFestivalPage() {
                 onChange={setName}
                 placeholder="e.g. Java Jazz Festival 2026"
               />
+              <div className="mt-4">
+                <Select
+                  label={
+                    isAdmin
+                      ? 'Atas Nama Organizer'
+                      : 'Penyelenggara (Organizer)'
+                  }
+                  name="organizerId"
+                  value={organizerId}
+                  onChange={setOrganizerId}
+                >
+                  {organizers.length === 0 && (
+                    <option value="">Belum ada organizer terdaftar</option>
+                  )}
+                  {organizers.map((o) => (
+                    <option key={o.id} value={o.id}>
+                      {o.name}
+                    </option>
+                  ))}
+                </Select>
+                {isAdmin && (
+                  <p className="mt-1.5 text-xs text-[#6d6d6d]">
+                    Event akan tampil atas nama organizer ini.
+                  </p>
+                )}
+              </div>
               <div className="mt-4 grid gap-4 sm:grid-cols-2">
                 <Select label="Kategori" name="category" value={category} onChange={setCategory}>
                   {apiCategories.map((c) => (

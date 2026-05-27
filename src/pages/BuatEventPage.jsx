@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import AdminLayout from "../components/AdminLayout";
+import { useAuth } from "../context/AuthContext";
 
 function TicketIcon({ className }) {
   return (
@@ -247,10 +248,15 @@ function GatheringCard() {
 }
 
 function BuatEventPage() {
+  const { isAdmin } = useAuth();
   return (
     <AdminLayout
       title="Buat Event"
-      subtitle="Pilih tipe event yang ingin kamu buat"
+      subtitle={
+        isAdmin
+          ? "Pilih tipe event yang ingin kamu buat"
+          : "Buat meetup, gathering, atau private event RSVP"
+      }
       actions={
         <Link
           to="/event-kamu"
@@ -260,8 +266,18 @@ function BuatEventPage() {
         </Link>
       }
     >
-      <div className="mt-6 grid gap-6 sm:mt-8 lg:grid-cols-2">
-        <FestivalCard />
+      {!isAdmin && (
+        <div className="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs text-amber-800 sm:text-sm">
+          Sebagai user kamu bisa membuat <span className="font-semibold">event RSVP / private</span>. Untuk event
+          publik berbayar dengan tiket berjenjang (Festival & Ticketing), silakan hubungi admin Ramein.
+        </div>
+      )}
+      <div
+        className={`grid gap-6 ${
+          isAdmin ? "lg:grid-cols-2" : "lg:grid-cols-1"
+        }`}
+      >
+        {isAdmin && <FestivalCard />}
         <GatheringCard />
       </div>
     </AdminLayout>

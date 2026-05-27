@@ -11,7 +11,7 @@ function LoginPage() {
   const { login } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
-  const redirectTo = location.state?.from ?? '/home'
+  const requestedPath = location.state?.from ?? null
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -25,18 +25,22 @@ function LoginPage() {
       return
     }
     const user = login({ email, password })
-    if (redirectTo.startsWith('/buat-event') || redirectTo.startsWith('/event-kamu')) {
-      if (user.role !== 'admin') {
-        setError('Akses admin diperlukan. Gunakan kredensial admin di bawah.')
-        return
-      }
-    }
-    navigate(redirectTo, { replace: true })
+    // Role-aware destination. If the user originally tried to reach an
+    // admin-only path but isn't admin, silently fall back to /home instead
+    // of blocking the login.
+    const adminOnly =
+      requestedPath?.startsWith('/admin') || requestedPath === '/dashboard'
+    const fallback = user.role === 'admin' ? '/dashboard' : '/home'
+    const destination =
+      requestedPath && !(adminOnly && user.role !== 'admin')
+        ? requestedPath
+        : fallback
+    navigate(destination, { replace: true })
   }
 
-  function fillAdmin() {
-    setEmail(DUMMY_CREDENTIALS.email)
-    setPassword(DUMMY_CREDENTIALS.password)
+  function fillWith(creds) {
+    setEmail(creds.email)
+    setPassword(creds.password)
   }
 
   return (
@@ -67,15 +71,31 @@ function LoginPage() {
           <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>
         )}
 
-        <div className="rounded-lg border border-dashed border-emerald-300 bg-emerald-50/60 px-3 py-2 text-xs text-[#2b2b2b]">
+        <div className="space-y-2 rounded-lg border border-dashed border-emerald-300 bg-emerald-50/60 px-3 py-2.5 text-xs text-[#2b2b2b]">
+          <p className="font-semibold uppercase tracking-wider text-emerald-700">
+            Dummy credentials
+          </p>
           <div className="flex items-center justify-between gap-2">
             <span>
-              <span className="font-semibold">Dummy admin:</span> {DUMMY_CREDENTIALS.email} /{' '}
-              {DUMMY_CREDENTIALS.password}
+              <span className="font-semibold">User</span> · {DUMMY_CREDENTIALS.user.email} /{' '}
+              {DUMMY_CREDENTIALS.user.password}
             </span>
             <button
               type="button"
-              onClick={fillAdmin}
+              onClick={() => fillWith(DUMMY_CREDENTIALS.user)}
+              className="rounded-md bg-emerald-600 px-2 py-1 text-xs font-semibold text-white hover:bg-emerald-700"
+            >
+              Isi
+            </button>
+          </div>
+          <div className="flex items-center justify-between gap-2">
+            <span>
+              <span className="font-semibold">Admin</span> · {DUMMY_CREDENTIALS.admin.email} /{' '}
+              {DUMMY_CREDENTIALS.admin.password}
+            </span>
+            <button
+              type="button"
+              onClick={() => fillWith(DUMMY_CREDENTIALS.admin)}
               className="rounded-md bg-emerald-600 px-2 py-1 text-xs font-semibold text-white hover:bg-emerald-700"
             >
               Isi

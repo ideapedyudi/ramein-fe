@@ -21,6 +21,9 @@ import TermsPage from './pages/TermsPage'
 import TiketSayaPage from './pages/TiketSayaPage'
 import TransaksiPage from './pages/TransaksiPage'
 import UntukKamuPage from './pages/UntukKamuPage'
+import AdminKategoriPage from './pages/admin/AdminKategoriPage'
+import AdminKotaPage from './pages/admin/AdminKotaPage'
+import AdminOrganizerPage from './pages/admin/AdminOrganizerPage'
 
 function App() {
   return (
@@ -41,52 +44,11 @@ function App() {
       <Route path="/checkout" element={<CheckoutPage />} />
       <Route path="/order/success" element={<OrderSuccessPage />} />
 
-      <Route
-        path="/buat-event"
-        element={
-          <ProtectedRoute requireAdmin>
-            <BuatEventPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/buat-event/festival"
-        element={
-          <ProtectedRoute requireAdmin>
-            <BuatEventFestivalPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/buat-event/gathering"
-        element={
-          <ProtectedRoute requireAdmin>
-            <BuatEventGatheringPage />
-          </ProtectedRoute>
-        }
-      />
-
-      <Route
-        path="/event-kamu"
-        element={
-          <ProtectedRoute requireAdmin>
-            <EventKamuPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/event-kamu/:eventId"
-        element={
-          <ProtectedRoute requireAdmin>
-            <EventKamuDetailPage />
-          </ProtectedRoute>
-        }
-      />
-
+      {/* Dashboard — admin only (overview of master data) */}
       <Route
         path="/dashboard"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute requireAdmin>
             <DashboardPage />
           </ProtectedRoute>
         }
@@ -112,6 +74,75 @@ function App() {
         element={
           <ProtectedRoute>
             <PengaturanPage />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Event hosting — any authenticated user can host events */}
+      <Route
+        path="/buat-event"
+        element={
+          <ProtectedRoute>
+            <BuatEventPage />
+          </ProtectedRoute>
+        }
+      />
+      {/* Festival = public ticketed event. Admin only. */}
+      <Route
+        path="/buat-event/festival"
+        element={
+          <ProtectedRoute requireAdmin>
+            <BuatEventFestivalPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/buat-event/gathering"
+        element={
+          <ProtectedRoute>
+            <BuatEventGatheringPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/event-kamu"
+        element={
+          <ProtectedRoute>
+            <EventKamuPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/event-kamu/:eventId"
+        element={
+          <ProtectedRoute>
+            <EventKamuDetailPage />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Admin master data — internal staff only */}
+      <Route
+        path="/admin/kategori"
+        element={
+          <ProtectedRoute requireAdmin>
+            <AdminKategoriPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/kota"
+        element={
+          <ProtectedRoute requireAdmin>
+            <AdminKotaPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/organizer"
+        element={
+          <ProtectedRoute requireAdmin>
+            <AdminOrganizerPage />
           </ProtectedRoute>
         }
       />
