@@ -1,7 +1,9 @@
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import Carousel from "../components/Carousel";
 import CategoryCard from "../components/CategoryCard";
 import Container from "../components/Container";
-import EventCard from "../components/EventCard";
+import EventListCard from "../components/EventListCard";
 import HeroSlideshow from "../components/HeroSlideshow";
 import RegionCard from "../components/RegionCard";
 import SectionTitle from "../components/SectionTitle";
@@ -10,14 +12,86 @@ import SiteLayout from "../components/SiteLayout";
 import {
   categories,
   heroSlides,
-  recommendedEvents,
   regions,
-  trendingEvents,
 } from "../data/homeData";
+import { api } from "../lib/api";
 
 const eventItemsPerView = { base: 2, sm: 3, md: 4, lg: 5, xl: 6 };
 
 function HomePage() {
+  const [trendingState, setTrendingState] = useState({
+    items: [],
+    loading: true,
+    error: "",
+  });
+  const [recommendedState, setRecommendedState] = useState({
+    items: [],
+    loading: true,
+    error: "",
+  });
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadSection(loader, setter) {
+      try {
+        const items = await loader();
+        if (cancelled) return;
+        setter({ items, loading: false, error: "" });
+      } catch (error) {
+        if (cancelled) return;
+        setter({
+          items: [],
+          loading: false,
+          error: error.message || "Gagal memuat event terbaru.",
+        });
+      }
+    }
+
+    loadSection(api.getTrendingEvents, setTrendingState);
+    loadSection(api.getRecommendedEvents, setRecommendedState);
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const renderEventSection = ({ items, loading, error }) => {
+    if (loading) {
+      return (
+        <div className="rounded-2xl border border-dashed border-[#d9d9d9] bg-white/70 px-5 py-8 text-sm text-[#6d6d6d]">
+          Memuat event...
+        </div>
+      );
+    }
+
+    if (error) {
+      return (
+        <div className="rounded-2xl border border-[#ffd9d5] bg-[#fff4f2] px-5 py-8 text-sm text-[#b54737]">
+          {error}
+        </div>
+      );
+    }
+
+    if (items.length === 0) {
+      return (
+        <div className="rounded-2xl border border-dashed border-[#d9d9d9] bg-white/70 px-5 py-8 text-sm text-[#6d6d6d]">
+          Belum ada event untuk ditampilkan.
+        </div>
+      );
+    }
+
+    return (
+      <Carousel
+        items={items}
+        itemsPerView={eventItemsPerView}
+        gap={12}
+        showDots={false}
+        renderItem={(event) => <EventListCard event={event} />}
+      />
+    );
+  };
+
   return (
     <SiteLayout>
       <main className="pb-10">
@@ -44,21 +118,15 @@ function HomePage() {
               title="Trending"
               subtitle="Event populer yang lagi ramai saat ini"
               action={
-                <button
-                  type="button"
+                <Link
+                  to="/jelajahi"
                   className="rounded-xl border border-[#e2e2e2] px-4 py-2 text-sm font-semibold text-[#373737] hover:bg-white"
                 >
                   Lihat Semua
-                </button>
+                </Link>
               }
             />
-            <Carousel
-              items={trendingEvents}
-              itemsPerView={eventItemsPerView}
-              gap={12}
-              showDots={false}
-              renderItem={(event) => <EventCard event={event} />}
-            />
+            {renderEventSection(trendingState)}
           </section>
         </Container>
 
@@ -68,13 +136,7 @@ function HomePage() {
               title="Recommended For You"
               subtitle="Berdasarkan minat favorit kamu"
             />
-            <Carousel
-              items={recommendedEvents}
-              itemsPerView={eventItemsPerView}
-              gap={12}
-              showDots={false}
-              renderItem={(event) => <EventCard event={event} />}
-            />
+            {renderEventSection(recommendedState)}
           </section>
         </Container>
 

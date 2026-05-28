@@ -2,8 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import AdminLayout from '../components/AdminLayout'
 import EventCardPreview from '../components/EventCardPreview'
-import { useAuth } from '../context/AuthContext'
-import { api, apiCategories, apiRegions } from '../lib/api'
+import { api } from '../lib/api'
 import { formatIDR } from '../lib/format'
 
 function BigField({ label, name, value, onChange, placeholder, required, big }) {
@@ -13,12 +12,11 @@ function BigField({ label, name, value, onChange, placeholder, required, big }) 
       <input
         name={name}
         value={value}
-        onChange={onChange ? (e) => onChange(e.target.value) : undefined}
+        onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         required={required}
-        className={`w-full rounded-xl border border-gray-200 px-4 outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100 ${
-          big ? 'py-4 text-xl font-semibold sm:text-2xl' : 'py-3 text-sm'
-        }`}
+        className={`w-full rounded-xl border border-gray-200 px-4 outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100 ${big ? 'py-4 text-xl font-semibold sm:text-2xl' : 'py-3 text-sm'
+          }`}
       />
     </label>
   )
@@ -32,7 +30,7 @@ function SmallField({ label, name, type = 'text', value, onChange, placeholder, 
         name={name}
         type={type}
         value={value}
-        onChange={onChange ? (e) => onChange(e.target.value) : undefined}
+        onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         required={required}
         className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
@@ -41,14 +39,15 @@ function SmallField({ label, name, type = 'text', value, onChange, placeholder, 
   )
 }
 
-function SmallSelect({ label, name, value, onChange, children }) {
+function SmallSelect({ label, name, value, onChange, children, required }) {
   return (
     <label className="block">
       <span className="mb-1 block text-xs font-medium text-gray-600">{label}</span>
       <select
         name={name}
         value={value}
-        onChange={onChange ? (e) => onChange(e.target.value) : undefined}
+        onChange={(e) => onChange(e.target.value)}
+        required={required}
         className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
       >
         {children}
@@ -57,26 +56,15 @@ function SmallSelect({ label, name, value, onChange, children }) {
   )
 }
 
-function formatDateLabel(iso) {
-  if (!iso) return ''
-  const parts = iso.split('-')
-  if (parts.length !== 3) return iso
-  const [y, m, d] = parts
-  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des']
-  const mi = Number(m) - 1
-  return `${Number(d)} ${months[mi] ?? m} ${y}`
-}
-
 function PriceMode({ title, desc, selected, onClick }) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className={`rounded-xl border p-3 text-left transition ${
-        selected
+      className={`rounded-xl border p-3 text-left transition ${selected
           ? 'border-brand-500 bg-brand-50/50 ring-2 ring-brand-200'
           : 'border-gray-200 hover:border-brand-300'
-      }`}
+        }`}
     >
       <p className="text-sm font-semibold text-gray-900">{title}</p>
       <p className="mt-0.5 text-xs text-gray-600">{desc}</p>
@@ -84,125 +72,171 @@ function PriceMode({ title, desc, selected, onClick }) {
   )
 }
 
-function Visibility({ icon, title, desc, selected, onClick }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`flex flex-col items-start gap-1 rounded-xl border p-3 text-left transition ${
-        selected
-          ? 'border-brand-500 bg-brand-50/50 ring-2 ring-brand-200'
-          : 'border-gray-200 hover:border-brand-300'
-      }`}
-    >
-      <div className="flex items-center gap-2">
-        <span className="text-base">{icon}</span>
-        <span className="text-sm font-semibold text-gray-900">{title}</span>
-      </div>
-      <p className="text-xs text-gray-600">{desc}</p>
-    </button>
-  )
+function readFileAsDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => resolve(reader.result)
+    reader.onerror = reject
+    reader.readAsDataURL(file)
+  })
+}
+
+function toIsoDateTime(value) {
+  return value ? new Date(value).toISOString() : ''
+}
+
+function previewDate(value) {
+  return value ? value.slice(0, 10) : ''
+}
+
+function previewTime(value) {
+  return value ? value.slice(11, 16) : ''
 }
 
 function BuatEventGatheringPage() {
   const navigate = useNavigate()
-  const { isAdmin } = useAuth()
   const [submitting, setSubmitting] = useState(false)
+  const [loadingMaster, setLoadingMaster] = useState(true)
+  const [error, setError] = useState('')
 
-  const [name, setName] = useState('')
+  const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
-  const [date, setDate] = useState('')
-  const [time, setTime] = useState('')
-  const [location, setLocation] = useState('')
-  const [category, setCategory] = useState('Kreatif')
-  const [region, setRegion] = useState('JABODETABEK')
-  const [isOnline, setIsOnline] = useState(true)
-  const [priceMode, setPriceMode] = useState('free')
-  const [price, setPrice] = useState('')
-  const [capacity, setCapacity] = useState('')
-  const [visibility, setVisibility] = useState('public')
-  const [attachmentLabel, setAttachmentLabel] = useState('')
-  const [attachmentUrl, setAttachmentUrl] = useState('')
-  const [organizers, setOrganizers] = useState([])
+  const [categoryId, setCategoryId] = useState('')
   const [organizerId, setOrganizerId] = useState('')
+  const [cityId, setCityId] = useState('')
+  const [addressDetail, setAddressDetail] = useState('')
+  const [banner, setBanner] = useState('')
+  const [bannerName, setBannerName] = useState('')
+  const [labelOnline, setLabelOnline] = useState('Zoom Meeting')
+  const [urlOnline, setUrlOnline] = useState('')
+  const [paymentType, setPaymentType] = useState('free')
+  const [startDateTime, setStartDateTime] = useState('')
+  const [endDateTime, setEndDateTime] = useState('')
+  const [ticketName, setTicketName] = useState('Free Pass')
+  const [ticketPrice, setTicketPrice] = useState('')
+  const [ticketQuota, setTicketQuota] = useState('')
+  const [saleStartAt, setSaleStartAt] = useState('')
+  const [saleEndAt, setSaleEndAt] = useState('')
+  const [categories, setCategories] = useState([])
+  const [organizers, setOrganizers] = useState([])
+  const [cities, setCities] = useState([])
 
   useEffect(() => {
-    if (!isAdmin) return undefined
     let cancelled = false
-    api.getMasterOrganizers().then((res) => {
-      if (cancelled) return
-      setOrganizers(res)
-      if (res.length && !organizerId) setOrganizerId(res[0].id)
-    })
+    setLoadingMaster(true)
+    setError('')
+
+    Promise.all([api.getMasterCategories(), api.getMasterOrganizers(), api.getMasterCities()])
+      .then(([categoryRes, organizerRes, cityRes]) => {
+        if (cancelled) return
+        setCategories(categoryRes)
+        setOrganizers(organizerRes)
+        setCities(cityRes)
+        setCategoryId(categoryRes[0]?.id ?? '')
+        setOrganizerId(organizerRes[0]?.id ?? '')
+        setCityId(cityRes[0]?.id ?? '')
+      })
+      .catch((err) => {
+        if (!cancelled) setError(err.message || 'Gagal memuat master data.')
+      })
+      .finally(() => {
+        if (!cancelled) setLoadingMaster(false)
+      })
+
     return () => {
       cancelled = true
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAdmin])
+  }, [])
 
-  const selectedOrganizer = organizers.find((o) => o.id === organizerId)
+  const selectedCategory = categories.find((category) => category.id === categoryId)
+  const selectedCity = cities.find((city) => city.id === cityId)
+  const resolvedTicketName = paymentType === 'free' ? ticketName || 'Free Pass' : ticketName || 'Regular'
+  const resolvedTicketPrice = paymentType === 'free' ? 0 : Number(ticketPrice) || 0
+  const previewPrice = paymentType === 'free' ? 0 : ticketPrice === '' ? undefined : Number(ticketPrice)
 
-  const previewPrice = priceMode === 'free' ? 0 : price === '' ? undefined : Number(price)
-  const previewDateLabel = formatDateLabel(date)
+  useEffect(() => {
+    if (paymentType === 'free') {
+      setTicketName((current) => current || 'Free Pass')
+      setTicketPrice('')
+    } else {
+      setTicketName((current) => (current === 'Free Pass' ? 'Regular' : current || 'Regular'))
+    }
+  }, [paymentType])
 
-  const handleSubmit = async (e) => {
+  async function handleBannerChange(file) {
+    if (!file) return
+    setError('')
+    if (file.size > 5 * 1024 * 1024) {
+      setError('Ukuran banner maksimal 5MB.')
+      return
+    }
+    const dataUrl = await readFileAsDataUrl(file)
+    setBanner(dataUrl)
+    setBannerName(file.name)
+  }
+
+  async function handleSubmit(e) {
     e.preventDefault()
     setSubmitting(true)
-    const isFree = priceMode === 'free'
-    const event = await api.createEvent({
-      name,
-      category,
-      region,
-      date,
-      time,
-      location,
-      description,
-      visibility,
-      isOnline,
-      organizerId: organizerId || undefined,
-      onBehalfOf: isAdmin && selectedOrganizer ? selectedOrganizer.name : null,
-      attachmentLabel: attachmentLabel.trim() || undefined,
-      attachmentUrl: attachmentUrl.trim() || undefined,
-      tiers: [
-        {
-          name: isFree ? 'Free RSVP' : 'Ticket',
-          price: isFree ? 0 : Number(price) || 0,
-          quotaTotal: Number(capacity) || 50,
-          perks: [],
-        },
-      ],
-    })
-    navigate(`/event-kamu/${event.id}`)
+    setError('')
+
+    try {
+      const event = await api.createTicketedEvent({
+        title,
+        description,
+        categoryId,
+        organizerId,
+        cityId,
+        addressDetail,
+        banner,
+        event_type: 'online',
+        label_online: labelOnline,
+        url_online: urlOnline,
+        payment_type: paymentType,
+        startDateTime: toIsoDateTime(startDateTime),
+        endDateTime: toIsoDateTime(endDateTime),
+        ticketTypes: [
+          {
+            name: resolvedTicketName,
+            price: resolvedTicketPrice,
+            quota: Number(ticketQuota) || 0,
+            saleStartAt: toIsoDateTime(saleStartAt),
+            saleEndAt: toIsoDateTime(saleEndAt),
+          },
+        ],
+      })
+      navigate(`/event-kamu/${event.id}`)
+    } catch (err) {
+      setError(err.message || 'Gagal membuat event.')
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
     <AdminLayout
       title="Buat Meetup / Gathering"
-      subtitle="Cocok untuk komunitas, workshop, webinar — link akses dikirim otomatis"
+      subtitle="Cocok untuk komunitas, workshop, webinar"
       actions={
         <span className="inline-flex items-center gap-2 rounded-full bg-brand-50 px-3 py-1 text-xs font-semibold text-brand-700">
-          ✨ Meetup
+          Meetup
         </span>
       }
     >
-      <Link
-        to="/buat-event"
-        className="mb-4 inline-block text-sm text-gray-600 hover:text-brand-600"
-      >
-        ← Pilih tipe event lain
+      <Link to="/buat-event" className="mb-4 inline-block text-sm text-gray-600 hover:text-brand-600">
+        Pilih tipe event lain
       </Link>
 
       <form onSubmit={handleSubmit}>
-
         <div className="mt-6 grid gap-6 sm:mt-8 sm:gap-8 md:grid-cols-[1fr_340px]">
           <div className="min-w-0 space-y-6">
             <BigField
               label="Nama Event"
-              name="name"
+              name="title"
               required
-              value={name}
-              onChange={setName}
-              placeholder="e.g. React Jakarta Monthly Meetup"
+              value={title}
+              onChange={setTitle}
+              placeholder="Konser Perunggu"
               big
             />
 
@@ -213,210 +247,119 @@ function BuatEventGatheringPage() {
                 rows={4}
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="Cerita singkat — apa yang dibahas, siapa yang cocok ikut, expected outcome..."
+                placeholder="konser musik yang megah"
                 className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
               />
             </div>
 
             <div className="rounded-2xl border border-black/5 bg-white p-5 shadow-sm">
-              <p className="mb-3 text-sm font-semibold text-gray-900">📅 Kapan</p>
-              <div className="grid gap-3 sm:grid-cols-2">
-                <SmallField
-                  label="Tanggal"
-                  name="date"
-                  type="date"
-                  required
-                  value={date}
-                  onChange={setDate}
-                />
-                <SmallField
-                  label="Waktu"
-                  name="time"
-                  type="time"
-                  required
-                  value={time}
-                  onChange={setTime}
-                />
-              </div>
-            </div>
-
-            <div className="rounded-2xl border border-black/5 bg-white p-5 shadow-sm">
-              <div className="flex items-center justify-between">
-                <p className="text-sm font-semibold text-gray-900">📍 Di Mana</p>
-                <label className="flex cursor-pointer items-center gap-2 text-xs font-medium text-gray-600">
-                  <input
-                    type="checkbox"
-                    name="isOnline"
-                    checked={isOnline}
-                    onChange={(e) => setIsOnline(e.target.checked)}
-                    className="h-4 w-4 rounded border-gray-300 text-brand-600 focus:ring-brand-500"
-                  />
-                  Online event
-                </label>
-              </div>
-              <div className="mt-3">
-                <SmallField
-                  label={isOnline ? 'Platform' : 'Lokasi'}
-                  name="location"
-                  required
-                  value={location}
-                  onChange={setLocation}
-                  placeholder={
-                    isOnline ? 'e.g. Zoom, Google Meet, Discord' : 'Alamat venue / kafe / co-working'
-                  }
-                />
-              </div>
-              {isAdmin && (
-                <div className="mt-3">
-                  <SmallSelect
-                    label="Atas Nama Organizer"
-                    name="organizerId"
-                    value={organizerId}
-                    onChange={setOrganizerId}
-                  >
-                    {organizers.length === 0 && (
-                      <option value="">Belum ada organizer terdaftar</option>
-                    )}
-                    {organizers.map((o) => (
-                      <option key={o.id} value={o.id}>
-                        {o.name}
-                      </option>
-                    ))}
-                  </SmallSelect>
-                  <p className="mt-1 text-xs text-[#6d6d6d]">
-                    Event akan tampil atas nama organizer ini.
-                  </p>
-                </div>
-              )}
-              <div className={`mt-3 grid gap-3 ${isOnline ? '' : 'sm:grid-cols-2'}`}>
-                <SmallSelect label="Kategori" name="category" value={category} onChange={setCategory}>
-                  {apiCategories.map((c) => (
-                    <option key={c.category} value={c.category}>
-                      {c.category}
+              <p className="mb-3 text-sm font-semibold text-gray-900">Master Data</p>
+              <div className="grid gap-3 sm:grid-cols-3">
+                <SmallSelect label="Kategori" name="categoryId" required value={categoryId} onChange={setCategoryId}>
+                  {loadingMaster && <option value="">Memuat...</option>}
+                  {!loadingMaster && categories.length === 0 && <option value="">Belum ada kategori</option>}
+                  {categories.map((category) => (
+                    <option key={category.id} value={category.id}>
+                      {category.name}
                     </option>
                   ))}
                 </SmallSelect>
-                {!isOnline && (
-                  <SmallSelect label="Wilayah" name="region" value={region} onChange={setRegion}>
-                    {apiRegions.map((r) => (
-                      <option key={r.region} value={r.region}>
-                        {r.region}
-                      </option>
-                    ))}
-                  </SmallSelect>
-                )}
+                <SmallSelect label="Organizer" name="organizerId" required value={organizerId} onChange={setOrganizerId}>
+                  {loadingMaster && <option value="">Memuat...</option>}
+                  {!loadingMaster && organizers.length === 0 && <option value="">Belum ada organizer</option>}
+                  {organizers.map((organizer) => (
+                    <option key={organizer.id} value={organizer.id}>
+                      {organizer.name}
+                    </option>
+                  ))}
+                </SmallSelect>
+                <SmallSelect label="Kota" name="cityId" required value={cityId} onChange={setCityId}>
+                  {loadingMaster && <option value="">Memuat...</option>}
+                  {!loadingMaster && cities.length === 0 && <option value="">Belum ada kota</option>}
+                  {cities.map((city) => (
+                    <option key={city.id} value={city.id}>
+                      {city.name}
+                    </option>
+                  ))}
+                </SmallSelect>
               </div>
             </div>
 
             <div className="rounded-2xl border border-black/5 bg-white p-5 shadow-sm">
-              <p className="mb-3 text-sm font-semibold text-gray-900">🎟️ Tiket</p>
+              <p className="mb-3 text-sm font-semibold text-gray-900">Waktu & Lokasi</p>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <SmallField label="Mulai Event" name="startDateTime" type="datetime-local" required value={startDateTime} onChange={setStartDateTime} />
+                <SmallField label="Selesai Event" name="endDateTime" type="datetime-local" required value={endDateTime} onChange={setEndDateTime} />
+              </div>
+              <div className="mt-3">
+                <SmallField
+                  label="Detail Alamat"
+                  name="addressDetail"
+                  required
+                  value={addressDetail}
+                  onChange={setAddressDetail}
+                  placeholder="Jl soekarto hatta nomer 89"
+                />
+              </div>
+              <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                <SmallField label="Label Online" name="label_online" required value={labelOnline} onChange={setLabelOnline} placeholder="Zoom Meeting" />
+                <SmallField label="URL Online" name="url_online" type="url" required value={urlOnline} onChange={setUrlOnline} placeholder="https://zoom.us/j/123456789" />
+              </div>
+            </div>
+
+            <div className="rounded-2xl border border-black/5 bg-white p-5 shadow-sm">
+              <p className="mb-3 text-sm font-semibold text-gray-900">Banner</p>
+              <label className="block rounded-xl border-2 border-dashed border-gray-200 p-6 text-center">
+                <p className="text-sm text-gray-600">Upload banner event sebagai base64, maks. 5MB</p>
+                <span className="mt-3 inline-flex cursor-pointer rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-700">
+                  Pilih Gambar
+                </span>
+                <input
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp"
+                  className="sr-only"
+                  onChange={(e) => handleBannerChange(e.target.files?.[0])}
+                />
+                {bannerName && <p className="mt-3 text-xs font-medium text-gray-700">{bannerName}</p>}
+              </label>
+            </div>
+
+            <div className="rounded-2xl border border-black/5 bg-white p-5 shadow-sm">
+              <p className="mb-3 text-sm font-semibold text-gray-900">Pembayaran & Tiket</p>
               <div className="grid gap-2 sm:grid-cols-2">
-                <PriceMode
-                  title="Gratis"
-                  desc="RSVP terbuka, tanpa biaya"
-                  selected={priceMode === 'free'}
-                  onClick={() => setPriceMode('free')}
-                />
-                <PriceMode
-                  title="Berbayar"
-                  desc="Set harga tiket"
-                  selected={priceMode === 'paid'}
-                  onClick={() => setPriceMode('paid')}
-                />
+                <PriceMode title="Gratis" desc="payment free" selected={paymentType === 'free'} onClick={() => setPaymentType('free')} />
+                <PriceMode title="Berbayar" desc="payment paid" selected={paymentType === 'paid'} onClick={() => setPaymentType('paid')} />
               </div>
 
-              <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                {priceMode === 'paid' && (
-                  <SmallField
-                    label="Harga per orang (Rp)"
-                    name="price"
-                    type="number"
-                    required
-                    value={price}
-                    onChange={setPrice}
-                    placeholder="50000"
-                  />
+              <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                <SmallField label="Nama Tiket" name="ticketName" required value={ticketName} onChange={setTicketName} placeholder={paymentType === 'free' ? 'Free Pass' : 'Regular'} />
+                {paymentType === 'paid' && (
+                  <SmallField label="Harga (Rp)" name="ticketPrice" type="number" required value={ticketPrice} onChange={setTicketPrice} placeholder="100000" />
                 )}
-                <SmallField
-                  label="Kapasitas peserta"
-                  name="capacity"
-                  type="number"
-                  required
-                  value={capacity}
-                  onChange={setCapacity}
-                  placeholder="50"
-                />
+                <SmallField label="Kuota" name="ticketQuota" type="number" required value={ticketQuota} onChange={setTicketQuota} placeholder="100" />
               </div>
-              {priceMode === 'paid' && price && Number(price) > 0 && (
+              <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                <SmallField label="Mulai Penjualan" name="saleStartAt" type="datetime-local" required value={saleStartAt} onChange={setSaleStartAt} />
+                <SmallField label="Akhir Penjualan" name="saleEndAt" type="datetime-local" required value={saleEndAt} onChange={setSaleEndAt} />
+              </div>
+              {paymentType === 'paid' && ticketPrice && Number(ticketPrice) > 0 && (
                 <p className="mt-2 text-xs text-gray-500">
-                  Peserta bayar {formatIDR(Number(price))} per tiket.
+                  Peserta bayar {formatIDR(Number(ticketPrice))} per tiket.
                 </p>
               )}
             </div>
 
-            <div className="rounded-2xl border border-brand-200 bg-brand-50/40 p-5">
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <p className="text-sm font-semibold text-brand-800">🎁 Akses untuk Peserta</p>
-                  <p className="mt-0.5 text-xs text-brand-800/80">
-                    Link yang otomatis dikirim ke peserta <strong>setelah RSVP</strong>. Sembunyi dari halaman
-                    publik — cuma yang RSVP yang lihat.
-                  </p>
-                </div>
-              </div>
-              <div className="mt-4 space-y-3">
-                <SmallField
-                  label="Label"
-                  name="attachmentLabel"
-                  value={attachmentLabel}
-                  onChange={setAttachmentLabel}
-                  placeholder={isOnline ? 'Link Zoom Meeting' : 'Petunjuk Akses & Parkir'}
-                />
-                <SmallField
-                  label="URL"
-                  name="attachmentUrl"
-                  type="url"
-                  value={attachmentUrl}
-                  onChange={setAttachmentUrl}
-                  placeholder={isOnline ? 'https://zoom.us/j/...' : 'https://maps.app.goo.gl/...'}
-                />
-              </div>
-            </div>
-
-            <div className="rounded-2xl border border-black/5 bg-white p-5 shadow-sm">
-              <p className="mb-3 text-sm font-semibold text-gray-900">👀 Siapa yang bisa lihat?</p>
-              <div className="grid gap-2 sm:grid-cols-2">
-                <Visibility
-                  icon="🌐"
-                  title="Publik"
-                  desc="Muncul di Jelajahi & Beranda"
-                  selected={visibility === 'public'}
-                  onClick={() => setVisibility('public')}
-                />
-                <Visibility
-                  icon="🔒"
-                  title="Private"
-                  desc="Hanya via link langsung"
-                  selected={visibility === 'private'}
-                  onClick={() => setVisibility('private')}
-                />
-              </div>
-            </div>
+            {error && (
+              <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>
+            )}
 
             <button
               type="submit"
-              disabled={submitting}
+              disabled={submitting || loadingMaster}
               className="w-full cursor-pointer rounded-xl bg-brand-600 py-3.5 text-base font-semibold text-white shadow-sm transition hover:bg-brand-700 disabled:opacity-60"
             >
-              {submitting ? 'Mempublikasikan...' : `Buat Event${name ? ` — ${name}` : ''}`}
+              {submitting ? 'Mempublikasikan...' : `Buat Event${title ? ` - ${title}` : ''}`}
             </button>
-            <p className="text-center text-xs text-gray-500">
-              Dengan publikasi, kamu setuju dengan{' '}
-              <Link to="/terms" className="text-brand-600 hover:underline">
-                Syarat & Ketentuan
-              </Link>{' '}
-              Ramein.
-            </p>
           </div>
 
           <aside className="md:sticky md:top-6 md:self-start">
@@ -426,15 +369,15 @@ function BuatEventGatheringPage() {
                 <span className="text-[10px] font-medium uppercase tracking-wide text-gray-400">Live</span>
               </div>
               <EventCardPreview
-                name={name}
-                category={category}
-                region={region}
-                dateLabel={previewDateLabel}
-                timeLabel={time}
-                location={location}
-                isOnline={isOnline}
-                visibility={visibility}
+                name={title}
+                category={selectedCategory?.name ?? 'Kategori'}
+                region={selectedCity?.name ?? 'Kota'}
+                dateLabel={previewDate(startDateTime)}
+                timeLabel={previewTime(startDateTime)}
+                location={labelOnline}
+                isOnline
                 price={previewPrice}
+                imageUrl={banner}
               />
               <p className="mt-3 text-center text-xs text-gray-500">
                 Tampilan kartu event saat dibuka peserta

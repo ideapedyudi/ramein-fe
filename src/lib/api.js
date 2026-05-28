@@ -17,6 +17,7 @@ import jatimImg from "../assets/jatim.png";
 import kalimantanImg from "../assets/kalimantan.png";
 import sulawesiImg from "../assets/sulawesi.png";
 import indtimurImg from "../assets/bali.png";
+import { apiRequest } from "./http";
 
 const eventImages = {
   jazz: jazzImg,
@@ -593,6 +594,127 @@ const toSummary = (e) => ({
   isOnline: e.isOnline,
 });
 
+const formatEventDateLabel = (value) => {
+  if (!value) return "-"
+  const date = new Date(value)
+
+  if (Number.isNaN(date.getTime())) return "-"
+
+  return new Intl.DateTimeFormat("id-ID", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(date)
+}
+
+const getEventStartingPrice = (ticketTypes = []) => {
+  const prices = ticketTypes
+    .map((ticket) => Number(ticket.price))
+    .filter((price) => !Number.isNaN(price) && price >= 0)
+
+  return prices.length ? Math.min(...prices) : 0
+}
+
+const formatEventTimeRange = (start, end) => {
+  if (!start) return "-"
+
+  const startDate = new Date(start)
+  if (Number.isNaN(startDate.getTime())) return "-"
+
+  const sameDay =
+    end &&
+    !Number.isNaN(new Date(end).getTime()) &&
+    startDate.toDateString() === new Date(end).toDateString()
+
+  const startText = new Intl.DateTimeFormat("id-ID", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(startDate)
+
+  if (!end) return startText
+
+  const endDate = new Date(end)
+  if (Number.isNaN(endDate.getTime())) return startText
+
+  const endText = sameDay
+    ? new Intl.DateTimeFormat("id-ID", {
+        hour: "2-digit",
+        minute: "2-digit",
+      }).format(endDate)
+    : new Intl.DateTimeFormat("id-ID", {
+        day: "2-digit",
+        month: "long",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      }).format(endDate)
+
+  return `${startText} - ${endText}`
+}
+
+const toPublicEventSummaryFromApi = (event) => ({
+  id: event.id,
+  name: event.title,
+  category: event.category?.name ?? "-",
+  region: event.city?.name ?? "-",
+  city: event.city?.name ?? "-",
+  date: event.startDateTime ?? event.start_datetime ?? null,
+  dateLabel: formatEventDateLabel(event.startDateTime ?? event.start_datetime),
+  startingPrice: getEventStartingPrice(event.ticketTypes),
+  organizer: {
+    id: event.organizer?.id ?? event.organizerId ?? "organizer",
+    name: event.organizer?.name ?? "Ramein",
+    initial: (event.organizer?.name ?? "Ramein").charAt(0).toUpperCase(),
+  },
+  badges: [event.category?.name, event.eventType ?? event.event_type]
+    .filter(Boolean)
+    .map((badge) => String(badge)),
+  bannerHue: "from-brand-400 to-brand-600",
+  imageUrl: event.banner,
+  visibility: event.visibility ?? "public",
+  isOnline: (event.eventType ?? event.event_type) === "online",
+})
+
+const toPublicEventDetailFromApi = (event) => {
+  const summary = toPublicEventSummaryFromApi(event)
+  const ticketTypes = Array.isArray(event.ticketTypes) ? event.ticketTypes : []
+
+  return {
+    ...summary,
+    description: event.description ?? "-",
+    timeLabel: formatEventTimeRange(
+      event.startDateTime ?? event.start_datetime,
+      event.endDateTime ?? event.end_datetime,
+    ),
+    location: summary.isOnline
+      ? event.labelOnline ?? event.label_online ?? "Online Event"
+      : [event.addressDetail, event.city?.name].filter(Boolean).join(", ") || "-",
+    attendees: ticketTypes.reduce((sum, ticket) => sum + (Number(ticket.sold) || 0), 0),
+    attachmentLabel: summary.isOnline
+      ? event.labelOnline ?? event.label_online ?? "Link event online"
+      : null,
+    attachmentUrl: summary.isOnline ? event.urlOnline ?? event.url_online ?? null : null,
+    tiers: ticketTypes.map((ticket) => ({
+      id: ticket.id,
+      name: ticket.name,
+      price: Number(ticket.price) || 0,
+      quotaAvailable: Math.max((Number(ticket.quota) || 0) - (Number(ticket.sold) || 0), 0),
+      perks: [],
+    })),
+  }
+}
+
+const getApiCollection = (payload) => {
+  if (Array.isArray(payload)) return payload
+  if (Array.isArray(payload?.data)) return payload.data
+  return []
+}
+
 const publicCatalog = () =>
   eventCatalog.filter((e) => e.visibility === "public");
 
@@ -635,12 +757,49 @@ let masterOrganizers = [
   },
 ];
 
-const nextId = (prefix) => `${prefix}-${Date.now()}`;
+const toManagedEvent = (event) => {
+  const ticketTypes = event.ticketTypes ?? [];
+  const totalQuota = ticketTypes.reduce((sum, ticket) => sum + (Number(ticket.quota) || 0), 0);
+  const sold = ticketTypes.reduce((sum, ticket) => sum + (Number(ticket.sold) || 0), 0);
+  const revenue = ticketTypes.reduce(
+    (sum, ticket) => sum + (Number(ticket.price) || 0) * (Number(ticket.sold) || 0),
+    0,
+  );
+  const prices = ticketTypes
+    .map((ticket) => Number(ticket.price))
+    .filter((price) => !Number.isNaN(price) && price > 0);
+
+  return {
+    ...event,
+    name: event.title,
+    category: event.category?.name ?? "-",
+    city: event.city?.name ?? "-",
+    dateLabel: event.startDateTime,
+    imageUrl: event.banner,
+    registered: sold,
+    attended: 0,
+    revenue,
+    totalQuota,
+    startingPrice: prices.length ? Math.min(...prices) : 0,
+    status: event.status ?? (event.isPublished ? "active" : "draft"),
+  };
+};
 
 export const api = {
   getCarousel: () => delay(carousel),
-  getTrendingEvents: () => delay(publicCatalog().slice(0, 4).map(toSummary)),
-  getRecommendedEvents: () => delay(publicCatalog().slice(3).map(toSummary)),
+  getTrendingEvents: () =>
+    apiRequest("/events/trending").then((res) =>
+      getApiCollection(res).map(toPublicEventSummaryFromApi),
+    ),
+  getRecommendedEvents: () =>
+    apiRequest("/events/recommended").then((res) =>
+      getApiCollection(res).map(toPublicEventSummaryFromApi),
+    ),
+  createTransaction: ({ eventId, items }) =>
+    apiRequest("/transactions", {
+      method: "POST",
+      body: JSON.stringify({ eventId, items }),
+    }).then((res) => res.data ?? res),
   getCategories: () => delay(apiCategories),
   getRegions: () => delay(apiRegions),
   searchEvents: ({ category, region, city, query }) => {
@@ -658,7 +817,10 @@ export const api = {
       .map(toSummary);
     return delay(results);
   },
-  getEvent: (id) => delay(eventCatalog.find((e) => e.id === id) ?? null),
+  getEvent: (id) =>
+    apiRequest(`/events/${id}`)
+      .then((res) => (res.data ? toPublicEventDetailFromApi(res.data) : null))
+      .catch(() => delay(eventCatalog.find((e) => e.id === id) ?? null)),
   getForYou: () =>
     delay({
       interests: ["Music", "Esports", "Workshop", "Festival"],
@@ -666,8 +828,10 @@ export const api = {
       wishlist: [publicCatalog()[2], publicCatalog()[3]].map(toSummary),
       trendingInCity: [publicCatalog()[0], publicCatalog()[1]].map(toSummary),
     }),
-  getMyEvents: () => delay(userMyEvents),
-  getMyEvent: (id) => delay(userMyEvents.find((e) => e.id === id) ?? null),
+  getMyEvents: () =>
+    apiRequest("/events").then((res) => (res.data ?? []).map(toManagedEvent)),
+  getMyEvent: (id) =>
+    apiRequest(`/events/${id}`).then((res) => (res.data ? toManagedEvent(res.data) : null)),
   getMyTickets: () => delay(userMyTickets),
   getMyTicket: (id) => delay(userMyTickets.find((t) => t.id === id) ?? null),
   getMyTransactions: () => delay(userMyTransactions),
@@ -675,50 +839,69 @@ export const api = {
     delay(userMyTransactions.find((t) => t.id === id) ?? null),
 
   // Admin master-data CRUD
-  getMasterCategories: () => delay(masterCategories),
-  createMasterCategory: ({ name }) => {
-    const row = {
-      id: nextId("cat"),
-      name,
-      createdAt: new Date().toISOString().slice(0, 10),
-    };
-    masterCategories = [row, ...masterCategories];
-    return delay(row);
-  },
+  getMasterCategories: () =>
+    apiRequest("/master/categories").then((res) => res.data ?? []),
+  createMasterCategory: ({ name }) =>
+    apiRequest("/master/categories", {
+      method: "POST",
+      body: JSON.stringify({ name }),
+    }).then((res) => res.data),
+  updateMasterCategory: (id, { name }) =>
+    apiRequest(`/master/categories/${id}`, {
+      method: "PUT",
+      body: JSON.stringify({ name }),
+    }).then((res) => res.data),
   deleteMasterCategory: (id) => {
     masterCategories = masterCategories.filter((c) => c.id !== id);
     return delay({ id });
   },
 
-  getMasterCities: () => delay(masterCities),
-  createMasterCity: ({ name }) => {
-    const row = {
-      id: nextId("city"),
-      name,
-      createdAt: new Date().toISOString().slice(0, 10),
-    };
-    masterCities = [row, ...masterCities];
-    return delay(row);
-  },
+  getMasterCities: () =>
+    apiRequest("/master/cities").then((res) => res.data ?? []),
+  createMasterCity: ({ name, provinsi }) =>
+    apiRequest("/master/cities", {
+      method: "POST",
+      body: JSON.stringify({ name, provinsi }),
+    }).then((res) => res.data),
+  updateMasterCity: (id, { name, provinsi }) =>
+    apiRequest(`/master/cities/${id}`, {
+      method: "PUT",
+      body: JSON.stringify({ name, provinsi }),
+    }).then((res) => res.data),
   deleteMasterCity: (id) => {
     masterCities = masterCities.filter((c) => c.id !== id);
     return delay({ id });
   },
 
-  getMasterOrganizers: () => delay(masterOrganizers),
-  createMasterOrganizer: (payload) => {
-    const row = {
-      id: nextId("org"),
-      name: payload.name,
-      description: payload.description ?? "",
-      contactName: payload.contactName ?? "",
-      contactEmail: payload.contactEmail ?? "",
-      contactPhone: payload.contactPhone ?? "",
-      createdAt: new Date().toISOString().slice(0, 10),
-    };
-    masterOrganizers = [row, ...masterOrganizers];
-    return delay(row);
-  },
+  getMasterOrganizers: () =>
+    apiRequest("/master/organizers").then((res) => res.data ?? []),
+  createMasterOrganizer: (payload) =>
+    apiRequest("/master/organizers", {
+      method: "POST",
+      body: JSON.stringify({
+        name: payload.name,
+        description: payload.description,
+        contactName: payload.contactName,
+        contactEmail: payload.contactEmail,
+        contactPhone: payload.contactPhone,
+      }),
+    }).then((res) => res.data),
+  updateMasterOrganizer: (id, payload) =>
+    apiRequest(`/master/organizers/${id}`, {
+      method: "PUT",
+      body: JSON.stringify({
+        name: payload.name,
+        description: payload.description,
+        contactName: payload.contactName,
+        contactEmail: payload.contactEmail,
+        contactPhone: payload.contactPhone,
+      }),
+    }).then((res) => res.data),
+  createTicketedEvent: (payload) =>
+    apiRequest("/events", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }).then((res) => res.data),
   deleteMasterOrganizer: (id) => {
     masterOrganizers = masterOrganizers.filter((o) => o.id !== id);
     return delay({ id });

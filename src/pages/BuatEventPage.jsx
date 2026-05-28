@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import AdminLayout from "../components/AdminLayout";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/authContext";
 
 function TicketIcon({ className }) {
   return (

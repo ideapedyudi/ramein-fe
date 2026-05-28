@@ -80,10 +80,18 @@ function EventCardPreview({
   price,
   organizerName = 'Kamu',
   coverEmoji,
+  imageUrl,
 }) {
   return (
     <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
       <div className="relative aspect-[16/10] overflow-hidden bg-gradient-to-br from-brand-500 via-brand-400 to-emerald-400">
+        {imageUrl && (
+          <img
+            src={imageUrl}
+            alt={name || 'Preview event'}
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+        )}
         {coverEmoji && (
           <div className="absolute inset-0 grid place-items-center text-5xl">
             <span>{coverEmoji}</span>

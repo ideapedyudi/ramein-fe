@@ -1,3 +1,5 @@
+import dayjs from 'dayjs'
+
 const idr = new Intl.NumberFormat('id-ID', {
   style: 'currency',
   currency: 'IDR',
@@ -12,4 +14,16 @@ export function formatIDR(value) {
 
 export function formatNumber(value) {
   return new Intl.NumberFormat('id-ID').format(value)
+}
+
+export function formatDate(value) {
+  if (!value) return '-'
+  const date = dayjs(value)
+  return date.isValid() ? date.format('DD-MM-YYYY') : '-'
+}
+
+export function formatDateTime(value) {
+  if (!value) return '-'
+  const date = dayjs(value)
+  return date.isValid() ? date.format('DD-MM-YYYY HH:mm') : '-'
 }
