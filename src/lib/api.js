@@ -795,6 +795,11 @@ export const api = {
     apiRequest("/events/recommended").then((res) =>
       getApiCollection(res).map(toPublicEventSummaryFromApi),
     ),
+  createTransaction: ({ eventId, items }) =>
+    apiRequest("/transactions", {
+      method: "POST",
+      body: JSON.stringify({ eventId, items }),
+    }).then((res) => res.data ?? res),
   getCategories: () => delay(apiCategories),
   getRegions: () => delay(apiRegions),
   searchEvents: ({ category, region, city, query }) => {

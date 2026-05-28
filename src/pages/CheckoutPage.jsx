@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { api } from '../lib/api'
 import { formatIDR } from '../lib/format'
 
@@ -112,17 +112,123 @@ function Row({ label, value }) {
   )
 }
 
+function PaymentModal({ open, transaction, onClose }) {
+  useEffect(() => {
+    if (!open) return undefined
+
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+
+    return () => {
+      document.body.style.overflow = previousOverflow
+    }
+  }, [open])
+
+  if (!open || !transaction?.redirectUrl) return null
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4 py-6"
+      onClick={onClose}
+      role="presentation"
+    >
+      <div
+        className="flex max-h-[90vh] w-full max-w-5xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="midtrans-payment-title"
+      >
+        <div className="flex items-start justify-between gap-4 border-b border-gray-100 p-4 sm:p-5">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide text-brand-600">
+              Pembayaran Midtrans
+            </p>
+            <h2 id="midtrans-payment-title" className="mt-1 text-lg font-semibold text-gray-900">
+              Selesaikan pembayaran
+            </h2>
+            <p className="mt-1 text-sm text-gray-600">
+              Order ID: <span className="font-mono text-gray-900">{transaction.orderId}</span>
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-lg border border-gray-200 px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50"
+          >
+            Tutup
+          </button>
+        </div>
+
+        <div className="grid flex-1 gap-4 p-4 sm:p-5 lg:grid-cols-[1fr_280px]">
+          <div className="min-h-[60vh] overflow-hidden rounded-xl border border-gray-200 bg-gray-50">
+            <iframe
+              src={transaction.redirectUrl}
+              title="Midtrans payment"
+              className="h-full min-h-[60vh] w-full"
+              referrerPolicy="no-referrer"
+            />
+          </div>
+
+          <div className="space-y-3">
+            <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
+              <p className="text-sm font-semibold text-gray-900">Kalau halaman tidak muncul</p>
+              <p className="mt-1 text-sm text-gray-600">
+                Browser atau Midtrans bisa memblokir embed. Buka link pembayaran di tab baru.
+              </p>
+              <a
+                href={transaction.redirectUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="mt-3 inline-flex w-full items-center justify-center rounded-lg bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-brand-700"
+              >
+                Buka di tab baru
+              </a>
+            </div>
+
+            <div className="rounded-xl border border-brand-100 bg-brand-50 p-4 text-sm text-brand-700">
+              <p className="font-semibold">Langkah berikutnya</p>
+              <p className="mt-1">
+                Selesaikan pembayaran di Midtrans. Setelah status transaksi berubah, kamu bisa
+                lanjut ke halaman sukses / riwayat transaksi.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="border-t border-gray-100 p-4 sm:p-5">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <p className="text-sm text-gray-600">
+              Kalau sudah bayar, tutup modal ini dan tunggu update status transaksi.
+            </p>
+            <button
+              type="button"
+              onClick={onClose}
+              className="rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium hover:bg-gray-50"
+            >
+              Tutup modal
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 function CheckoutPage() {
   const [params] = useSearchParams()
-  const navigate = useNavigate()
   const eventId = params.get('eventId')
   const tierId = params.get('tierId')
   const qty = Number(params.get('qty') ?? '1')
+  const initialError = !eventId || !tierId ? 'Missing params' : ''
 
   const [event, setEvent] = useState(null)
   const [tier, setTier] = useState(null)
-  const [error, setError] = useState('')
+  const [error, setError] = useState(initialError)
   const [submitting, setSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState('')
+  const [paymentModalOpen, setPaymentModalOpen] = useState(false)
+  const [transaction, setTransaction] = useState(null)
 
   const [payment, setPayment] = useState('ewallet')
   const [contact, setContact] = useState({ email: '', firstName: '', lastName: '', phone: '' })
@@ -131,8 +237,7 @@ function CheckoutPage() {
 
   useEffect(() => {
     let cancelled = false
-    if (!eventId || !tierId) {
-      setError('Missing params')
+    if (initialError) {
       return
     }
     api.getEvent(eventId).then((res) => {
@@ -152,7 +257,7 @@ function CheckoutPage() {
     return () => {
       cancelled = true
     }
-  }, [eventId, tierId])
+  }, [eventId, tierId, initialError])
 
   if (error) {
     return (
@@ -177,19 +282,30 @@ function CheckoutPage() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     setSubmitting(true)
-    const result = await api.checkout({
-      eventId: event.id,
-      tierId: tier.id,
-      quantity: qty,
-      contact,
-      paymentMethod: payment,
-    })
-    const search = new URLSearchParams({
-      eventId: result.eventId,
-      orderId: result.orderId,
-      total: String(result.total),
-    })
-    navigate(`/order/success?${search.toString()}`)
+    setSubmitError('')
+
+    try {
+      const result = await api.createTransaction({
+        eventId: event.id,
+        items: [
+          {
+            ticketTypeId: tier.id,
+            quantity: qty,
+          },
+        ],
+      })
+
+      if (!result?.redirectUrl) {
+        throw new Error('Redirect URL pembayaran tidak tersedia.')
+      }
+
+      setTransaction(result)
+      setPaymentModalOpen(true)
+    } catch (submitErr) {
+      setSubmitError(submitErr.message || 'Gagal membuat transaksi.')
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -316,6 +432,11 @@ function CheckoutPage() {
               >
                 {submitting ? 'Memproses...' : 'Complete Payment'}
               </button>
+              {submitError && (
+                <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
+                  {submitError}
+                </p>
+              )}
               <p className="mt-3 text-center text-xs text-gray-500">
                 By completing this purchase you agree to our{' '}
                 <Link to="/terms" className="text-brand-600 hover:underline">
@@ -331,6 +452,11 @@ function CheckoutPage() {
           </div>
         </form>
       </div>
+      <PaymentModal
+        open={paymentModalOpen}
+        transaction={transaction}
+        onClose={() => setPaymentModalOpen(false)}
+      />
     </div>
   )
 }
