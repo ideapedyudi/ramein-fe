@@ -16,9 +16,8 @@ function BigField({ label, name, value, onChange, placeholder, required, big }) 
         onChange={onChange ? (e) => onChange(e.target.value) : undefined}
         placeholder={placeholder}
         required={required}
-        className={`w-full rounded-xl border border-gray-200 px-4 outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100 ${
-          big ? 'py-4 text-xl font-semibold sm:text-2xl' : 'py-3 text-sm'
-        }`}
+        className={`w-full rounded-xl border border-gray-200 px-4 outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100 ${big ? 'py-4 text-xl font-semibold sm:text-2xl' : 'py-3 text-sm'
+          }`}
       />
     </label>
   )
@@ -72,34 +71,13 @@ function PriceMode({ title, desc, selected, onClick }) {
     <button
       type="button"
       onClick={onClick}
-      className={`rounded-xl border p-3 text-left transition ${
-        selected
+      className={`rounded-xl border p-3 text-left transition ${selected
           ? 'border-brand-500 bg-brand-50/50 ring-2 ring-brand-200'
           : 'border-gray-200 hover:border-brand-300'
-      }`}
+        }`}
     >
       <p className="text-sm font-semibold text-gray-900">{title}</p>
       <p className="mt-0.5 text-xs text-gray-600">{desc}</p>
-    </button>
-  )
-}
-
-function Visibility({ icon, title, desc, selected, onClick }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`flex flex-col items-start gap-1 rounded-xl border p-3 text-left transition ${
-        selected
-          ? 'border-brand-500 bg-brand-50/50 ring-2 ring-brand-200'
-          : 'border-gray-200 hover:border-brand-300'
-      }`}
-    >
-      <div className="flex items-center gap-2">
-        <span className="text-base">{icon}</span>
-        <span className="text-sm font-semibold text-gray-900">{title}</span>
-      </div>
-      <p className="text-xs text-gray-600">{desc}</p>
     </button>
   )
 }
@@ -120,7 +98,6 @@ function BuatEventGatheringPage() {
   const [priceMode, setPriceMode] = useState('free')
   const [price, setPrice] = useState('')
   const [capacity, setCapacity] = useState('')
-  const [visibility, setVisibility] = useState('public')
   const [attachmentLabel, setAttachmentLabel] = useState('')
   const [attachmentUrl, setAttachmentUrl] = useState('')
   const [organizers, setOrganizers] = useState([])
@@ -157,7 +134,6 @@ function BuatEventGatheringPage() {
       time,
       location,
       description,
-      visibility,
       isOnline,
       organizerId: organizerId || undefined,
       onBehalfOf: isAdmin && selectedOrganizer ? selectedOrganizer.name : null,
@@ -383,32 +359,13 @@ function BuatEventGatheringPage() {
               </div>
             </div>
 
-            <div className="rounded-2xl border border-black/5 bg-white p-5 shadow-sm">
-              <p className="mb-3 text-sm font-semibold text-gray-900">👀 Siapa yang bisa lihat?</p>
-              <div className="grid gap-2 sm:grid-cols-2">
-                <Visibility
-                  icon="🌐"
-                  title="Publik"
-                  desc="Muncul di Jelajahi & Beranda"
-                  selected={visibility === 'public'}
-                  onClick={() => setVisibility('public')}
-                />
-                <Visibility
-                  icon="🔒"
-                  title="Private"
-                  desc="Hanya via link langsung"
-                  selected={visibility === 'private'}
-                  onClick={() => setVisibility('private')}
-                />
-              </div>
-            </div>
 
             <button
               type="submit"
               disabled={submitting}
               className="w-full cursor-pointer rounded-xl bg-brand-600 py-3.5 text-base font-semibold text-white shadow-sm transition hover:bg-brand-700 disabled:opacity-60"
             >
-              {submitting ? 'Mempublikasikan...' : `Buat Event${name ? ` — ${name}` : ''}`}
+              {submitting ? 'Mempublikasikan...' : `Buat Event${name ? ` - ${name}` : ''}`}
             </button>
             <p className="text-center text-xs text-gray-500">
               Dengan publikasi, kamu setuju dengan{' '}
@@ -433,7 +390,6 @@ function BuatEventGatheringPage() {
                 timeLabel={time}
                 location={location}
                 isOnline={isOnline}
-                visibility={visibility}
                 price={previewPrice}
               />
               <p className="mt-3 text-center text-xs text-gray-500">

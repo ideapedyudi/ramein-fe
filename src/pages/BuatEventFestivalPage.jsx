@@ -161,6 +161,8 @@ function BuatEventFestivalPage() {
       const event = await api.createTicketedEvent({
         title,
         description,
+        event_type: 'festival',
+        payment_type: 'paid',
         categoryId,
         organizerId,
         cityId,

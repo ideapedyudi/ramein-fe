@@ -9,5 +9,5 @@ export function useAuth() {
 }
 
 export const SAMPLE_CREDENTIALS = {
-  user: { email: 'user@demo.com', password: 'password123' },
+  user: { email: 'usertest@ramein.fun', password: 'password123' },
 }
