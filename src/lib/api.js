@@ -538,16 +538,16 @@ const formatEventTimeRange = (start, end) => {
 
   const endText = sameDay
     ? new Intl.DateTimeFormat("id-ID", {
-        hour: "2-digit",
-        minute: "2-digit",
-      }).format(endDate)
+      hour: "2-digit",
+      minute: "2-digit",
+    }).format(endDate)
     : new Intl.DateTimeFormat("id-ID", {
-        day: "2-digit",
-        month: "long",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-      }).format(endDate)
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    }).format(endDate)
 
   return `${startText} - ${endText}`
 }
@@ -809,7 +809,7 @@ export const api = {
       trendingInCity: [publicCatalog()[0], publicCatalog()[1]].map(toSummary),
     }),
   getMyEvents: () =>
-    apiRequest("/events").then((res) => (res.data ?? []).map(toManagedEvent)),
+    apiRequest("/events?createdBy=me").then((res) => (res.data ?? []).map(toManagedEvent)),
   getMyEvent: (id) =>
     apiRequest(`/events/${id}`).then((res) => (res.data ? toManagedEvent(res.data) : null)),
   getMyTickets: () =>
@@ -902,10 +902,10 @@ export const api = {
       : null;
     const organizer = partner
       ? {
-          id: partner.id,
-          name: partner.name,
-          initial: partner.name.charAt(0).toUpperCase(),
-        }
+        id: partner.id,
+        name: partner.name,
+        initial: partner.name.charAt(0).toUpperCase(),
+      }
       : { id: "me", name: "Kamu", initial: "K" };
     const newEvent = {
       id: `evt-${Date.now()}`,
