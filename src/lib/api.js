@@ -17,6 +17,7 @@ import jatimImg from "../assets/jatim.png";
 import kalimantanImg from "../assets/kalimantan.png";
 import sulawesiImg from "../assets/sulawesi.png";
 import indtimurImg from "../assets/bali.png";
+import { apiRequest } from "./http";
 
 const eventImages = {
   jazz: jazzImg,
@@ -675,16 +676,13 @@ export const api = {
     delay(userMyTransactions.find((t) => t.id === id) ?? null),
 
   // Admin master-data CRUD
-  getMasterCategories: () => delay(masterCategories),
-  createMasterCategory: ({ name }) => {
-    const row = {
-      id: nextId("cat"),
-      name,
-      createdAt: new Date().toISOString().slice(0, 10),
-    };
-    masterCategories = [row, ...masterCategories];
-    return delay(row);
-  },
+  getMasterCategories: () =>
+    apiRequest("/master/categories").then((res) => res.data ?? []),
+  createMasterCategory: ({ name }) =>
+    apiRequest("/master/categories", {
+      method: "POST",
+      body: JSON.stringify({ name }),
+    }).then((res) => res.data),
   deleteMasterCategory: (id) => {
     masterCategories = masterCategories.filter((c) => c.id !== id);
     return delay({ id });
