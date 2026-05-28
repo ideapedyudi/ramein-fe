@@ -845,6 +845,11 @@ export const api = {
     apiRequest(`/ticket/event-ticket/${eventId}/${attendanceFilter}`).then((res) =>
       (res.data ?? []).map(toEventAttendeeFromApi),
     ),
+  scanTicketQrCode: (qrCode) =>
+    apiRequest("/ticket/qr-code/scan", {
+      method: "POST",
+      body: JSON.stringify({ qrCode }),
+    }).then((res) => res.data ?? res),
   getMyTransactions: () =>
     apiRequest("/transactions/me").then((res) =>
       getTransactionCollection(res).map(toMyTransactionSummaryFromApi),
