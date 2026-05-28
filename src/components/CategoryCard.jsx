@@ -41,11 +41,10 @@ function CategoryCard({ category, active = false }) {
         <Icon />
       </div>
       <p
-        className={`text-sm font-medium transition ${
-          active ? 'text-brand-600' : 'text-[#444] group-hover:text-brand-600'
-        }`}
+        className={`text-sm font-medium transition ${active ? 'text-brand-600' : 'text-[#444] group-hover:text-brand-600'
+          }`}
       >
-        {category.name}
+        {category.name}in
       </p>
     </Link>
   )

@@ -1,6 +1,13 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { FaCalendarAlt, FaMapMarkerAlt, FaQrcode, FaTicketAlt, FaTimes } from 'react-icons/fa'
+import {
+  FaCalendarAlt,
+  FaMapMarkerAlt,
+  FaQrcode,
+  FaShareAlt,
+  FaTicketAlt,
+  FaTimes,
+} from 'react-icons/fa'
 import { QRCodeSVG } from 'qrcode.react'
 import AdminLayout from '../components/AdminLayout'
 import { api } from '../lib/api'
@@ -80,7 +87,7 @@ function TicketQrModal({ open, ticket, onClose }) {
   )
 }
 
-function TicketCard({ ticket, onShowQr }) {
+function TicketCard({ ticket, onShowQr, onShareSocialMedia, sharing }) {
   return (
     <article className="flex flex-col overflow-hidden rounded-2xl border border-[#eee] bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md sm:flex-row">
       <div className="h-32 w-full shrink-0 overflow-hidden bg-[#f3f3f3] sm:h-auto sm:w-48">
@@ -144,6 +151,14 @@ function TicketCard({ ticket, onShowQr }) {
           >
             <FaQrcode /> Tampilkan QR
           </button>
+          <button
+            type="button"
+            onClick={() => onShareSocialMedia(ticket)}
+            disabled={sharing}
+            className="inline-flex items-center gap-2 rounded-lg border border-sky-200 bg-sky-50 px-3 py-2 text-xs font-semibold text-sky-700 transition hover:bg-sky-100 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            <FaShareAlt /> {sharing ? 'Menyiapkan...' : 'Pamerin'}
+          </button>
           <Link
             to={`/event/${ticket.eventId}`}
             className="inline-flex items-center gap-2 rounded-lg border border-[#e2e2e2] px-3 py-2 text-xs font-semibold text-[#373737] hover:bg-[#f9f9f9]"
@@ -156,12 +171,145 @@ function TicketCard({ ticket, onShowQr }) {
   )
 }
 
+function wrapCanvasText(ctx, text, x, y, maxWidth, lineHeight, maxLines = 3) {
+  const words = String(text ?? '').split(' ')
+  const lines = []
+  let current = ''
+
+  words.forEach((word) => {
+    const trial = current ? `${current} ${word}` : word
+    if (ctx.measureText(trial).width <= maxWidth) {
+      current = trial
+    } else if (current) {
+      lines.push(current)
+      current = word
+    } else {
+      lines.push(word)
+      current = ''
+    }
+  })
+
+  if (current) lines.push(current)
+
+  lines.slice(0, maxLines).forEach((line, index) => {
+    const visible = index === maxLines - 1 && lines.length > maxLines ? `${line}...` : line
+    ctx.fillText(visible, x, y + lineHeight * index)
+  })
+}
+
+function loadImage(src) {
+  return new Promise((resolve, reject) => {
+    if (!src) {
+      reject(new Error('Image source missing'))
+      return
+    }
+
+    const image = new Image()
+    image.crossOrigin = 'anonymous'
+    image.onload = () => resolve(image)
+    image.onerror = () => reject(new Error('Failed to load image'))
+    image.src = src
+  })
+}
+
+async function buildSocialShareBlob(ticket) {
+  const width = 1080
+  const height = 1920
+  const canvas = document.createElement('canvas')
+  canvas.width = width
+  canvas.height = height
+  const ctx = canvas.getContext('2d')
+
+  if (!ctx) throw new Error('Canvas tidak tersedia.')
+
+  const gradient = ctx.createLinearGradient(0, 0, width, height)
+  gradient.addColorStop(0, '#171717')
+  gradient.addColorStop(0.45, '#2563eb')
+  gradient.addColorStop(1, '#06b6d4')
+  ctx.fillStyle = gradient
+  ctx.fillRect(0, 0, width, height)
+
+  try {
+    const image = await loadImage(ticket.imageUrl)
+    ctx.save()
+    ctx.globalAlpha = 0.32
+    const imageRatio = image.width / image.height
+    const canvasRatio = width / 720
+    let drawWidth = width
+    let drawHeight = width / imageRatio
+
+    if (imageRatio < canvasRatio) {
+      drawHeight = 720
+      drawWidth = drawHeight * imageRatio
+    }
+
+    ctx.drawImage(image, (width - drawWidth) / 2, 0, drawWidth, drawHeight)
+    ctx.restore()
+  } catch {
+    // Keep the gradient-only background when the event image cannot be loaded.
+  }
+
+  ctx.fillStyle = 'rgba(255,255,255,0.14)'
+  ctx.fillRect(72, 72, width - 144, height - 144)
+
+  ctx.fillStyle = '#ffffff'
+  ctx.font = '600 42px Inter, Arial, sans-serif'
+  ctx.fillText('Aku baru beli tiket di', 108, 162)
+
+  ctx.font = '700 68px Inter, Arial, sans-serif'
+  ctx.fillText('ramein.fun', 108, 238)
+
+  ctx.fillStyle = '#f5f5f5'
+  ctx.font = '700 72px Inter, Arial, sans-serif'
+  wrapCanvasText(ctx, ticket.eventName, 108, 980, width - 216, 88, 3)
+
+  ctx.fillStyle = '#e0f2fe'
+  ctx.font = '500 38px Inter, Arial, sans-serif'
+  ctx.fillText(ticket.dateLabel, 108, 1270)
+  wrapCanvasText(ctx, ticket.location, 108, 1328, width - 216, 48, 2)
+
+  ctx.fillStyle = '#ffffff'
+  ctx.font = '600 44px Inter, Arial, sans-serif'
+  ctx.fillText(`${ticket.tier} • ${ticket.quantity}x`, 108, 1460)
+  ctx.fillText(formatIDR(ticket.total), 108, 1528)
+
+  ctx.fillStyle = '#111827'
+  ctx.fillRect(108, 1640, width - 216, 132)
+  ctx.fillStyle = '#ffffff'
+  ctx.font = '700 46px Inter, Arial, sans-serif'
+  ctx.fillText('Beli ticket kamu di ramein.fun', 154, 1722)
+
+  ctx.fillStyle = 'rgba(255,255,255,0.75)'
+  ctx.font = '500 28px Inter, Arial, sans-serif'
+  ctx.fillText('#Ramein #EventSeru #TicketReady', 108, 1830)
+
+  const blob = await new Promise((resolve, reject) => {
+    canvas.toBlob((result) => {
+      if (result) resolve(result)
+      else reject(new Error('Gagal membuat gambar share.'))
+    }, 'image/png')
+  })
+
+  return blob
+}
+
+function downloadBlob(blob, fileName) {
+  const url = URL.createObjectURL(blob)
+  const anchor = document.createElement('a')
+  anchor.href = url
+  anchor.download = fileName
+  anchor.click()
+  setTimeout(() => URL.revokeObjectURL(url), 1000)
+}
+
 function TiketSayaPage() {
   const [tickets, setTickets] = useState([])
   const [filter, setFilter] = useState('all')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [selectedTicket, setSelectedTicket] = useState(null)
+  const [sharingTicketId, setSharingTicketId] = useState('')
+  const [shareNotice, setShareNotice] = useState(null)
 
   useEffect(() => {
     let cancelled = false
@@ -183,10 +331,65 @@ function TiketSayaPage() {
     }
   }, [])
 
+  useEffect(() => {
+    if (shareNotice?.type !== 'success') return undefined
+
+    const timeoutId = window.setTimeout(() => {
+      setShareNotice(null)
+    }, 3000)
+
+    return () => window.clearTimeout(timeoutId)
+  }, [shareNotice])
+
   const filtered = useMemo(() => {
     if (filter === 'all') return tickets
     return tickets.filter((ticket) => ticket.status === filter)
   }, [filter, tickets])
+
+  async function handleShareSocialMedia(ticket) {
+    setSharingTicketId(ticket.id)
+    setShareNotice(null)
+
+    try {
+      const blob = await buildSocialShareBlob(ticket)
+      const file = new File([blob], `ramein-share-${ticket.id}.png`, { type: 'image/png' })
+      const promoText = `Aku baru beli tiket ${ticket.eventName}. Beli ticket kamu di ramein.fun`
+
+      if (
+        navigator.share &&
+        navigator.canShare &&
+        navigator.canShare({ files: [file] })
+      ) {
+        await navigator.share({
+          files: [file],
+          title: `Share ${ticket.eventName}`,
+          text: promoText,
+        })
+        setShareNotice({
+          type: 'success',
+          text: 'Gambar share sudah dibuka di share sheet. Pilih social media yang ingin dipakai.',
+        })
+      } else {
+        downloadBlob(blob, `ramein-share-${ticket.id}.png`)
+
+        if (navigator.clipboard?.writeText) {
+          await navigator.clipboard.writeText(promoText)
+        }
+
+        setShareNotice({
+          type: 'info',
+          text: 'Gambar share sudah diunduh. Teks promo siap dipakai untuk caption atau status.',
+        })
+      }
+    } catch (err) {
+      setShareNotice({
+        type: 'error',
+        text: err.message || 'Gagal menyiapkan gambar share.',
+      })
+    } finally {
+      setSharingTicketId('')
+    }
+  }
 
   return (
     <AdminLayout title="Tiket Saya" subtitle="Semua tiket berbayar yang sudah kamu beli">
@@ -213,6 +416,20 @@ function TiketSayaPage() {
         </div>
       )}
 
+      {shareNotice && (
+        <div
+          className={`mb-4 rounded-2xl px-4 py-3 text-sm ${
+            shareNotice.type === 'success'
+              ? 'border border-emerald-100 bg-emerald-50 text-emerald-700'
+              : shareNotice.type === 'error'
+                ? 'border border-red-100 bg-red-50 text-red-700'
+                : 'border border-sky-100 bg-sky-50 text-sky-700'
+          }`}
+        >
+          {shareNotice.text}
+        </div>
+      )}
+
       {loading ? (
         <div className="rounded-2xl border border-dashed border-[#d5d5d5] bg-white p-10 text-center text-sm text-[#6d6d6d]">
           Memuat tiket...
@@ -231,7 +448,13 @@ function TiketSayaPage() {
       ) : (
         <div className="grid grid-cols-1 gap-4">
           {filtered.map((ticket) => (
-            <TicketCard key={ticket.id} ticket={ticket} onShowQr={setSelectedTicket} />
+            <TicketCard
+              key={ticket.id}
+              ticket={ticket}
+              onShowQr={setSelectedTicket}
+              onShareSocialMedia={handleShareSocialMedia}
+              sharing={sharingTicketId === ticket.id}
+            />
           ))}
         </div>
       )}
