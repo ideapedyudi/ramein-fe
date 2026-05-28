@@ -3,7 +3,7 @@ import { NavLink, Link, useNavigate } from 'react-router-dom'
 import { FaBars, FaTimes } from 'react-icons/fa'
 import brandLogo from '../assets/logobrand2.png'
 import { navMenus } from '../data/homeData'
-import { useAuth } from '../context/AuthContext'
+import { useAuth } from '../context/authContext'
 import Container from './Container'
 import ProfileMenu from './ProfileMenu'
 

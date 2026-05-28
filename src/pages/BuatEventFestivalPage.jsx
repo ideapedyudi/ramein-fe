@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import AdminLayout from '../components/AdminLayout'
 import EventCardPreview from '../components/EventCardPreview'
-import { useAuth } from '../context/AuthContext'
+import { useAuth } from '../context/authContext'
 import { api, apiCategories, apiRegions } from '../lib/api'
 import { formatIDR } from '../lib/format'
 

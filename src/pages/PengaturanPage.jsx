@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { FaBell, FaLock, FaUser } from 'react-icons/fa'
 import AdminLayout from '../components/AdminLayout'
-import { useAuth } from '../context/AuthContext'
+import { useAuth } from '../context/authContext'
 
 const tabs = [
   { key: 'profile', label: 'Profil', icon: FaUser },

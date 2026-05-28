@@ -7,7 +7,7 @@ import {
   FaListUl,
 } from 'react-icons/fa'
 import AdminLayout from '../components/AdminLayout'
-import { useAuth } from '../context/AuthContext'
+import { useAuth } from '../context/authContext'
 import { api } from '../lib/api'
 
 function StatCard({ icon: Icon, label, value, accent, hint }) {

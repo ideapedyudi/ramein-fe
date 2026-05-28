@@ -16,7 +16,7 @@ import {
   FaTimes,
   FaUserShield,
 } from 'react-icons/fa'
-import { useAuth } from '../context/AuthContext'
+import { useAuth } from '../context/authContext'
 
 function initialsOf(name = '') {
   const parts = name.trim().split(/\s+/).slice(0, 2)
