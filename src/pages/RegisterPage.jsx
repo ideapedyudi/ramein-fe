@@ -7,13 +7,6 @@ import { useAuth } from '../context/authContext'
 const inputClass =
   'mt-2 h-10 w-full rounded-xl border border-[#f0f0f0] bg-[#f5f5f5] px-4 text-sm text-[#333333] outline-none placeholder:text-[#9d9d9d] focus:border-emerald-300 md:h-11 md:text-base'
 
-const sampleUser = {
-  name: 'Admin Demo',
-  email: 'admin@demo.com',
-  password: 'password123',
-  phone: '081299999999',
-}
-
 function RegisterPage() {
   const { isLoading, register } = useAuth()
   const navigate = useNavigate()
@@ -32,15 +25,6 @@ function RegisterPage() {
       const value = field === 'agree' ? e.target.checked : e.target.value
       setForm((prev) => ({ ...prev, [field]: value }))
     }
-  }
-
-  function fillSample() {
-    setForm((prev) => ({
-      ...prev,
-      ...sampleUser,
-      confirmPassword: sampleUser.password,
-      agree: true,
-    }))
   }
 
   async function handleSubmit(e) {
@@ -143,20 +127,6 @@ function RegisterPage() {
         {error && (
           <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>
         )}
-
-        <div className="flex items-center justify-between gap-2 rounded-lg border border-dashed border-emerald-300 bg-emerald-50/60 px-3 py-2.5 text-xs text-[#2b2b2b]">
-          <span>
-            <span className="font-semibold">Sample</span> · {sampleUser.email} /{' '}
-            {sampleUser.password}
-          </span>
-          <button
-            type="button"
-            onClick={fillSample}
-            className="rounded-md bg-emerald-600 px-2 py-1 text-xs font-semibold text-white hover:bg-emerald-700"
-          >
-            Isi
-          </button>
-        </div>
 
         <label className="flex items-start gap-3 pt-1 text-xs leading-tight text-[#666666] md:text-sm">
           <input
