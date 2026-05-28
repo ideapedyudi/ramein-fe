@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { FaDownload, FaReceipt, FaSearch } from 'react-icons/fa'
 import AdminLayout from '../components/AdminLayout'
 import { api } from '../lib/api'
-import { formatIDR } from '../lib/format'
+import { formatDateTime, formatIDR } from '../lib/format'
 
 const statusStyle = {
   paid: 'bg-emerald-50 text-emerald-700 ring-emerald-200',
@@ -22,12 +22,24 @@ function TransaksiPage() {
   const [transactions, setTransactions] = useState([])
   const [filter, setFilter] = useState('all')
   const [query, setQuery] = useState('')
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
 
   useEffect(() => {
     let cancelled = false
-    api.getMyTransactions().then((res) => {
-      if (!cancelled) setTransactions(res)
-    })
+
+    api
+      .getMyTransactions()
+      .then((res) => {
+        if (!cancelled) setTransactions(res)
+      })
+      .catch((err) => {
+        if (!cancelled) setError(err.message || 'Gagal memuat transaksi.')
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false)
+      })
+
     return () => {
       cancelled = true
     }
@@ -35,23 +47,27 @@ function TransaksiPage() {
 
   const filtered = useMemo(() => {
     const q = query.toLowerCase().trim()
-    return transactions.filter((t) => {
-      if (filter !== 'all' && t.status !== filter) return false
+
+    return transactions.filter((transaction) => {
+      if (filter !== 'all' && transaction.status !== filter) return false
       if (!q) return true
+
       return (
-        t.id.toLowerCase().includes(q) ||
-        t.eventName.toLowerCase().includes(q) ||
-        t.paymentMethod.toLowerCase().includes(q)
+        transaction.id.toLowerCase().includes(q) ||
+        transaction.orderId.toLowerCase().includes(q) ||
+        transaction.eventName.toLowerCase().includes(q) ||
+        transaction.paymentMethod.toLowerCase().includes(q)
       )
     })
   }, [filter, query, transactions])
 
   const totals = useMemo(() => {
-    const paid = transactions.filter((t) => t.status === 'paid')
+    const paid = transactions.filter((transaction) => transaction.status === 'paid')
+
     return {
       count: paid.length,
-      sum: paid.reduce((s, t) => s + t.total, 0),
-      pending: transactions.filter((t) => t.status === 'pending').length,
+      sum: paid.reduce((sum, transaction) => sum + transaction.total, 0),
+      pending: transactions.filter((transaction) => transaction.status === 'pending').length,
     }
   }, [transactions])
 
@@ -84,18 +100,18 @@ function TransaksiPage() {
       <section className="mt-6 rounded-2xl border border-[#eee] bg-white">
         <div className="flex flex-col gap-3 border-b border-[#eee] p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
           <div className="flex flex-wrap items-center gap-2">
-            {filters.map((f) => (
+            {filters.map((item) => (
               <button
-                key={f.value}
+                key={item.value}
                 type="button"
-                onClick={() => setFilter(f.value)}
+                onClick={() => setFilter(item.value)}
                 className={`rounded-full px-3 py-1.5 text-xs font-semibold transition ${
-                  filter === f.value
+                  filter === item.value
                     ? 'bg-brand-600 text-white'
                     : 'border border-[#e2e2e2] bg-white text-[#4a4a4a] hover:bg-[#f9f9f9]'
                 }`}
               >
-                {f.label}
+                {item.label}
               </button>
             ))}
           </div>
@@ -105,11 +121,17 @@ function TransaksiPage() {
               type="search"
               placeholder="Cari order / event / metode"
               value={query}
-              onChange={(e) => setQuery(e.target.value)}
+              onChange={(event) => setQuery(event.target.value)}
               className="w-full rounded-lg border border-[#e2e2e2] py-2 pl-9 pr-3 text-xs outline-none focus:border-brand-500 sm:w-72"
             />
           </div>
         </div>
+
+        {error && (
+          <div className="border-b border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700 sm:px-5">
+            {error}
+          </div>
+        )}
 
         <div className="overflow-x-auto">
           <table className="w-full min-w-[720px] text-left text-sm">
@@ -125,37 +147,55 @@ function TransaksiPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-[#f0f0f0]">
-              {filtered.map((t) => (
-                <tr key={t.id} className="hover:bg-[#fafafa]">
-                  <td className="px-4 py-3 font-mono text-xs text-[#4a4a4a]">{t.id}</td>
+              {filtered.map((transaction) => (
+                <tr key={transaction.id} className="hover:bg-[#fafafa]">
+                  <td className="px-4 py-3 font-mono text-xs text-[#4a4a4a]">
+                    {transaction.orderId}
+                  </td>
                   <td className="px-4 py-3">
-                    <p className="font-medium text-[#1f1f1f]">{t.eventName}</p>
+                    <p className="font-medium text-[#1f1f1f]">{transaction.eventName}</p>
                     <p className="text-xs text-[#6d6d6d]">
-                      {t.tier} • {t.quantity}x
+                      {transaction.tier} • {transaction.quantity}x
                     </p>
                   </td>
-                  <td className="px-4 py-3 text-xs text-[#6d6d6d]">{t.createdAt}</td>
-                  <td className="px-4 py-3 text-xs text-[#4a4a4a]">{t.paymentMethod}</td>
+                  <td className="px-4 py-3 text-xs text-[#6d6d6d]">
+                    {formatDateTime(transaction.paidAt ?? transaction.createdAt)}
+                  </td>
+                  <td className="px-4 py-3 text-xs text-[#4a4a4a]">
+                    {transaction.paymentMethod}
+                  </td>
                   <td className="px-4 py-3 text-right font-semibold text-[#1f1f1f]">
-                    {formatIDR(t.total)}
+                    {formatIDR(transaction.total)}
                   </td>
                   <td className="px-4 py-3">
                     <span
                       className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase ring-1 ${
-                        statusStyle[t.status] ?? 'bg-gray-100 text-gray-600 ring-gray-200'
+                        statusStyle[transaction.status] ??
+                        'bg-gray-100 text-gray-600 ring-gray-200'
                       }`}
                     >
-                      {t.status}
+                      {transaction.status}
                     </span>
                   </td>
                   <td className="px-4 py-3 text-right">
-                    <button
-                      type="button"
-                      disabled={t.status !== 'paid'}
-                      className="inline-flex items-center gap-1.5 rounded-md border border-[#e2e2e2] px-2 py-1 text-xs font-medium text-[#4a4a4a] hover:bg-[#f9f9f9] disabled:cursor-not-allowed disabled:opacity-50"
-                    >
-                      <FaDownload className="text-[10px]" /> Invoice
-                    </button>
+                    {transaction.redirectUrl && transaction.status === 'pending' ? (
+                      <a
+                        href={transaction.redirectUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-1.5 rounded-md border border-[#e2e2e2] px-2 py-1 text-xs font-medium text-[#4a4a4a] hover:bg-[#f9f9f9]"
+                      >
+                        <FaDownload className="text-[10px]" /> Bayar
+                      </a>
+                    ) : (
+                      <button
+                        type="button"
+                        disabled
+                        className="inline-flex items-center gap-1.5 rounded-md border border-[#e2e2e2] px-2 py-1 text-xs font-medium text-[#4a4a4a] disabled:cursor-not-allowed disabled:opacity-50"
+                      >
+                        <FaDownload className="text-[10px]" /> Invoice
+                      </button>
+                    )}
                   </td>
                 </tr>
               ))}
@@ -163,7 +203,11 @@ function TransaksiPage() {
           </table>
         </div>
 
-        {filtered.length === 0 && (
+        {loading && (
+          <div className="p-10 text-center text-sm text-[#6d6d6d]">Memuat transaksi...</div>
+        )}
+
+        {!loading && filtered.length === 0 && (
           <div className="p-10 text-center">
             <FaReceipt className="mx-auto text-3xl text-[#c5c5c5]" />
             <p className="mt-3 text-sm font-medium text-[#4a4a4a]">Tidak ada transaksi.</p>
