@@ -695,6 +695,28 @@ const toMyPaidTicketFromApi = (entry) => {
   }
 }
 
+const toEventAttendeeFromApi = (entry) => {
+  const items = Array.isArray(entry?.transaction?.items) ? entry.transaction.items : []
+  const firstItem = items[0]
+  const quantity = items.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0)
+  const rawStatus = String(entry.attendanceStatus ?? "not_attended").toLowerCase()
+
+  return {
+    id: entry.id,
+    userId: entry.user?.id ?? entry.userId ?? null,
+    name: entry.user?.name ?? "-",
+    email: entry.user?.email ?? "-",
+    orderId: entry.transaction?.orderId ?? entry.transactionId ?? "-",
+    ticketName: firstItem?.ticketName ?? "-",
+    paymentProvider: entry.transaction?.paymentProvider ?? "-",
+    total: Number(entry.transaction?.grossAmount) || 0,
+    quantity,
+    attendanceStatus: rawStatus,
+    attendedAt: entry.attendedAt ?? null,
+    registeredAt: entry.createdAt ?? null,
+  }
+}
+
 const publicCatalog = () =>
   eventCatalog.filter((e) => e.visibility === "public");
 
@@ -819,6 +841,10 @@ export const api = {
       const tickets = (res.data ?? []).map(toMyPaidTicketFromApi)
       return tickets.find((ticket) => ticket.id === id) ?? null
     }),
+  getEventAttendees: (eventId, attendanceFilter = "all") =>
+    apiRequest(`/ticket/event-ticket/${eventId}/${attendanceFilter}`).then((res) =>
+      (res.data ?? []).map(toEventAttendeeFromApi),
+    ),
   getMyTransactions: () =>
     apiRequest("/transactions/me").then((res) =>
       getTransactionCollection(res).map(toMyTransactionSummaryFromApi),

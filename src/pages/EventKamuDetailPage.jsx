@@ -4,6 +4,21 @@ import AdminLayout from '../components/AdminLayout'
 import { api } from '../lib/api'
 import { formatDateTime, formatIDR, formatNumber } from '../lib/format'
 
+const attendeeTabs = [
+  { value: 'all', label: 'Semua' },
+  { value: 'tidak_hadir', label: 'Tidak Hadir' },
+  { value: 'hadir', label: 'Hadir' },
+]
+
+function isAttendedStatus(value) {
+  const status = String(value ?? '').toLowerCase()
+  return status === 'hadir' || status === 'attended'
+}
+
+function formatAttendeeStatus(value) {
+  return isAttendedStatus(value) ? 'Hadir' : 'Tidak Hadir'
+}
+
 function Card({ children }) {
   return (
     <div className="rounded-2xl border border-black/5 bg-white p-4 shadow-sm sm:p-6">{children}</div>
@@ -32,6 +47,147 @@ function BigStat({ label, value, accent }) {
   )
 }
 
+function AttendeeSection({ eventId }) {
+  const [activeTab, setActiveTab] = useState('all')
+  const [attendeesByTab, setAttendeesByTab] = useState({})
+  const [loadingTab, setLoadingTab] = useState('all')
+  const [error, setError] = useState('')
+
+  useEffect(() => {
+    let cancelled = false
+
+    api
+      .getEventAttendees(eventId, 'all')
+      .then((res) => {
+        if (!cancelled) setAttendeesByTab({ all: res })
+      })
+      .catch((err) => {
+        if (!cancelled) setError(err.message || 'Gagal memuat daftar peserta.')
+      })
+      .finally(() => {
+        if (!cancelled) setLoadingTab('')
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [eventId])
+
+  function loadTab(tab) {
+    setActiveTab(tab)
+
+    if (attendeesByTab[tab]) return
+
+    setError('')
+    setLoadingTab(tab)
+
+    api
+      .getEventAttendees(eventId, tab)
+      .then((res) => {
+        setAttendeesByTab((current) => ({ ...current, [tab]: res }))
+      })
+      .catch((err) => {
+        setError(err.message || 'Gagal memuat daftar peserta.')
+      })
+      .finally(() => {
+        setLoadingTab('')
+      })
+  }
+
+  const attendees = attendeesByTab[activeTab] ?? []
+
+  return (
+    <div className="mt-6 border-t border-gray-100 pt-6">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h3 className="text-base font-semibold text-gray-900">Peserta Terdaftar</h3>
+          <p className="text-sm text-gray-500">Daftar pembeli tiket berdasarkan status kehadiran.</p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {attendeeTabs.map((tab) => (
+            <button
+              key={tab.value}
+              type="button"
+              onClick={() => loadTab(tab.value)}
+              className={`rounded-full px-3 py-1.5 text-xs font-semibold transition ${
+                activeTab === tab.value
+                  ? 'bg-brand-600 text-white'
+                  : 'border border-[#e2e2e2] bg-white text-[#4a4a4a] hover:bg-[#f9f9f9]'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {error && (
+        <div className="mt-4 rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700">
+          {error}
+        </div>
+      )}
+
+      {loadingTab === activeTab ? (
+        <div className="mt-4 rounded-xl border border-dashed border-gray-200 bg-gray-50 px-4 py-6 text-center text-sm text-gray-500">
+          Memuat peserta...
+        </div>
+      ) : attendees.length === 0 ? (
+        <div className="mt-4 rounded-xl border border-dashed border-gray-200 bg-gray-50 px-4 py-6 text-center text-sm text-gray-500">
+          Belum ada peserta untuk filter ini.
+        </div>
+      ) : (
+        <div className="mt-4 overflow-x-auto rounded-xl border border-gray-100">
+          <table className="w-full min-w-[820px] text-left text-sm">
+            <thead className="bg-gray-50 text-[11px] uppercase tracking-wide text-gray-500">
+              <tr>
+                <th className="px-4 py-3 font-semibold">Peserta</th>
+                <th className="px-4 py-3 font-semibold">Order ID</th>
+                <th className="px-4 py-3 font-semibold">Tiket</th>
+                <th className="px-4 py-3 font-semibold">Pembayaran</th>
+                <th className="px-4 py-3 font-semibold">Status</th>
+                <th className="px-4 py-3 font-semibold">Waktu</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {attendees.map((attendee) => (
+                <tr key={attendee.id}>
+                  <td className="px-4 py-3">
+                    <p className="font-medium text-gray-900">{attendee.name}</p>
+                    <p className="text-xs text-gray-500">{attendee.email}</p>
+                  </td>
+                  <td className="px-4 py-3 font-mono text-xs text-gray-500">{attendee.orderId}</td>
+                  <td className="px-4 py-3">
+                    <p className="font-medium text-gray-900">{attendee.ticketName}</p>
+                    <p className="text-xs text-gray-500">{attendee.quantity}x</p>
+                  </td>
+                  <td className="px-4 py-3">
+                    <p className="font-medium text-gray-900">{formatIDR(attendee.total)}</p>
+                    <p className="text-xs uppercase text-gray-500">{attendee.paymentProvider}</p>
+                  </td>
+                  <td className="px-4 py-3">
+                    <span
+                      className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase ${
+                        isAttendedStatus(attendee.attendanceStatus)
+                          ? 'bg-emerald-50 text-emerald-700'
+                          : 'bg-amber-50 text-amber-700'
+                      }`}
+                    >
+                      {formatAttendeeStatus(attendee.attendanceStatus)}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 text-xs text-gray-500">
+                    {formatDateTime(attendee.attendedAt ?? attendee.registeredAt)}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  )
+}
+
 function EventKamuDetailPage() {
   const { eventId } = useParams()
   const [event, setEvent] = useState(null)
@@ -41,8 +197,6 @@ function EventKamuDetailPage() {
 
   useEffect(() => {
     let cancelled = false
-    setLoading(true)
-    setError('')
     api
       .getMyEvent(eventId)
       .then((res) => {
@@ -107,10 +261,11 @@ function EventKamuDetailPage() {
               <button
                 key={item.key}
                 onClick={() => setTab(item.key)}
-                className={`relative -mb-px whitespace-nowrap border-b-2 px-1 pb-3 pt-2 text-sm font-medium transition ${tab === item.key
-                  ? 'border-brand-600 text-brand-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-800'
-                  }`}
+                className={`relative -mb-px whitespace-nowrap border-b-2 px-1 pb-3 pt-2 text-sm font-medium transition ${
+                  tab === item.key
+                    ? 'border-brand-600 text-brand-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-800'
+                }`}
               >
                 {item.label}
               </button>
@@ -205,6 +360,8 @@ function EventKamuDetailPage() {
                   accent="text-rose-600"
                 />
               </div>
+
+              <AttendeeSection eventId={eventId} />
             </Card>
           )}
         </div>
