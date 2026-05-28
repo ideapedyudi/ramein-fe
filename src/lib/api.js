@@ -683,40 +683,57 @@ export const api = {
       method: "POST",
       body: JSON.stringify({ name }),
     }).then((res) => res.data),
+  updateMasterCategory: (id, { name }) =>
+    apiRequest(`/master/categories/${id}`, {
+      method: "PUT",
+      body: JSON.stringify({ name }),
+    }).then((res) => res.data),
   deleteMasterCategory: (id) => {
     masterCategories = masterCategories.filter((c) => c.id !== id);
     return delay({ id });
   },
 
-  getMasterCities: () => delay(masterCities),
-  createMasterCity: ({ name }) => {
-    const row = {
-      id: nextId("city"),
-      name,
-      createdAt: new Date().toISOString().slice(0, 10),
-    };
-    masterCities = [row, ...masterCities];
-    return delay(row);
-  },
+  getMasterCities: () =>
+    apiRequest("/master/cities").then((res) => res.data ?? []),
+  createMasterCity: ({ name, provinsi }) =>
+    apiRequest("/master/cities", {
+      method: "POST",
+      body: JSON.stringify({ name, provinsi }),
+    }).then((res) => res.data),
+  updateMasterCity: (id, { name, provinsi }) =>
+    apiRequest(`/master/cities/${id}`, {
+      method: "PUT",
+      body: JSON.stringify({ name, provinsi }),
+    }).then((res) => res.data),
   deleteMasterCity: (id) => {
     masterCities = masterCities.filter((c) => c.id !== id);
     return delay({ id });
   },
 
-  getMasterOrganizers: () => delay(masterOrganizers),
-  createMasterOrganizer: (payload) => {
-    const row = {
-      id: nextId("org"),
-      name: payload.name,
-      description: payload.description ?? "",
-      contactName: payload.contactName ?? "",
-      contactEmail: payload.contactEmail ?? "",
-      contactPhone: payload.contactPhone ?? "",
-      createdAt: new Date().toISOString().slice(0, 10),
-    };
-    masterOrganizers = [row, ...masterOrganizers];
-    return delay(row);
-  },
+  getMasterOrganizers: () =>
+    apiRequest("/master/organizers").then((res) => res.data ?? []),
+  createMasterOrganizer: (payload) =>
+    apiRequest("/master/organizers", {
+      method: "POST",
+      body: JSON.stringify({
+        name: payload.name,
+        description: payload.description,
+        contactName: payload.contactName,
+        contactEmail: payload.contactEmail,
+        contactPhone: payload.contactPhone,
+      }),
+    }).then((res) => res.data),
+  updateMasterOrganizer: (id, payload) =>
+    apiRequest(`/master/organizers/${id}`, {
+      method: "PUT",
+      body: JSON.stringify({
+        name: payload.name,
+        description: payload.description,
+        contactName: payload.contactName,
+        contactEmail: payload.contactEmail,
+        contactPhone: payload.contactPhone,
+      }),
+    }).then((res) => res.data),
   deleteMasterOrganizer: (id) => {
     masterOrganizers = masterOrganizers.filter((o) => o.id !== id);
     return delay({ id });
