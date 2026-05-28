@@ -76,6 +76,12 @@ function EventKamuPage() {
                     className="absolute inset-0 h-full w-full object-cover"
                   />
                 )}
+                <span
+                  className={`absolute right-3 top-3 rounded-full px-2.5 py-0.5 text-xs font-semibold uppercase ${statusStyles[event.eventType] ?? 'bg-brand-600 text-white'
+                    }`}
+                >
+                  {event.eventType}
+                </span>
               </div>
 
               <div className="flex flex-1 flex-col">

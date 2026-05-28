@@ -161,7 +161,7 @@ function BuatEventFestivalPage() {
       const event = await api.createTicketedEvent({
         title,
         description,
-        event_type: 'festival',
+        event_type: 'offline',
         payment_type: 'paid',
         categoryId,
         organizerId,
