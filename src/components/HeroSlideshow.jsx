@@ -16,7 +16,7 @@ function HeroSlideshow({ slides }) {
       dimInactive
       className="mt-6"
       renderItem={(slide, index) => (
-        <div className="h-65 overflow-hidden rounded-xl md:h-115">
+        <div className="aspect-4838/1459 overflow-hidden rounded-xl">
           <img
             src={slide.image}
             alt={slide.title ?? `Banner ${index + 1}`}

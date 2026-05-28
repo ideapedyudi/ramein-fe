@@ -1,17 +1,16 @@
-import { Link } from 'react-router-dom'
+import { Link } from "react-router-dom";
+import brandLogo from "../assets/logobrand2.png";
 
 function Brand() {
   return (
     <div className="mb-4 flex items-center justify-center gap-3">
-      <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-500 text-xl font-bold text-white">
-        R
-      </div>
+      <img src={brandLogo} alt="brand logo" className="w-10" />
       <h1 className="text-4xl font-extrabold leading-none tracking-tight">
         <span className="text-emerald-600">Ram</span>
         <span className="text-amber-500">ein</span>
       </h1>
     </div>
-  )
+  );
 }
 
 function AuthLayout({ title, subtitle, children }) {
@@ -29,14 +28,17 @@ function AuthLayout({ title, subtitle, children }) {
           {children}
         </section>
         <div className="mt-6 text-center text-sm font-medium text-[#6e6e6e] md:text-base">
-          <Link to="/home" className="inline-flex items-center gap-2 hover:text-[#2ea387]">
+          <Link
+            to="/home"
+            className="inline-flex items-center gap-2 hover:text-[#2ea387]"
+          >
             <span aria-hidden="true">&lt;-</span>
             Kembali ke Beranda
           </Link>
         </div>
       </div>
     </main>
-  )
+  );
 }
 
-export default AuthLayout
+export default AuthLayout;
