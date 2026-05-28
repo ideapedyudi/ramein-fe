@@ -813,9 +813,9 @@ export const api = {
   getMyEvent: (id) =>
     apiRequest(`/events/${id}`).then((res) => (res.data ? toManagedEvent(res.data) : null)),
   getMyTickets: () =>
-    apiRequest("/event-paid/me").then((res) => (res.data ?? []).map(toMyPaidTicketFromApi)),
+    apiRequest("/ticket").then((res) => (res.data ?? []).map(toMyPaidTicketFromApi)),
   getMyTicket: (id) =>
-    apiRequest("/event-paid/me").then((res) => {
+    apiRequest("/ticket").then((res) => {
       const tickets = (res.data ?? []).map(toMyPaidTicketFromApi)
       return tickets.find((ticket) => ticket.id === id) ?? null
     }),
