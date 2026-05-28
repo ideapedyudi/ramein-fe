@@ -76,13 +76,6 @@ function EventKamuPage() {
                     className="absolute inset-0 h-full w-full object-cover"
                   />
                 )}
-                <span
-                  className={`absolute right-3 top-3 rounded-full px-2.5 py-0.5 text-xs font-semibold uppercase ${
-                    statusStyles[event.status] ?? 'bg-gray-500 text-white'
-                  }`}
-                >
-                  {event.status}
-                </span>
               </div>
 
               <div className="flex flex-1 flex-col">
@@ -91,16 +84,12 @@ function EventKamuPage() {
                   <span>{formatDateTime(event.dateLabel)}</span>
                   <span>{event.city}</span>
                   <span>{event.category}</span>
+                  <span>{event.visibility ?? (event.isPublished ? 'Published' : 'Draft')}</span>
                 </div>
-
                 <div className="mt-4 grid grid-cols-3 gap-4 border-t border-gray-100 pt-4">
                   <Stat label="Terjual" value={formatNumber(event.registered)} accent="text-brand-600" />
                   <Stat label="Kuota" value={formatNumber(event.totalQuota)} accent="text-emerald-600" />
-                  <Stat
-                    label="Revenue"
-                    value={event.revenue > 0 ? formatIDR(event.revenue) : formatIDR(0)}
-                    accent="text-gray-900"
-                  />
+                  <Stat label="Visibility" value={event.visibility ?? (event.isPublished ? 'Published' : 'Draft')} accent="text-emerald-600" />
                 </div>
               </div>
             </div>

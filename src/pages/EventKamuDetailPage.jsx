@@ -107,11 +107,10 @@ function EventKamuDetailPage() {
               <button
                 key={item.key}
                 onClick={() => setTab(item.key)}
-                className={`relative -mb-px whitespace-nowrap border-b-2 px-1 pb-3 pt-2 text-sm font-medium transition ${
-                  tab === item.key
-                    ? 'border-brand-600 text-brand-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-800'
-                }`}
+                className={`relative -mb-px whitespace-nowrap border-b-2 px-1 pb-3 pt-2 text-sm font-medium transition ${tab === item.key
+                  ? 'border-brand-600 text-brand-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-800'
+                  }`}
               >
                 {item.label}
               </button>

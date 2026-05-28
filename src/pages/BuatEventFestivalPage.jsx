@@ -342,6 +342,7 @@ function BuatEventFestivalPage() {
               timeLabel={timePart(startDateTime)}
               location={addressDetail}
               price={minPrice ?? undefined}
+              imageUrl={banner}
             />
             <p className="mt-3 text-center text-xs text-gray-500">Tampilan kartu event di Jelajahi</p>
           </div>
