@@ -638,6 +638,34 @@ let masterOrganizers = [
 
 const nextId = (prefix) => `${prefix}-${Date.now()}`;
 
+const toManagedEvent = (event) => {
+  const ticketTypes = event.ticketTypes ?? [];
+  const totalQuota = ticketTypes.reduce((sum, ticket) => sum + (Number(ticket.quota) || 0), 0);
+  const sold = ticketTypes.reduce((sum, ticket) => sum + (Number(ticket.sold) || 0), 0);
+  const revenue = ticketTypes.reduce(
+    (sum, ticket) => sum + (Number(ticket.price) || 0) * (Number(ticket.sold) || 0),
+    0,
+  );
+  const prices = ticketTypes
+    .map((ticket) => Number(ticket.price))
+    .filter((price) => !Number.isNaN(price) && price > 0);
+
+  return {
+    ...event,
+    name: event.title,
+    category: event.category?.name ?? "-",
+    city: event.city?.name ?? "-",
+    dateLabel: event.startDateTime,
+    imageUrl: event.banner,
+    registered: sold,
+    attended: 0,
+    revenue,
+    totalQuota,
+    startingPrice: prices.length ? Math.min(...prices) : 0,
+    status: event.status ?? (event.isPublished ? "active" : "draft"),
+  };
+};
+
 export const api = {
   getCarousel: () => delay(carousel),
   getTrendingEvents: () => delay(publicCatalog().slice(0, 4).map(toSummary)),
@@ -667,8 +695,10 @@ export const api = {
       wishlist: [publicCatalog()[2], publicCatalog()[3]].map(toSummary),
       trendingInCity: [publicCatalog()[0], publicCatalog()[1]].map(toSummary),
     }),
-  getMyEvents: () => delay(userMyEvents),
-  getMyEvent: (id) => delay(userMyEvents.find((e) => e.id === id) ?? null),
+  getMyEvents: () =>
+    apiRequest("/events").then((res) => (res.data ?? []).map(toManagedEvent)),
+  getMyEvent: (id) =>
+    apiRequest(`/events/${id}`).then((res) => (res.data ? toManagedEvent(res.data) : null)),
   getMyTickets: () => delay(userMyTickets),
   getMyTicket: (id) => delay(userMyTickets.find((t) => t.id === id) ?? null),
   getMyTransactions: () => delay(userMyTransactions),
@@ -733,6 +763,11 @@ export const api = {
         contactEmail: payload.contactEmail,
         contactPhone: payload.contactPhone,
       }),
+    }).then((res) => res.data),
+  createTicketedEvent: (payload) =>
+    apiRequest("/events", {
+      method: "POST",
+      body: JSON.stringify(payload),
     }).then((res) => res.data),
   deleteMasterOrganizer: (id) => {
     masterOrganizers = masterOrganizers.filter((o) => o.id !== id);

@@ -21,3 +21,9 @@ export function formatDate(value) {
   const date = dayjs(value)
   return date.isValid() ? date.format('DD-MM-YYYY') : '-'
 }
+
+export function formatDateTime(value) {
+  if (!value) return '-'
+  const date = dayjs(value)
+  return date.isValid() ? date.format('DD-MM-YYYY HH:mm') : '-'
+}
