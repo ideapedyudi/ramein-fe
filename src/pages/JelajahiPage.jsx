@@ -5,6 +5,7 @@ import EventCardSkeleton from '../components/EventCardSkeleton'
 import EventListCard from '../components/EventListCard'
 import SiteFooter from '../components/SiteFooter'
 import SiteLayout from '../components/SiteLayout'
+import { useInfiniteScroll } from '../hooks/useInfiniteScroll'
 import { api, apiRegions } from '../lib/api'
 
 function Select({ label, value, onChange, options }) {
@@ -126,6 +127,11 @@ function JelajahiPage() {
       .sort((a, b) => a.localeCompare(b))
   }, [cities])
 
+  const { visible, hasMore, sentinelRef } = useInfiniteScroll(events, {
+    pageSize: 12,
+    resetKey: `${filters.category}|${filters.wilayah}|${filters.kota}|${filters.date}`,
+  })
+
   function update(key, value) {
     const next = new URLSearchParams(params)
     if (value) next.set(key, value)
@@ -216,8 +222,20 @@ function JelajahiPage() {
             ? Array.from({ length: 12 }).map((_, i) => (
                 <EventCardSkeleton key={i} />
               ))
-            : events.map((e) => <EventListCard key={e.id} event={e} />)}
+            : visible.map((e) => <EventListCard key={e.id} event={e} />)}
         </div>
+
+        {/* Infinite-scroll sentinel: loading more reveals the next batch. */}
+        {!loading && hasMore && (
+          <div
+            ref={sentinelRef}
+            className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6"
+          >
+            {Array.from({ length: 6 }).map((_, i) => (
+              <EventCardSkeleton key={i} />
+            ))}
+          </div>
+        )}
 
         {!loading && events.length === 0 && (
           <div className="mt-10 rounded-2xl border border-dashed border-gray-300 p-12 text-center">

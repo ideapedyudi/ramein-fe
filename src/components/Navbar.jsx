@@ -7,6 +7,13 @@ import { useAuth } from "../context/authContext";
 import Container from "./Container";
 import ProfileMenu from "./ProfileMenu";
 
+const topLinks = [
+  { label: "Harga", to: "/pricing" },
+  { label: "FAQ", to: "/pricing#faq" },
+  { label: "Syarat", to: "/terms" },
+  { label: "Privasi", to: "/privacy" },
+];
+
 function Navbar() {
   const { user, isAuthenticated, isAdmin, logout } = useAuth();
   const navigate = useNavigate();
@@ -20,8 +27,21 @@ function Navbar() {
 
   return (
     <header className="sticky top-0 z-50">
-      <div className="bg-[#0d7f74] py-2 text-center text-xs font-medium text-white sm:text-sm">
-        Hari mu ngebosenin? #Rameinaja
+      <div className="bg-[#0d7f74] text-white">
+        <div className="mx-auto flex w-full max-w-370 items-center justify-center gap-4 px-3 py-1.5 text-xs font-medium sm:justify-center sm:text-sm">
+          {/* <span className="hidden sm:inline">Hari mu ngebosenin? #Rameinaja</span> */}
+          <nav className="scrollbar-hide flex items-center gap-3 overflow-x-auto sm:gap-5">
+            {topLinks.map((link) => (
+              <Link
+                key={link.to}
+                to={link.to}
+                className="shrink-0 whitespace-nowrap text-white/90 transition hover:text-accent-300"
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
+        </div>
       </div>
       <div className="bg-[rgb(50,160,140)]">
         <div className="mx-auto flex w-full max-w-370 flex-row items-center justify-between gap-3 px-2 py-3 md:h-16 md:px-3 md:py-0">

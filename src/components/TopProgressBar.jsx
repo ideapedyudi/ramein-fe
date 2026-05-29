@@ -54,7 +54,7 @@ function TopProgressBar() {
       }}
     >
       <div
-        className="h-full w-full origin-left bg-brand-500 shadow-[0_0_8px_rgba(47,160,132,0.7)]"
+        className="h-full w-full origin-left bg-accent-400 shadow-[0_0_10px_2px_rgba(243,185,28,0.85)]"
         style={{
           transform: `scaleX(${progress})`,
           transition: animated ? "transform 200ms ease-out" : "none",

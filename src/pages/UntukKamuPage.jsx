@@ -1,8 +1,11 @@
 import { useEffect, useMemo, useState } from 'react'
+import { FaPlus } from 'react-icons/fa'
 import Container from '../components/Container'
+import EventCardSkeleton from '../components/EventCardSkeleton'
 import EventListCard from '../components/EventListCard'
 import SiteFooter from '../components/SiteFooter'
 import SiteLayout from '../components/SiteLayout'
+import { useInfiniteScroll } from '../hooks/useInfiniteScroll'
 import { api } from '../lib/api'
 
 const INTEREST_STORAGE_KEY = 'ramein:selected-interests'
@@ -93,6 +96,11 @@ function UntukKamuPage() {
     [categories, selectedCategories],
   )
 
+  const { visible, hasMore, sentinelRef } = useInfiniteScroll(events, {
+    pageSize: 12,
+    resetKey: selectedCategories.join(','),
+  })
+
   function addCategory(categoryName) {
     setSelectedCategories((current) =>
       current.includes(categoryName) ? current : [...current, categoryName],
@@ -126,9 +134,15 @@ function UntukKamuPage() {
                 type="button"
                 onClick={() => setAddInterestOpen((open) => !open)}
                 disabled={loadingCategories}
-                className="rounded-full bg-brand-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-gray-300"
+                aria-expanded={addInterestOpen}
+                className="inline-flex items-center gap-1.5 rounded-full bg-brand-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-gray-300"
               >
-                + Tambah Minat
+                <FaPlus
+                  className={`text-xs transition-transform duration-300 ${
+                    addInterestOpen ? 'rotate-45' : ''
+                  }`}
+                />
+                Tambah Minat
               </button>
               {selectedCategories.length > 0 && (
                 <button
@@ -159,28 +173,36 @@ function UntukKamuPage() {
             )}
           </div>
 
-          {addInterestOpen && (
-            <div className="mt-4 rounded-xl border border-brand-100 bg-brand-50/50 p-3">
-              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-brand-700">
-                Tambah dari kategori
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {availableCategories.map((category) => (
-                  <button
-                    key={category.id ?? category.name}
-                    type="button"
-                    onClick={() => addCategory(category.name)}
-                    className="rounded-full border border-brand-100 bg-white px-3 py-1.5 text-sm font-medium text-brand-700 hover:bg-brand-100"
-                  >
-                    {category.name}
-                  </button>
-                ))}
-                {!loadingCategories && availableCategories.length === 0 && (
-                  <p className="text-sm text-gray-500">Semua kategori sudah ditambahkan.</p>
-                )}
+          <div
+            className={`grid transition-all duration-300 ease-out ${
+              addInterestOpen
+                ? 'mt-4 grid-rows-[1fr] opacity-100'
+                : 'grid-rows-[0fr] opacity-0'
+            }`}
+          >
+            <div className="overflow-hidden">
+              <div className="rounded-xl border border-brand-100 bg-brand-50/50 p-3">
+                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-brand-700">
+                  Tambah dari kategori
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {availableCategories.map((category) => (
+                    <button
+                      key={category.id ?? category.name}
+                      type="button"
+                      onClick={() => addCategory(category.name)}
+                      className="rounded-full border border-brand-100 bg-white px-3 py-1.5 text-sm font-medium text-brand-700 transition hover:bg-brand-100"
+                    >
+                      {category.name}
+                    </button>
+                  ))}
+                  {!loadingCategories && availableCategories.length === 0 && (
+                    <p className="text-sm text-gray-500">Semua kategori sudah ditambahkan.</p>
+                  )}
+                </div>
               </div>
             </div>
-          )}
+          </div>
 
           {loadingCategories && (
             <p className="mt-3 text-xs text-gray-500">Memuat kategori minat...</p>
@@ -205,10 +227,26 @@ function UntukKamuPage() {
           )}
 
           <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-            {events.map((event) => (
-              <EventListCard key={event.id} event={event} />
-            ))}
+            {loadingEvents
+              ? Array.from({ length: 12 }).map((_, i) => (
+                  <EventCardSkeleton key={i} />
+                ))
+              : visible.map((event) => (
+                  <EventListCard key={event.id} event={event} />
+                ))}
           </div>
+
+          {/* Infinite-scroll sentinel: reveals the next batch on scroll. */}
+          {!loadingEvents && hasMore && (
+            <div
+              ref={sentinelRef}
+              className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6"
+            >
+              {Array.from({ length: 6 }).map((_, i) => (
+                <EventCardSkeleton key={i} />
+              ))}
+            </div>
+          )}
 
           {!loadingEvents && events.length === 0 && (
             <div className="mt-10 rounded-2xl border border-dashed border-gray-300 p-12 text-center">

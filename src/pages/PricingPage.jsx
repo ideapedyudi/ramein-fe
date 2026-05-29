@@ -1,4 +1,5 @@
-import { Link } from "react-router-dom";
+import { useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
 import PageHeader from "../components/PageHeader";
 import Reveal from "../components/Reveal";
 import SiteFooter from "../components/SiteFooter";
@@ -42,6 +43,15 @@ const steps = [
 ];
 
 function PricingPage() {
+  const { hash } = useLocation();
+
+  // Scroll to the targeted section (e.g. #faq from the top nav) once mounted.
+  useEffect(() => {
+    if (!hash) return;
+    const el = document.querySelector(hash);
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [hash]);
+
   return (
     <SiteLayout>
       <PageHeader
@@ -136,7 +146,7 @@ function PricingPage() {
         </Reveal>
 
         {/* FAQ */}
-        <Reveal as="section">
+        <Reveal as="section" id="faq" className="scroll-mt-28">
           <h2 className="text-xl font-bold text-gray-900 sm:text-2xl">
             Pertanyaan Umum
           </h2>

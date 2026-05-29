@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { FaRegCalendarAlt } from 'react-icons/fa'
 import { formatIDR } from '../lib/format'
+import MarqueeText from './MarqueeText'
 
 function EventListCard({ event }) {
   const [imgLoaded, setImgLoaded] = useState(false)
@@ -46,8 +47,8 @@ function EventListCard({ event }) {
           )}
         </div>
         <div className="flex flex-col gap-2 p-3">
-          <h4 className="line-clamp-1 text-sm font-semibold text-[#1f1f1f] group-hover:text-brand-600">
-            {event.name}
+          <h4 className="text-sm font-semibold text-[#1f1f1f] group-hover:text-brand-600">
+            <MarqueeText text={event.name} />
           </h4>
           <div className="flex items-center gap-1.5 text-xs text-[#7a7a7a]">
             <FaRegCalendarAlt className="text-brand-500" />
