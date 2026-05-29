@@ -751,6 +751,47 @@ const toEventAttendeeFromApi = (entry) => {
   }
 }
 
+const normalizeWithdrawStatus = (value) => {
+  const status = String(value ?? "").toLowerCase()
+
+  if (["approved", "success", "paid", "completed"].includes(status)) return "approved"
+  if (["reject", "rejected", "failed", "cancelled"].includes(status)) return "rejected"
+
+  return status || "pending"
+}
+
+const toWithdrawFromApi = (entry) => ({
+  id: entry.id,
+  eventId: entry.eventId ?? entry.event?.id ?? null,
+  userId: entry.userId ?? entry.user?.id ?? null,
+  totalAmount: Number(entry.totalAmount) || 0,
+  bankName: entry.bank_name ?? entry.bankName ?? "-",
+  bankAccount: entry.bank_account ?? entry.bankAccount ?? "-",
+  accountNumber: entry.account_number ?? entry.accountNumber ?? "-",
+  status: normalizeWithdrawStatus(entry.status),
+  isApproval: Boolean(entry.is_approval ?? entry.isApproval),
+  createdAt: entry.createdAt ?? null,
+  updatedAt: entry.updatedAt ?? null,
+  event: {
+    id: entry.event?.id ?? entry.eventId ?? null,
+    title: entry.event?.title ?? "-",
+    isWithdraw: Boolean(entry.event?.isWithdraw ?? entry.event?.is_withdraw),
+  },
+  user: {
+    id: entry.user?.id ?? entry.userId ?? null,
+    name: entry.user?.name ?? "-",
+    email: entry.user?.email ?? "-",
+  },
+})
+
+const getWithdrawCollection = (payload) => {
+  if (Array.isArray(payload)) return payload
+  if (Array.isArray(payload?.data)) return payload.data
+  if (Array.isArray(payload?.data?.withdraws)) return payload.data.withdraws
+  if (Array.isArray(payload?.withdraws)) return payload.withdraws
+  return []
+}
+
 const publicCatalog = () =>
   eventCatalog.filter((e) => e.visibility === "public");
 
@@ -818,6 +859,7 @@ const toManagedEvent = (event) => {
     totalQuota,
     startingPrice: prices.length ? Math.min(...prices) : 0,
     status: event.status ?? (event.isPublished ? "active" : "draft"),
+    isWithdraw: Boolean(event.is_withdraw ?? event.isWithdraw),
   };
 };
 
@@ -889,6 +931,23 @@ export const api = {
         revenue: Number(data.revenue) || 0,
       };
     }),
+  createWithdraw: (payload) =>
+    apiRequest("/withdraw", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }).then((res) => res.data ?? res),
+  getMyWithdraws: () =>
+    apiRequest("/withdraw/me").then((res) => getWithdrawCollection(res).map(toWithdrawFromApi)),
+  getAllWithdraws: () =>
+    apiRequest("/withdraw/all").then((res) => getWithdrawCollection(res).map(toWithdrawFromApi)),
+  updateWithdrawStatus: (id, status) =>
+    apiRequest("/withdraw/status", {
+      method: "POST",
+      body: JSON.stringify({
+        id,
+        status,
+      }),
+    }).then((res) => (res.data ? toWithdrawFromApi(res.data) : res)),
   scanTicketQrCode: (qrCode) =>
     apiRequest("/ticket/qr-code/scan", {
       method: "POST",

@@ -8,6 +8,7 @@ import {
   FaCity,
   FaCog,
   FaListUl,
+  FaMoneyBillWave,
   FaPlusCircle,
   FaReceipt,
   FaSignOutAlt,
@@ -29,6 +30,7 @@ const userNav = [
   { to: '/transaksi', label: 'Transaksi', icon: FaReceipt },
   { to: '/event-kamu', label: 'Event Saya', icon: FaCalendarAlt },
   { to: '/buat-event', label: 'Buat Event', icon: FaPlusCircle },
+  { to: '/withdraw', label: 'Withdraw', icon: FaMoneyBillWave },
 ]
 
 // Internal staff (admin) — manages master data and can create events
@@ -40,6 +42,7 @@ const adminNav = [
   { to: '/admin/organizer', label: 'Organizer', icon: FaBuilding },
   { to: '/event-kamu', label: 'Event Dikelola', icon: FaCalendarAlt },
   { to: '/buat-event', label: 'Buat Event', icon: FaPlusCircle },
+  { to: '/admin/withdraw', label: 'Withdraw', icon: FaMoneyBillWave },
 ]
 
 const footerNav = [{ to: '/pengaturan', label: 'Pengaturan', icon: FaCog }]
