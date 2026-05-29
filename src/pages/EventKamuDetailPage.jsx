@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom'
 import { FaCamera, FaKeyboard, FaTimes } from 'react-icons/fa'
 import { useZxing } from 'react-zxing'
 import AdminLayout from '../components/AdminLayout'
+import { useAuth } from '../context/authContext'
 import { api } from '../lib/api'
 import { formatDateTime, formatIDR, formatNumber } from '../lib/format'
 
@@ -600,6 +601,7 @@ function AttendeeSection({ eventId, onScanSuccess }) {
 }
 
 function EventKamuDetailPage() {
+  const { isAdmin } = useAuth()
   const { eventId } = useParams()
   const [event, setEvent] = useState(null)
   const [error, setError] = useState('')
@@ -824,16 +826,18 @@ function EventKamuDetailPage() {
             <Card>
               <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <CardHeader title="Statistik" />
-                <div className="text-left sm:text-right">
-                  <button
-                    type="button"
-                    onClick={() => setWithdrawModalOpen(true)}
-                    disabled={isWithdrawDisabled}
-                    className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-gray-300"
-                  >
-                    {isWithdraw ? 'Withdraw' : 'Withdraw'}
-                  </button>
-                </div>
+                {!isAdmin && (
+                  <div className="text-left sm:text-right">
+                    <button
+                      type="button"
+                      onClick={() => setWithdrawModalOpen(true)}
+                      disabled={isWithdrawDisabled}
+                      className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-gray-300"
+                    >
+                      {isWithdraw ? 'Withdraw' : 'Withdraw'}
+                    </button>
+                  </div>
+                )}
               </div>
               {withdrawMessage && (
                 <div className="mb-4 rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
