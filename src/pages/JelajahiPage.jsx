@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import Container from '../components/Container'
 import EventListCard from '../components/EventListCard'
 import SiteFooter from '../components/SiteFooter'
 import SiteLayout from '../components/SiteLayout'
-import { api, apiCategories, apiRegions } from '../lib/api'
+import { api, apiRegions } from '../lib/api'
 
 function Select({ label, value, onChange, options }) {
   return (
@@ -28,33 +28,82 @@ function Select({ label, value, onChange, options }) {
 function JelajahiPage() {
   const [params, setParams] = useSearchParams()
   const [events, setEvents] = useState([])
+  const [categories, setCategories] = useState([])
+  const [cities, setCities] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [masterLoading, setMasterLoading] = useState(true)
+  const [error, setError] = useState('')
 
   const filters = {
     category: params.get('category') ?? undefined,
-    region: params.get('region') ?? undefined,
-    query: params.get('q') ?? undefined,
+    wilayah: params.get('wilayah') ?? undefined,
+    kota: params.get('kota') ?? undefined,
+    date: params.get('date') ?? undefined,
   }
 
   useEffect(() => {
     let cancelled = false
+
+    setMasterLoading(true)
+    Promise.all([api.getMasterCategories(), api.getMasterCities()])
+      .then(([categoryRes, cityRes]) => {
+        if (cancelled) return
+        setCategories(categoryRes)
+        setCities(cityRes)
+      })
+      .catch((err) => {
+        if (!cancelled) setError(err.message || 'Gagal memuat filter event.')
+      })
+      .finally(() => {
+        if (!cancelled) setMasterLoading(false)
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  useEffect(() => {
+    let cancelled = false
+    setLoading(true)
+    setError('')
+
     api
       .searchEvents({
         category: filters.category,
-        region: filters.region,
-        query: filters.query,
+        wilayah: filters.wilayah,
+        kota: filters.kota,
+        date: filters.date,
       })
       .then((res) => {
         if (!cancelled) setEvents(res)
       })
+      .catch((err) => {
+        if (!cancelled) {
+          setEvents([])
+          setError(err.message || 'Gagal memuat event.')
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false)
+      })
     return () => {
       cancelled = true
     }
-  }, [filters.category, filters.region, filters.query])
+  }, [filters.category, filters.wilayah, filters.kota, filters.date])
+
+  const cityOptions = useMemo(() => {
+    return cities
+      .map((city) => city.name)
+      .filter(Boolean)
+      .sort((a, b) => a.localeCompare(b))
+  }, [cities])
 
   function update(key, value) {
     const next = new URLSearchParams(params)
     if (value) next.set(key, value)
     else next.delete(key)
+
     setParams(next)
   }
 
@@ -79,43 +128,61 @@ function JelajahiPage() {
               onChange={(v) => update('category', v)}
               options={[
                 { value: '', label: 'Semua Kategori' },
-                ...apiCategories.map((c) => ({ value: c.category, label: c.category })),
+                ...categories.map((category) => ({
+                  value: category.name,
+                  label: category.name,
+                })),
               ]}
             />
             <Select
               label="Wilayah"
-              value={filters.region ?? ''}
-              onChange={(v) => update('region', v)}
+              value={filters.wilayah ?? ''}
+              onChange={(v) => update('wilayah', v)}
               options={[
                 { value: '', label: 'Semua Wilayah' },
-                ...apiRegions.map((r) => ({ value: r.region, label: r.region })),
+                ...apiRegions.map((region) => ({ value: region.region, label: region.region })),
               ]}
             />
-            <div>
-              <label className="mb-1.5 block text-sm font-medium text-gray-700">Kota</label>
-              <input
-                placeholder="Cari kota..."
-                className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
-              />
-            </div>
+            <Select
+              label="Kota"
+              value={filters.kota ?? ''}
+              onChange={(v) => update('kota', v)}
+              options={[
+                { value: '', label: 'Semua Kota' },
+                ...cityOptions.map((city) => ({ value: city, label: city })),
+              ]}
+            />
             <div>
               <label className="mb-1.5 block text-sm font-medium text-gray-700">Tanggal</label>
               <input
                 type="date"
+                value={filters.date ?? ''}
+                onChange={(event) => update('date', event.target.value)}
                 className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
               />
             </div>
           </div>
+          {masterLoading && (
+            <p className="mt-3 text-xs text-gray-500">Memuat filter kategori dan kota...</p>
+          )}
         </div>
 
         <div className="mt-6 flex items-center justify-between">
-          <p className="text-sm text-gray-600">Menampilkan {events.length} event</p>
-          {(filters.category || filters.region) && (
+          <p className="text-sm text-gray-600">
+            {loading ? 'Memuat event...' : `Menampilkan ${events.length} event`}
+          </p>
+          {(filters.category || filters.wilayah || filters.kota || filters.date) && (
             <Link to="/jelajahi" className="text-sm font-medium text-brand-600 hover:underline">
               Hapus filter
             </Link>
           )}
         </div>
+
+        {error && (
+          <div className="mt-4 rounded-2xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700">
+            {error}
+          </div>
+        )}
 
         <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
           {events.map((e) => (
@@ -123,7 +190,7 @@ function JelajahiPage() {
           ))}
         </div>
 
-        {events.length === 0 && (
+        {!loading && events.length === 0 && (
           <div className="mt-10 rounded-2xl border border-dashed border-gray-300 p-12 text-center">
             <p className="text-gray-500">Tidak ada event yang cocok dengan filter kamu.</p>
           </div>

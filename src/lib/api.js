@@ -512,6 +512,13 @@ const getEventStartingPrice = (ticketTypes = []) => {
   return prices.length ? Math.min(...prices) : 0
 }
 
+const getEventTicketTypes = (event) =>
+  Array.isArray(event.ticketTypes)
+    ? event.ticketTypes
+    : Array.isArray(event.ticket_types)
+      ? event.ticket_types
+      : []
+
 const formatEventTimeRange = (start, end) => {
   if (!start) return "-"
 
@@ -556,13 +563,13 @@ const toPublicEventSummaryFromApi = (event) => ({
   id: event.id,
   name: event.title,
   category: event.category?.name ?? "-",
-  region: event.city?.name ?? "-",
+  region: event.city?.provinsi ?? event.city?.name ?? "-",
   city: event.city?.name ?? "-",
   date: event.startDateTime ?? event.start_datetime ?? null,
   dateLabel: formatEventDateLabel(event.startDateTime ?? event.start_datetime),
-  startingPrice: getEventStartingPrice(event.ticketTypes),
+  startingPrice: getEventStartingPrice(getEventTicketTypes(event)),
   organizer: {
-    id: event.organizer?.id ?? event.organizerId ?? "organizer",
+    id: event.organizer?.id ?? event.organizerId ?? event.organizer_id ?? "organizer",
     name: event.organizer?.name ?? "Ramein",
     initial: (event.organizer?.name ?? "Ramein").charAt(0).toUpperCase(),
   },
@@ -577,7 +584,7 @@ const toPublicEventSummaryFromApi = (event) => ({
 
 const toPublicEventDetailFromApi = (event) => {
   const summary = toPublicEventSummaryFromApi(event)
-  const ticketTypes = Array.isArray(event.ticketTypes) ? event.ticketTypes : []
+  const ticketTypes = getEventTicketTypes(event)
 
   return {
     ...summary,
@@ -588,7 +595,7 @@ const toPublicEventDetailFromApi = (event) => {
     ),
     location: summary.isOnline
       ? event.labelOnline ?? event.label_online ?? "Online Event"
-      : [event.addressDetail, event.city?.name].filter(Boolean).join(", ") || "-",
+      : [event.addressDetail ?? event.address_detail, event.city?.name].filter(Boolean).join(", ") || "-",
     attendees: ticketTypes.reduce((sum, ticket) => sum + (Number(ticket.sold) || 0), 0),
     attachmentLabel: summary.isOnline
       ? event.labelOnline ?? event.label_online ?? "Link event online"
@@ -917,20 +924,18 @@ export const api = {
     }).then((res) => res.data ?? res),
   getCategories: () => delay(apiCategories),
   getRegions: () => delay(apiRegions),
-  searchEvents: ({ category, region, city, query }) => {
-    const q = (query ?? "").toLowerCase().trim();
-    const results = publicCatalog()
-      .filter((e) => !category || e.category === category)
-      .filter((e) => !region || e.region === region)
-      .filter((e) => !city || e.city.toLowerCase() === city.toLowerCase())
-      .filter(
-        (e) =>
-          !q ||
-          e.name.toLowerCase().includes(q) ||
-          e.organizer.name.toLowerCase().includes(q),
-      )
-      .map(toSummary);
-    return delay(results);
+  searchEvents: ({ category, wilayah, kota, date }) => {
+    const params = new URLSearchParams()
+
+    if (category) params.set("category", category)
+    if (wilayah) params.set("wilayah", wilayah)
+    if (kota) params.set("kota", kota)
+    if (date) params.set("date", date)
+
+    const query = params.toString()
+    return apiRequest(`/events/explore${query ? `?${query}` : ""}`).then((res) =>
+      getApiCollection(res).map(toPublicEventSummaryFromApi),
+    )
   },
   getEvent: (id) =>
     apiRequest(`/events/${id}`)
