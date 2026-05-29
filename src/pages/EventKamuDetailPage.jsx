@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { FaCamera, FaKeyboard, FaTimes } from 'react-icons/fa'
 import { useZxing } from 'react-zxing'
@@ -90,6 +90,8 @@ function ScanAttendanceModal({ open, onClose, onScanSuccess }) {
   const [manualQr, setManualQr] = useState('')
   const [submitError, setSubmitError] = useState('')
   const [submitMessage, setSubmitMessage] = useState('')
+  const [cameraError, setCameraError] = useState('')
+  const [cameraRetry, setCameraRetry] = useState(0)
   const [submitting, setSubmitting] = useState(false)
   const [scanLocked, setScanLocked] = useState(false)
 
@@ -118,21 +120,50 @@ function ScanAttendanceModal({ open, onClose, onScanSuccess }) {
     [onScanSuccess, scanLocked, submitting],
   )
 
-  const { ref } = useZxing(
-    open && mode === 'camera'
-      ? {
+  const scannerOptions = useMemo(
+    () =>
+      open && mode === 'camera'
+        ? {
         paused: submitting || scanLocked,
+        constraints: {
+          video: {
+            facingMode: { ideal: 'environment' },
+            width: { ideal: 1280 },
+            height: { ideal: 720 },
+          },
+          audio: false,
+        },
+        timeBetweenDecodingAttempts: 250,
         onDecodeResult(result) {
+          setCameraError('')
           submitQrCode(result.getText())
         },
-        onError() { },
+        onError(error) {
+          const errorName = error?.name ?? ''
+          const fallback =
+            window.isSecureContext || window.location.hostname === 'localhost'
+              ? 'Kamera tidak bisa dibuka. Pastikan izin kamera diberikan dan tidak sedang dipakai aplikasi lain.'
+              : 'Kamera hanya bisa dibuka di HTTPS atau localhost.'
+
+          setCameraError(
+            errorName === 'NotAllowedError'
+              ? 'Izin kamera ditolak. Aktifkan permission kamera di browser.'
+              : errorName === 'NotFoundError'
+                ? 'Kamera tidak ditemukan di perangkat ini.'
+                : errorName === 'NotReadableError'
+                  ? 'Kamera sedang dipakai aplikasi lain.'
+                  : fallback,
+          )
+        },
       }
-      : {
+        : {
         paused: true,
         onDecodeResult() { },
         onError() { },
       },
+    [cameraRetry, mode, open, scanLocked, submitQrCode, submitting],
   )
+  const { ref } = useZxing(scannerOptions)
 
   if (!open) return null
 
@@ -141,6 +172,7 @@ function ScanAttendanceModal({ open, onClose, onScanSuccess }) {
     setManualQr('')
     setSubmitError('')
     setSubmitMessage('')
+    setCameraError('')
     setSubmitting(false)
     setScanLocked(false)
     onClose()
@@ -191,8 +223,31 @@ function ScanAttendanceModal({ open, onClose, onScanSuccess }) {
           {mode === 'camera' ? (
             <div className="mt-4">
               <div className="overflow-hidden rounded-2xl border border-gray-200 bg-black">
-                <video ref={ref} className="h-[320px] w-full object-cover" />
+                <video
+                  key={cameraRetry}
+                  ref={ref}
+                  autoPlay
+                  muted
+                  playsInline
+                  onLoadedMetadata={(event) => event.currentTarget.play().catch(() => {})}
+                  className="h-[320px] w-full object-cover"
+                />
               </div>
+              {cameraError && (
+                <div className="mt-3 rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700">
+                  <p>{cameraError}</p>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setCameraError('')
+                      setCameraRetry((value) => value + 1)
+                    }}
+                    className="mt-2 rounded-lg bg-red-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-red-700"
+                  >
+                    Coba buka kamera lagi
+                  </button>
+                </div>
+              )}
               <p className="mt-3 text-xs text-gray-500">
                 Arahkan kamera ke QR peserta. Scan akan langsung diproses.
               </p>
