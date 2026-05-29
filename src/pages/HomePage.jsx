@@ -17,7 +17,7 @@ import {
 } from "../data/homeData";
 import { api } from "../lib/api";
 
-const eventItemsPerView = { base: 2, sm: 3, md: 4, lg: 5, xl: 6 };
+const eventItemsPerView = { base: 2, sm: 2, md: 3, lg: 4, xl: 4 };
 
 function HomePage() {
   const [trendingState, setTrendingState] = useState({
@@ -60,8 +60,8 @@ function HomePage() {
   const renderEventSection = ({ items, loading, error }) => {
     if (loading) {
       return (
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-          {Array.from({ length: 6 }).map((_, i) => (
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4">
+          {Array.from({ length: 4 }).map((_, i) => (
             <EventCardSkeleton key={i} />
           ))}
         </div>

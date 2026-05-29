@@ -148,15 +148,15 @@ function TicketCard({
   const canOpenOnlineLink = hasOnlineUrl && !openingOnlineLink
 
   return (
-    <article className="flex flex-col overflow-hidden rounded-2xl border border-[#eee] bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md sm:flex-row">
+    <article className="flex flex-col overflow-hidden rounded-2xl border border-[#eee] bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
       <div
-        className={`relative w-full shrink-0 self-start overflow-hidden bg-[#f3f3f3] sm:w-48 ${
-          ticket.imageUrl ? '' : 'h-32'
+        className={`relative w-full overflow-hidden bg-[#f3f3f3] ${
+          ticket.imageUrl ? '' : 'aspect-video'
         }`}
       >
         <EventImage src={ticket.imageUrl} alt={ticket.eventName} />
       </div>
-      <div className="flex flex-1 flex-col gap-3 p-4 sm:p-5">
+      <div className="flex flex-1 flex-col gap-3 p-4">
         <div className="flex flex-wrap items-start justify-between gap-2">
           <div className="min-w-0">
             <p className="text-[10px] font-mono uppercase tracking-wider text-[#9a9a9a]">
@@ -631,7 +631,7 @@ function TiketSayaPage() {
           </Link>
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-4">
+        <div className="grid grid-cols-1 items-start gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {filtered.map((ticket) => (
             <TicketCard
               key={ticket.id}

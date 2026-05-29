@@ -217,9 +217,9 @@ function JelajahiPage() {
           </div>
         )}
 
-        <div className="mt-4 grid grid-cols-2 items-start gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+        <div className="mt-4 grid grid-cols-2 items-start gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4">
           {loading
-            ? Array.from({ length: 12 }).map((_, i) => (
+            ? Array.from({ length: 8 }).map((_, i) => (
                 <EventCardSkeleton key={i} />
               ))
             : visible.map((e) => <EventListCard key={e.id} event={e} />)}
@@ -229,9 +229,9 @@ function JelajahiPage() {
         {!loading && hasMore && (
           <div
             ref={sentinelRef}
-            className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6"
+            className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4"
           >
-            {Array.from({ length: 6 }).map((_, i) => (
+            {Array.from({ length: 4 }).map((_, i) => (
               <EventCardSkeleton key={i} />
             ))}
           </div>
