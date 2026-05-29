@@ -262,12 +262,6 @@ function CheckoutPage() {
     }
   }, [eventId, tierId, initialError])
 
-  useEffect(() => {
-    if (!tier || total > 0) return
-
-    navigate('/home', { replace: true })
-  }, [navigate, tier, total])
-
   if (error) {
     return (
       <div className="mx-auto max-w-[1280px] px-4 py-20 text-center">
@@ -286,11 +280,6 @@ function CheckoutPage() {
   const handleSubmit = async (e) => {
     e.preventDefault()
 
-    if (total <= 0) {
-      navigate('/home', { replace: true })
-      return
-    }
-
     setSubmitting(true)
     setSubmitError('')
 
@@ -304,6 +293,16 @@ function CheckoutPage() {
           },
         ],
       })
+
+      if (total <= 0) {
+        const successParams = new URLSearchParams({
+          eventId: event.id,
+          orderId: result?.orderId ?? result?.id ?? `FREE-${Date.now()}`,
+          total: String(total),
+        })
+        navigate(`/order/success?${successParams.toString()}`, { replace: true })
+        return
+      }
 
       if (!result?.redirectUrl) {
         throw new Error('Redirect URL pembayaran tidak tersedia.')
@@ -438,7 +437,7 @@ function CheckoutPage() {
                 disabled={submitting}
                 className="mt-5 w-full cursor-pointer rounded-lg bg-brand-600 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-300 disabled:opacity-60"
               >
-                {submitting ? 'Memproses...' : 'Complete Payment'}
+                {submitting ? 'Memproses...' : total <= 0 ? 'Daftar Gratis' : 'Complete Payment'}
               </button>
               {submitError && (
                 <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
