@@ -44,7 +44,7 @@ function CategoryCard({ category, active = false }) {
         className={`text-sm font-medium transition ${active ? 'text-brand-600' : 'text-[#444] group-hover:text-brand-600'
           }`}
       >
-        {category.name}in
+        {category.name}
       </p>
     </Link>
   )

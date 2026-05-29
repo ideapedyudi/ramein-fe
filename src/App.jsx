@@ -23,9 +23,12 @@ import TermsPage from './pages/TermsPage'
 import TiketSayaPage from './pages/TiketSayaPage'
 import TransaksiPage from './pages/TransaksiPage'
 import UntukKamuPage from './pages/UntukKamuPage'
+import WithdrawPage from './pages/WithdrawPage'
+import AdminFinancePage from './pages/admin/AdminFinancePage'
 import AdminKategoriPage from './pages/admin/AdminKategoriPage'
 import AdminKotaPage from './pages/admin/AdminKotaPage'
 import AdminOrganizerPage from './pages/admin/AdminOrganizerPage'
+import AdminWithdrawPage from './pages/admin/AdminWithdrawPage'
 
 function App() {
   return (
@@ -71,6 +74,14 @@ function App() {
         element={
           <ProtectedRoute>
             <TransaksiPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/withdraw"
+        element={
+          <ProtectedRoute>
+            <WithdrawPage />
           </ProtectedRoute>
         }
       />
@@ -148,6 +159,22 @@ function App() {
         element={
           <ProtectedRoute requireAdmin>
             <AdminOrganizerPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/finance"
+        element={
+          <ProtectedRoute requireAdmin>
+            <AdminFinancePage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/withdraw"
+        element={
+          <ProtectedRoute requireAdmin>
+            <AdminWithdrawPage />
           </ProtectedRoute>
         }
       />

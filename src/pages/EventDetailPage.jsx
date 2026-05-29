@@ -28,6 +28,27 @@ function Info({ icon, label, value }) {
   )
 }
 
+function getPublicEventUrl(eventId) {
+  return `${window.location.origin}/event/${eventId}`
+}
+
+async function copyText(value) {
+  if (navigator.clipboard?.writeText) {
+    await navigator.clipboard.writeText(value)
+    return
+  }
+
+  const textarea = document.createElement('textarea')
+  textarea.value = value
+  textarea.setAttribute('readonly', '')
+  textarea.style.position = 'fixed'
+  textarea.style.opacity = '0'
+  document.body.appendChild(textarea)
+  textarea.select()
+  document.execCommand('copy')
+  document.body.removeChild(textarea)
+}
+
 function EventDetailPage() {
   const { eventId } = useParams()
   const navigate = useNavigate()
@@ -35,7 +56,21 @@ function EventDetailPage() {
   const [selectedTier, setSelectedTier] = useState('')
   const [quantity, setQuantity] = useState(1)
   const [notFound, setNotFound] = useState(false)
+  const [shareMessage, setShareMessage] = useState('')
   const canonicalPath = `/event/${eventId}`
+
+  async function handleShareLink() {
+    const publicUrl = getPublicEventUrl(eventId)
+
+    try {
+      await copyText(publicUrl)
+      setShareMessage('Link event disalin.')
+    } catch {
+      setShareMessage(publicUrl)
+    }
+
+    window.setTimeout(() => setShareMessage(''), 2500)
+  }
 
   const eventJsonLd =
     event && event.visibility !== 'private'
@@ -190,7 +225,21 @@ function EventDetailPage() {
                   </span>
                 )}
               </div>
-              <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">{event.name}</h1>
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">{event.name}</h1>
+                <div className="shrink-0">
+                  <button
+                    type="button"
+                    onClick={handleShareLink}
+                    className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50 sm:text-sm"
+                  >
+                    Share Link
+                  </button>
+                  {shareMessage && (
+                    <p className="mt-2 max-w-[240px] break-words text-xs text-emerald-600">{shareMessage}</p>
+                  )}
+                </div>
+              </div>
               <div className="mt-3 flex flex-wrap gap-2">
                 {event.badges?.map((b) => (
                   <span

@@ -1,8 +1,9 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { FaCamera, FaKeyboard, FaTimes } from 'react-icons/fa'
 import { useZxing } from 'react-zxing'
 import AdminLayout from '../components/AdminLayout'
+import { useAuth } from '../context/authContext'
 import { api } from '../lib/api'
 import { formatDateTime, formatIDR, formatNumber } from '../lib/format'
 
@@ -10,6 +11,21 @@ const attendeeTabs = [
   { value: 'all', label: 'Semua' },
   { value: 'tidak_hadir', label: 'Tidak Hadir' },
   { value: 'hadir', label: 'Hadir' },
+]
+
+const bankOptions = [
+  'BCA',
+  'Mandiri',
+  'BRI',
+  'BNI',
+  'BTN',
+  'BSI',
+  'CIMB Niaga',
+  'Permata Bank',
+  'Danamon',
+  'OCBC',
+  'Maybank',
+  'Panin Bank',
 ]
 
 function isAttendedStatus(value) {
@@ -49,11 +65,34 @@ function BigStat({ label, value, accent }) {
   )
 }
 
+function getPublicEventUrl(eventId) {
+  return `${window.location.origin}/event/${eventId}`
+}
+
+async function copyText(value) {
+  if (navigator.clipboard?.writeText) {
+    await navigator.clipboard.writeText(value)
+    return
+  }
+
+  const textarea = document.createElement('textarea')
+  textarea.value = value
+  textarea.setAttribute('readonly', '')
+  textarea.style.position = 'fixed'
+  textarea.style.opacity = '0'
+  document.body.appendChild(textarea)
+  textarea.select()
+  document.execCommand('copy')
+  document.body.removeChild(textarea)
+}
+
 function ScanAttendanceModal({ open, onClose, onScanSuccess }) {
   const [mode, setMode] = useState('camera')
   const [manualQr, setManualQr] = useState('')
   const [submitError, setSubmitError] = useState('')
   const [submitMessage, setSubmitMessage] = useState('')
+  const [cameraError, setCameraError] = useState('')
+  const [cameraRetry, setCameraRetry] = useState(0)
   const [submitting, setSubmitting] = useState(false)
   const [scanLocked, setScanLocked] = useState(false)
 
@@ -82,21 +121,50 @@ function ScanAttendanceModal({ open, onClose, onScanSuccess }) {
     [onScanSuccess, scanLocked, submitting],
   )
 
-  const { ref } = useZxing(
-    open && mode === 'camera'
-      ? {
-          paused: submitting || scanLocked,
-          onDecodeResult(result) {
-            submitQrCode(result.getText())
+  const scannerOptions = useMemo(
+    () =>
+      open && mode === 'camera'
+        ? {
+        paused: submitting || scanLocked,
+        constraints: {
+          video: {
+            facingMode: { ideal: 'environment' },
+            width: { ideal: 1280 },
+            height: { ideal: 720 },
           },
-          onError() {},
-        }
-      : {
-          paused: true,
-          onDecodeResult() {},
-          onError() {},
+          audio: false,
         },
+        timeBetweenDecodingAttempts: 250,
+        onDecodeResult(result) {
+          setCameraError('')
+          submitQrCode(result.getText())
+        },
+        onError(error) {
+          const errorName = error?.name ?? ''
+          const fallback =
+            window.isSecureContext || window.location.hostname === 'localhost'
+              ? 'Kamera tidak bisa dibuka. Pastikan izin kamera diberikan dan tidak sedang dipakai aplikasi lain.'
+              : 'Kamera hanya bisa dibuka di HTTPS atau localhost.'
+
+          setCameraError(
+            errorName === 'NotAllowedError'
+              ? 'Izin kamera ditolak. Aktifkan permission kamera di browser.'
+              : errorName === 'NotFoundError'
+                ? 'Kamera tidak ditemukan di perangkat ini.'
+                : errorName === 'NotReadableError'
+                  ? 'Kamera sedang dipakai aplikasi lain.'
+                  : fallback,
+          )
+        },
+      }
+        : {
+        paused: true,
+        onDecodeResult() { },
+        onError() { },
+      },
+    [cameraRetry, mode, open, scanLocked, submitQrCode, submitting],
   )
+  const { ref } = useZxing(scannerOptions)
 
   if (!open) return null
 
@@ -105,6 +173,7 @@ function ScanAttendanceModal({ open, onClose, onScanSuccess }) {
     setManualQr('')
     setSubmitError('')
     setSubmitMessage('')
+    setCameraError('')
     setSubmitting(false)
     setScanLocked(false)
     onClose()
@@ -133,22 +202,20 @@ function ScanAttendanceModal({ open, onClose, onScanSuccess }) {
             <button
               type="button"
               onClick={() => setMode('camera')}
-              className={`inline-flex items-center gap-2 rounded-full px-3 py-2 text-xs font-semibold ${
-                mode === 'camera'
-                  ? 'bg-brand-600 text-white'
-                  : 'border border-[#e2e2e2] bg-white text-[#4a4a4a]'
-              }`}
+              className={`inline-flex items-center gap-2 rounded-full px-3 py-2 text-xs font-semibold ${mode === 'camera'
+                ? 'bg-brand-600 text-white'
+                : 'border border-[#e2e2e2] bg-white text-[#4a4a4a]'
+                }`}
             >
               <FaCamera /> Kamera
             </button>
             <button
               type="button"
               onClick={() => setMode('manual')}
-              className={`inline-flex items-center gap-2 rounded-full px-3 py-2 text-xs font-semibold ${
-                mode === 'manual'
-                  ? 'bg-brand-600 text-white'
-                  : 'border border-[#e2e2e2] bg-white text-[#4a4a4a]'
-              }`}
+              className={`inline-flex items-center gap-2 rounded-full px-3 py-2 text-xs font-semibold ${mode === 'manual'
+                ? 'bg-brand-600 text-white'
+                : 'border border-[#e2e2e2] bg-white text-[#4a4a4a]'
+                }`}
             >
               <FaKeyboard /> Input Manual
             </button>
@@ -157,8 +224,31 @@ function ScanAttendanceModal({ open, onClose, onScanSuccess }) {
           {mode === 'camera' ? (
             <div className="mt-4">
               <div className="overflow-hidden rounded-2xl border border-gray-200 bg-black">
-                <video ref={ref} className="h-[320px] w-full object-cover" />
+                <video
+                  key={cameraRetry}
+                  ref={ref}
+                  autoPlay
+                  muted
+                  playsInline
+                  onLoadedMetadata={(event) => event.currentTarget.play().catch(() => {})}
+                  className="h-[320px] w-full object-cover"
+                />
               </div>
+              {cameraError && (
+                <div className="mt-3 rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700">
+                  <p>{cameraError}</p>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setCameraError('')
+                      setCameraRetry((value) => value + 1)
+                    }}
+                    className="mt-2 rounded-lg bg-red-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-red-700"
+                  >
+                    Coba buka kamera lagi
+                  </button>
+                </div>
+              )}
               <p className="mt-3 text-xs text-gray-500">
                 Arahkan kamera ke QR peserta. Scan akan langsung diproses.
               </p>
@@ -211,6 +301,151 @@ function ScanAttendanceModal({ open, onClose, onScanSuccess }) {
   )
 }
 
+function WithdrawModal({ open, eventId, totalAmount, onClose, onSuccess }) {
+  const [form, setForm] = useState({
+    bank_name: 'BCA',
+    bank_account: '',
+    account_number: '',
+    totalAmount: totalAmount || 0,
+  })
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState('')
+
+  if (!open) return null
+
+  function updateField(key, value) {
+    setForm((current) => ({ ...current, [key]: value }))
+  }
+
+  async function handleSubmit(event) {
+    event.preventDefault()
+    setSubmitting(true)
+    setError('')
+
+    try {
+      await api.createWithdraw({
+        eventId,
+        bank_name: form.bank_name,
+        bank_account: form.bank_account,
+        account_number: form.account_number,
+        totalAmount: Number(totalAmount) || 0,
+      })
+      onSuccess?.()
+    } catch (err) {
+      setError(err.message || 'Gagal mengajukan withdraw.')
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+      <div className="w-full max-w-lg rounded-2xl bg-white shadow-xl">
+        <div className="flex items-start justify-between border-b border-gray-100 p-5">
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900">Withdraw Revenue</h3>
+            <p className="text-sm text-gray-500">Ajukan pencairan dana untuk event ini.</p>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-lg p-2 text-gray-500 hover:bg-gray-100"
+            aria-label="Tutup modal withdraw"
+          >
+            <FaTimes />
+          </button>
+        </div>
+
+        <form className="space-y-4 p-5" onSubmit={handleSubmit}>
+          <div>
+            <label htmlFor="bank-name" className="mb-1 block text-xs font-medium text-gray-600">
+              Nama Bank
+            </label>
+            <select
+              id="bank-name"
+              required
+              value={form.bank_name}
+              onChange={(event) => updateField('bank_name', event.target.value)}
+              className="w-full rounded-xl border border-[#e2e2e2] px-3 py-2 text-sm outline-none focus:border-brand-500"
+            >
+              {bankOptions.map((bank) => (
+                <option key={bank} value={bank}>
+                  {bank}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label htmlFor="bank-account" className="mb-1 block text-xs font-medium text-gray-600">
+              Nama Pemilik Rekening
+            </label>
+            <input
+              id="bank-account"
+              type="text"
+              required
+              value={form.bank_account}
+              onChange={(event) => updateField('bank_account', event.target.value)}
+              className="w-full rounded-xl border border-[#e2e2e2] px-3 py-2 text-sm outline-none focus:border-brand-500"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="account-number" className="mb-1 block text-xs font-medium text-gray-600">
+              Nomor Rekening
+            </label>
+            <input
+              id="account-number"
+              type="text"
+              required
+              value={form.account_number}
+              onChange={(event) => updateField('account_number', event.target.value)}
+              className="w-full rounded-xl border border-[#e2e2e2] px-3 py-2 text-sm outline-none focus:border-brand-500"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="total-amount" className="mb-1 block text-xs font-medium text-gray-600">
+              Total Withdraw
+            </label>
+            <input
+              id="total-amount"
+              type="text"
+              readOnly
+              value={formatIDR(totalAmount)}
+              className="w-full rounded-xl border border-[#e2e2e2] bg-gray-50 px-3 py-2 text-sm text-gray-700 outline-none"
+            />
+            <p className="mt-1 text-xs text-gray-500">Jumlah withdraw mengikuti seluruh revenue event.</p>
+          </div>
+
+          {error && (
+            <div className="rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700">
+              {error}
+            </div>
+          )}
+
+          <div className="flex flex-wrap justify-end gap-2 border-t border-gray-100 pt-4">
+            <button
+              type="button"
+              onClick={onClose}
+              className="rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+            >
+              Batal
+            </button>
+            <button
+              type="submit"
+              disabled={submitting}
+              className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-gray-300"
+            >
+              {submitting ? 'Menyimpan...' : 'Ajukan Withdraw'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  )
+}
+
 function AttendeeSection({ eventId, onScanSuccess }) {
   const [activeTab, setActiveTab] = useState('all')
   const [attendeesByTab, setAttendeesByTab] = useState({})
@@ -244,18 +479,18 @@ function AttendeeSection({ eventId, onScanSuccess }) {
   useEffect(() => {
     let active = true
 
-    ;(async () => {
-      setError('')
-      setLoadingTab('all')
-      try {
-        const res = await api.getEventAttendees(eventId, 'all')
-        if (active) setAttendeesByTab({ all: res })
-      } catch (err) {
-        if (active) setError(err.message || 'Gagal memuat daftar peserta.')
-      } finally {
-        if (active) setLoadingTab('')
-      }
-    })()
+      ; (async () => {
+        setError('')
+        setLoadingTab('all')
+        try {
+          const res = await api.getEventAttendees(eventId, 'all')
+          if (active) setAttendeesByTab({ all: res })
+        } catch (err) {
+          if (active) setError(err.message || 'Gagal memuat daftar peserta.')
+        } finally {
+          if (active) setLoadingTab('')
+        }
+      })()
 
     return () => {
       active = false
@@ -285,11 +520,10 @@ function AttendeeSection({ eventId, onScanSuccess }) {
               key={tab.value}
               type="button"
               onClick={() => loadAttendees(tab.value)}
-              className={`rounded-full px-3 py-1.5 text-xs font-semibold transition ${
-                activeTab === tab.value
-                  ? 'bg-brand-600 text-white'
-                  : 'border border-[#e2e2e2] bg-white text-[#4a4a4a] hover:bg-[#f9f9f9]'
-              }`}
+              className={`rounded-full px-3 py-1.5 text-xs font-semibold transition ${activeTab === tab.value
+                ? 'bg-brand-600 text-white'
+                : 'border border-[#e2e2e2] bg-white text-[#4a4a4a] hover:bg-[#f9f9f9]'
+                }`}
             >
               {tab.label}
             </button>
@@ -325,8 +559,6 @@ function AttendeeSection({ eventId, onScanSuccess }) {
               <tr>
                 <th className="px-4 py-3 font-semibold">Peserta</th>
                 <th className="px-4 py-3 font-semibold">Order ID</th>
-                <th className="px-4 py-3 font-semibold">Tiket</th>
-                <th className="px-4 py-3 font-semibold">Pembayaran</th>
                 <th className="px-4 py-3 font-semibold">Status</th>
                 <th className="px-4 py-3 font-semibold">Waktu</th>
               </tr>
@@ -340,20 +572,11 @@ function AttendeeSection({ eventId, onScanSuccess }) {
                   </td>
                   <td className="px-4 py-3 font-mono text-xs text-gray-500">{attendee.orderId}</td>
                   <td className="px-4 py-3">
-                    <p className="font-medium text-gray-900">{attendee.ticketName}</p>
-                    <p className="text-xs text-gray-500">{attendee.quantity}x</p>
-                  </td>
-                  <td className="px-4 py-3">
-                    <p className="font-medium text-gray-900">{formatIDR(attendee.total)}</p>
-                    <p className="text-xs uppercase text-gray-500">{attendee.paymentProvider}</p>
-                  </td>
-                  <td className="px-4 py-3">
                     <span
-                      className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase ${
-                        isAttendedStatus(attendee.attendanceStatus)
-                          ? 'bg-emerald-50 text-emerald-700'
-                          : 'bg-amber-50 text-amber-700'
-                      }`}
+                      className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase ${isAttendedStatus(attendee.attendanceStatus)
+                        ? 'bg-emerald-50 text-emerald-700'
+                        : 'bg-amber-50 text-amber-700'
+                        }`}
                     >
                       {formatAttendeeStatus(attendee.attendanceStatus)}
                     </span>
@@ -378,6 +601,7 @@ function AttendeeSection({ eventId, onScanSuccess }) {
 }
 
 function EventKamuDetailPage() {
+  const { isAdmin } = useAuth()
   const { eventId } = useParams()
   const [event, setEvent] = useState(null)
   const [error, setError] = useState('')
@@ -386,6 +610,9 @@ function EventKamuDetailPage() {
   const [statistic, setStatistic] = useState(null)
   const [statisticLoading, setStatisticLoading] = useState(false)
   const [statisticError, setStatisticError] = useState('')
+  const [shareMessage, setShareMessage] = useState('')
+  const [withdrawModalOpen, setWithdrawModalOpen] = useState(false)
+  const [withdrawMessage, setWithdrawMessage] = useState('')
 
   const loadStatistic = useCallback(async () => {
     await Promise.resolve()
@@ -401,6 +628,19 @@ function EventKamuDetailPage() {
       setStatisticLoading(false)
     }
   }, [eventId])
+
+  async function handleShareLink() {
+    const publicUrl = getPublicEventUrl(eventId)
+
+    try {
+      await copyText(publicUrl)
+      setShareMessage('Link event disalin.')
+    } catch {
+      setShareMessage(publicUrl)
+    }
+
+    window.setTimeout(() => setShareMessage(''), 2500)
+  }
 
   useEffect(() => {
     let cancelled = false
@@ -459,15 +699,27 @@ function EventKamuDetailPage() {
     kuota: statistic?.kuota ?? event.totalQuota ?? 0,
     revenue: statistic?.revenue ?? event.revenue ?? 0,
   }
+  const isWithdraw = Boolean(event.isWithdraw ?? event.is_withdraw)
+  const isRevenueEmpty = Number(stats.revenue) <= 0
+  const isWithdrawDisabled = isWithdraw || isRevenueEmpty
 
   return (
     <AdminLayout
       title={event.name ?? '-'}
       subtitle={`${formatDateTime(event.startDateTime)} - ${event.city}`}
       actions={
-        <button className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs font-medium hover:bg-gray-50 sm:text-sm">
-          Share Link
-        </button>
+        <div className="text-right">
+          <button
+            type="button"
+            onClick={handleShareLink}
+            className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs font-medium hover:bg-gray-50 sm:text-sm"
+          >
+            Share Link
+          </button>
+          {shareMessage && (
+            <p className="mt-2 max-w-[240px] break-words text-xs text-emerald-600">{shareMessage}</p>
+          )}
+        </div>
       }
     >
       <Link to="/event-kamu" className="mb-4 inline-block text-sm text-gray-600 hover:text-brand-600">
@@ -485,11 +737,10 @@ function EventKamuDetailPage() {
               <button
                 key={item.key}
                 onClick={() => setTab(item.key)}
-                className={`relative -mb-px whitespace-nowrap border-b-2 px-1 pb-3 pt-2 text-sm font-medium transition ${
-                  tab === item.key
-                    ? 'border-brand-600 text-brand-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-800'
-                }`}
+                className={`relative -mb-px whitespace-nowrap border-b-2 px-1 pb-3 pt-2 text-sm font-medium transition ${tab === item.key
+                  ? 'border-brand-600 text-brand-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-800'
+                  }`}
               >
                 {item.label}
               </button>
@@ -573,7 +824,26 @@ function EventKamuDetailPage() {
 
           {tab === 'statistik' && (
             <Card>
-              <CardHeader title="Statistik" />
+              <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <CardHeader title="Statistik" />
+                {!isAdmin && (
+                  <div className="text-left sm:text-right">
+                    <button
+                      type="button"
+                      onClick={() => setWithdrawModalOpen(true)}
+                      disabled={isWithdrawDisabled}
+                      className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-gray-300"
+                    >
+                      {isWithdraw ? 'Withdraw' : 'Withdraw'}
+                    </button>
+                  </div>
+                )}
+              </div>
+              {withdrawMessage && (
+                <div className="mb-4 rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+                  {withdrawMessage}
+                </div>
+              )}
               {statisticError && (
                 <div className="mb-4 rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700">
                   {statisticError}
@@ -603,6 +873,21 @@ function EventKamuDetailPage() {
               </div>
 
               <AttendeeSection eventId={eventId} onScanSuccess={loadStatistic} />
+              {withdrawModalOpen && (
+                <WithdrawModal
+                  open={withdrawModalOpen}
+                  eventId={eventId}
+                  totalAmount={stats.revenue}
+                  onClose={() => setWithdrawModalOpen(false)}
+                  onSuccess={() => {
+                    setWithdrawModalOpen(false)
+                    setWithdrawMessage('Pengajuan withdraw berhasil disimpan.')
+                    setEvent((current) =>
+                      current ? { ...current, isWithdraw: true, is_withdraw: true } : current,
+                    )
+                  }}
+                />
+              )}
             </Card>
           )}
         </div>

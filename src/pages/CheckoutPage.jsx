@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { api } from '../lib/api'
 import { formatIDR } from '../lib/format'
 
@@ -217,6 +217,7 @@ function PaymentModal({ open, transaction, onClose }) {
 
 function CheckoutPage() {
   const [params] = useSearchParams()
+  const navigate = useNavigate()
   const eventId = params.get('eventId')
   const tierId = params.get('tierId')
   const qty = Number(params.get('qty') ?? '1')
@@ -234,6 +235,8 @@ function CheckoutPage() {
   const [contact, setContact] = useState({ email: '', firstName: '', lastName: '', phone: '' })
 
   const updateContact = (key) => (e) => setContact((c) => ({ ...c, [key]: e.target.value }))
+  const subtotal = (Number(tier?.price) || 0) * qty
+  const total = subtotal
 
   useEffect(() => {
     let cancelled = false
@@ -274,13 +277,9 @@ function CheckoutPage() {
     return <div className="mx-auto max-w-[1280px] px-4 py-20 text-center text-gray-500">Memuat...</div>
   }
 
-  const subtotal = tier.price * qty
-  const serviceFee = subtotal > 0 ? 15000 : 0
-  const platformFee = subtotal > 0 ? 10000 : 0
-  const total = subtotal + serviceFee + platformFee
-
   const handleSubmit = async (e) => {
     e.preventDefault()
+
     setSubmitting(true)
     setSubmitError('')
 
@@ -294,6 +293,32 @@ function CheckoutPage() {
           },
         ],
       })
+
+      if (total <= 0) {
+        const successParams = new URLSearchParams({
+          eventId: event.id,
+          orderId: result?.orderId ?? result?.id ?? `FREE-${Date.now()}`,
+          total: String(total),
+        })
+        navigate(`/order/success?${successParams.toString()}`, { replace: true })
+        return
+      }
+
+      const orderReference = String(result?.orderId ?? result?.order_id ?? result?.id ?? '').trim()
+      if (orderReference && typeof window !== 'undefined') {
+        try {
+          window.localStorage.setItem(
+            `checkout_meta_${orderReference}`,
+            JSON.stringify({
+              eventId: event.id,
+              total,
+              savedAt: Date.now(),
+            }),
+          )
+        } catch {
+          // Ignore storage errors; payment flow should continue.
+        }
+      }
 
       if (!result?.redirectUrl) {
         throw new Error('Redirect URL pembayaran tidak tersedia.')
@@ -416,8 +441,6 @@ function CheckoutPage() {
 
               <div className="my-5 space-y-1.5 border-t border-gray-100 pt-5 text-sm">
                 <Row label="Subtotal" value={formatIDR(subtotal)} />
-                <Row label="Service Fee" value={formatIDR(serviceFee)} />
-                <Row label="Platform Fee" value={formatIDR(platformFee)} />
               </div>
 
               <div className="flex items-center justify-between border-t border-gray-100 pt-4">
@@ -430,7 +453,7 @@ function CheckoutPage() {
                 disabled={submitting}
                 className="mt-5 w-full cursor-pointer rounded-lg bg-brand-600 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-300 disabled:opacity-60"
               >
-                {submitting ? 'Memproses...' : 'Complete Payment'}
+                {submitting ? 'Memproses...' : total <= 0 ? 'Daftar Gratis' : 'Complete Payment'}
               </button>
               {submitError && (
                 <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">

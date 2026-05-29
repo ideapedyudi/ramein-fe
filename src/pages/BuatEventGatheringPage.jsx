@@ -23,6 +23,59 @@ function BigField({ label, name, value, onChange, placeholder, required, big }) 
 }
 
 function SmallField({ label, name, type = 'text', value, onChange, placeholder, required }) {
+  if (type === 'datetime-local') {
+    const dateValue = value ? value.slice(0, 10) : ''
+    const parsedTime = value ? value.slice(11, 16) : ''
+    const hourValue = /^\d{2}:\d{2}$/.test(parsedTime) ? parsedTime.slice(0, 2) : '00'
+    const minuteValue = /^\d{2}:\d{2}$/.test(parsedTime) ? parsedTime.slice(3, 5) : '00'
+
+    const hourOptions = Array.from({ length: 24 }, (_, idx) => String(idx).padStart(2, '0'))
+    const minuteOptions = Array.from({ length: 60 }, (_, idx) => String(idx).padStart(2, '0'))
+
+    const composeDateTimeValue = (datePart, hourPart, minutePart) =>
+      datePart ? `${datePart}T${hourPart}:${minutePart}` : ''
+
+    return (
+      <label className="block">
+        <span className="mb-1 block text-xs font-medium text-gray-600">{label}</span>
+        <div className="grid grid-cols-[1fr_90px_90px] gap-2">
+          <input
+            name={name}
+            type="date"
+            value={dateValue}
+            onChange={(e) => onChange(composeDateTimeValue(e.target.value, hourValue, minuteValue))}
+            required={required}
+            className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
+          />
+          <select
+            value={hourValue}
+            onChange={(e) => onChange(composeDateTimeValue(dateValue, e.target.value, minuteValue))}
+            required={required}
+            className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
+          >
+            {hourOptions.map((hour) => (
+              <option key={hour} value={hour}>
+                {hour}
+              </option>
+            ))}
+          </select>
+          <select
+            value={minuteValue}
+            onChange={(e) => onChange(composeDateTimeValue(dateValue, hourValue, e.target.value))}
+            required={required}
+            className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
+          >
+            {minuteOptions.map((minute) => (
+              <option key={minute} value={minute}>
+                {minute}
+              </option>
+            ))}
+          </select>
+        </div>
+      </label>
+    )
+  }
+
   return (
     <label className="block">
       <span className="mb-1 block text-xs font-medium text-gray-600">{label}</span>

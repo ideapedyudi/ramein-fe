@@ -512,6 +512,13 @@ const getEventStartingPrice = (ticketTypes = []) => {
   return prices.length ? Math.min(...prices) : 0
 }
 
+const getEventTicketTypes = (event) =>
+  Array.isArray(event.ticketTypes)
+    ? event.ticketTypes
+    : Array.isArray(event.ticket_types)
+      ? event.ticket_types
+      : []
+
 const formatEventTimeRange = (start, end) => {
   if (!start) return "-"
 
@@ -556,13 +563,13 @@ const toPublicEventSummaryFromApi = (event) => ({
   id: event.id,
   name: event.title,
   category: event.category?.name ?? "-",
-  region: event.city?.name ?? "-",
+  region: event.city?.provinsi ?? event.city?.name ?? "-",
   city: event.city?.name ?? "-",
   date: event.startDateTime ?? event.start_datetime ?? null,
   dateLabel: formatEventDateLabel(event.startDateTime ?? event.start_datetime),
-  startingPrice: getEventStartingPrice(event.ticketTypes),
+  startingPrice: getEventStartingPrice(getEventTicketTypes(event)),
   organizer: {
-    id: event.organizer?.id ?? event.organizerId ?? "organizer",
+    id: event.organizer?.id ?? event.organizerId ?? event.organizer_id ?? "organizer",
     name: event.organizer?.name ?? "Ramein",
     initial: (event.organizer?.name ?? "Ramein").charAt(0).toUpperCase(),
   },
@@ -577,7 +584,7 @@ const toPublicEventSummaryFromApi = (event) => ({
 
 const toPublicEventDetailFromApi = (event) => {
   const summary = toPublicEventSummaryFromApi(event)
-  const ticketTypes = Array.isArray(event.ticketTypes) ? event.ticketTypes : []
+  const ticketTypes = getEventTicketTypes(event)
 
   return {
     ...summary,
@@ -588,7 +595,7 @@ const toPublicEventDetailFromApi = (event) => {
     ),
     location: summary.isOnline
       ? event.labelOnline ?? event.label_online ?? "Online Event"
-      : [event.addressDetail, event.city?.name].filter(Boolean).join(", ") || "-",
+      : [event.addressDetail ?? event.address_detail, event.city?.name].filter(Boolean).join(", ") || "-",
     attendees: ticketTypes.reduce((sum, ticket) => sum + (Number(ticket.sold) || 0), 0),
     attachmentLabel: summary.isOnline
       ? event.labelOnline ?? event.label_online ?? "Link event online"
@@ -668,30 +675,71 @@ const normalizeAttendanceStatus = (value) => {
 const toMyPaidTicketFromApi = (entry) => {
   const items = Array.isArray(entry?.transaction?.items) ? entry.transaction.items : []
   const firstItem = items[0]
-  const quantity = items.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0)
+  const eventType = String(entry?.event?.eventType ?? entry?.event?.event_type ?? "").toLowerCase()
+  const isOnlineEvent = eventType === "online"
+  const rawTickets = Array.isArray(entry?.tickets)
+    ? entry.tickets
+    : Array.isArray(entry?.transaction?.tickets)
+      ? entry.transaction.tickets
+      : []
+  const quantity =
+    rawTickets.length > 0
+      ? rawTickets.length
+      : items.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0)
   const total = Number(entry?.transaction?.grossAmount) || 0
+  const tickets =
+    rawTickets.length > 0
+      ? rawTickets.map((ticket, index) => ({
+          id: ticket.id,
+          qrCode: ticket.qrCode ?? null,
+          status: normalizeAttendanceStatus(ticket.attendanceStatus),
+          attendanceStatus: ticket.attendanceStatus ?? "not_attended",
+          attendedAt: ticket.attendedAt ?? null,
+          createdAt: ticket.createdAt ?? null,
+          number: index + 1,
+        }))
+      : [
+          {
+            id: entry.id,
+            qrCode: entry.qrCode ?? null,
+            status: normalizeAttendanceStatus(entry.attendanceStatus),
+            attendanceStatus: entry.attendanceStatus ?? "not_attended",
+            attendedAt: entry.attendedAt ?? null,
+            createdAt: entry.createdAt ?? null,
+            number: 1,
+          },
+        ]
+  const cardStatus = tickets.some((ticket) => ticket.status === "active")
+    ? "active"
+    : tickets[0]?.status ?? normalizeAttendanceStatus(entry.attendanceStatus)
 
   return {
     id: entry.id,
     eventId: entry.event?.id ?? entry.eventId,
     transactionId: entry.transactionId ?? entry.transaction?.id ?? null,
     orderId: entry.transaction?.orderId ?? entry.transactionId ?? entry.id,
-    qrCode: entry.qrCode ?? null,
+    qrCode: tickets[0]?.qrCode ?? entry.qrCode ?? null,
     eventName: entry.event?.title ?? "-",
     dateLabel: formatEventDateLabel(entry.event?.startDateTime),
+    eventType,
+    eventOnlineLabel: isOnlineEvent
+      ? entry.event?.labelOnline ?? entry.event?.label_online ?? "Online Event"
+      : null,
+    eventOnlineUrl: entry.event?.urlOnline ?? entry.event?.url_online ?? null,
     location:
-      entry.event?.eventType === "online"
-        ? entry.event?.labelOnline ?? "Online Event"
+      isOnlineEvent
+        ? entry.event?.labelOnline ?? entry.event?.label_online ?? "Online Event"
         : [entry.event?.city?.name, entry.event?.organizer?.name].filter(Boolean).join(" • ") || "-",
     tier: firstItem?.ticketName ?? "-",
     quantity,
     price: quantity > 0 ? total / quantity : total,
     total,
-    status: normalizeAttendanceStatus(entry.attendanceStatus),
-    attendanceStatus: entry.attendanceStatus ?? "not_attended",
-    attendedAt: entry.attendedAt ?? null,
+    status: cardStatus,
+    attendanceStatus: tickets[0]?.attendanceStatus ?? entry.attendanceStatus ?? "not_attended",
+    attendedAt: tickets[0]?.attendedAt ?? entry.attendedAt ?? null,
     purchasedAt: entry.transaction?.createdAt ?? entry.createdAt ?? null,
     imageUrl: entry.event?.banner ?? null,
+    tickets,
   }
 }
 
@@ -715,6 +763,84 @@ const toEventAttendeeFromApi = (entry) => {
     attendedAt: entry.attendedAt ?? null,
     registeredAt: entry.createdAt ?? null,
   }
+}
+
+const normalizeWithdrawStatus = (value) => {
+  const status = String(value ?? "").toLowerCase()
+
+  if (["approved", "success", "paid", "completed"].includes(status)) return "approved"
+  if (["reject", "rejected", "failed", "cancelled"].includes(status)) return "rejected"
+
+  return status || "pending"
+}
+
+const toWithdrawFromApi = (entry) => ({
+  id: entry.id,
+  eventId: entry.eventId ?? entry.event?.id ?? null,
+  userId: entry.userId ?? entry.user?.id ?? null,
+  totalAmount: Number(entry.totalAmount) || 0,
+  bankName: entry.bank_name ?? entry.bankName ?? "-",
+  bankAccount: entry.bank_account ?? entry.bankAccount ?? "-",
+  accountNumber: entry.account_number ?? entry.accountNumber ?? "-",
+  status: normalizeWithdrawStatus(entry.status),
+  isApproval: Boolean(entry.is_approval ?? entry.isApproval),
+  createdAt: entry.createdAt ?? null,
+  updatedAt: entry.updatedAt ?? null,
+  event: {
+    id: entry.event?.id ?? entry.eventId ?? null,
+    title: entry.event?.title ?? "-",
+    isWithdraw: Boolean(entry.event?.isWithdraw ?? entry.event?.is_withdraw),
+  },
+  user: {
+    id: entry.user?.id ?? entry.userId ?? null,
+    name: entry.user?.name ?? "-",
+    email: entry.user?.email ?? "-",
+  },
+})
+
+const getWithdrawCollection = (payload) => {
+  if (Array.isArray(payload)) return payload
+  if (Array.isArray(payload?.data)) return payload.data
+  if (Array.isArray(payload?.data?.withdraws)) return payload.data.withdraws
+  if (Array.isArray(payload?.withdraws)) return payload.withdraws
+  return []
+}
+
+const toFinanceFromApi = (entry) => ({
+  id: entry.id,
+  userId: entry.user_id ?? entry.userId ?? entry.user?.id ?? null,
+  eventId: entry.event_id ?? entry.eventId ?? entry.event?.id ?? null,
+  transactionId: entry.transaksi_id ?? entry.transactionId ?? null,
+  organizerId: entry.organizer_id ?? entry.organizerId ?? entry.organizer?.id ?? null,
+  grossAmount: Number(entry.gross_amount ?? entry.grossAmount) || 0,
+  adminIncome: Number(entry.admin_income ?? entry.adminIncome) || 0,
+  transactionTime: entry.time_transaksi ?? entry.transactionTime ?? null,
+  publishedBy: entry.published_by ?? entry.publishedBy ?? "-",
+  createdAt: entry.created_at ?? entry.createdAt ?? null,
+  updatedAt: entry.updated_at ?? entry.updatedAt ?? null,
+  user: {
+    id: entry.user?.id ?? entry.user_id ?? entry.userId ?? null,
+    name: entry.user?.name ?? "-",
+    email: entry.user?.email ?? "-",
+  },
+  event: {
+    id: entry.event?.id ?? entry.event_id ?? entry.eventId ?? null,
+    title: entry.event?.title ?? "-",
+  },
+  organizer: {
+    id: entry.organizer?.id ?? entry.organizer_id ?? entry.organizerId ?? null,
+    name: entry.organizer?.name ?? "-",
+  },
+})
+
+const getFinanceCollection = (payload) => {
+  if (Array.isArray(payload)) return payload
+  if (Array.isArray(payload?.data)) return payload.data
+  if (Array.isArray(payload?.data?.finance)) return payload.data.finance
+  if (Array.isArray(payload?.data?.items)) return payload.data.items
+  if (Array.isArray(payload?.finance)) return payload.finance
+  if (Array.isArray(payload?.items)) return payload.items
+  return []
 }
 
 const publicCatalog = () =>
@@ -760,7 +886,14 @@ let masterOrganizers = [
 ];
 
 const toManagedEvent = (event) => {
-  const ticketTypes = event.ticketTypes ?? [];
+  const ticketTypes = getEventTicketTypes(event).map((ticket) => ({
+    ...ticket,
+    eventId: ticket.eventId ?? ticket.event_id ?? event.id,
+    saleStartAt: ticket.saleStartAt ?? ticket.sale_start_at ?? null,
+    saleEndAt: ticket.saleEndAt ?? ticket.sale_end_at ?? null,
+    createdAt: ticket.createdAt ?? ticket.created_at ?? null,
+    updatedAt: ticket.updatedAt ?? ticket.updated_at ?? null,
+  }));
   const totalQuota = ticketTypes.reduce((sum, ticket) => sum + (Number(ticket.quota) || 0), 0);
   const sold = ticketTypes.reduce((sum, ticket) => sum + (Number(ticket.sold) || 0), 0);
   const revenue = ticketTypes.reduce(
@@ -773,17 +906,45 @@ const toManagedEvent = (event) => {
 
   return {
     ...event,
-    name: event.title,
+    name: event.title ?? event.name ?? "-",
+    title: event.title ?? event.name ?? "-",
+    categoryId: event.categoryId ?? event.category_id ?? null,
+    organizerId: event.organizerId ?? event.organizer_id ?? null,
+    createdBy: event.createdBy ?? event.created_by ?? null,
+    cityId: event.cityId ?? event.city_id ?? null,
     category: event.category?.name ?? "-",
     city: event.city?.name ?? "-",
-    dateLabel: event.startDateTime,
-    imageUrl: event.banner,
+    addressDetail: event.addressDetail ?? event.address_detail ?? "-",
+    dateLabel: event.startDateTime ?? event.start_datetime ?? null,
+    startDateTime: event.startDateTime ?? event.start_datetime ?? null,
+    endDateTime: event.endDateTime ?? event.end_datetime ?? null,
+    imageUrl: event.banner ?? event.imageUrl ?? null,
+    banner: event.banner ?? event.imageUrl ?? null,
+    eventType: event.eventType ?? event.event_type ?? "-",
+    labelOnline: event.labelOnline ?? event.label_online ?? null,
+    urlOnline: event.urlOnline ?? event.url_online ?? null,
+    paymentType: event.paymentType ?? event.payment_type ?? null,
+    visibility: event.visibility ?? "public",
+    isPublished: Boolean(event.isPublished ?? event.is_published),
+    publishedBy: event.publishedBy ?? event.published_by ?? null,
+    createdAt: event.createdAt ?? event.created_at ?? null,
+    updatedAt: event.updatedAt ?? event.updated_at ?? null,
+    ticketTypes,
+    organizer: event.organizer
+      ? {
+          ...event.organizer,
+          contactName: event.organizer.contactName ?? event.organizer.contact_name ?? null,
+          contactEmail: event.organizer.contactEmail ?? event.organizer.contact_email ?? null,
+          contactPhone: event.organizer.contactPhone ?? event.organizer.contact_phone ?? null,
+        }
+      : null,
     registered: sold,
     attended: 0,
     revenue,
     totalQuota,
     startingPrice: prices.length ? Math.min(...prices) : 0,
-    status: event.status ?? (event.isPublished ? "active" : "draft"),
+    status: event.status ?? (event.isPublished ?? event.is_published ? "active" : "draft"),
+    isWithdraw: Boolean(event.is_withdraw ?? event.isWithdraw),
   };
 };
 
@@ -804,20 +965,18 @@ export const api = {
     }).then((res) => res.data ?? res),
   getCategories: () => delay(apiCategories),
   getRegions: () => delay(apiRegions),
-  searchEvents: ({ category, region, city, query }) => {
-    const q = (query ?? "").toLowerCase().trim();
-    const results = publicCatalog()
-      .filter((e) => !category || e.category === category)
-      .filter((e) => !region || e.region === region)
-      .filter((e) => !city || e.city.toLowerCase() === city.toLowerCase())
-      .filter(
-        (e) =>
-          !q ||
-          e.name.toLowerCase().includes(q) ||
-          e.organizer.name.toLowerCase().includes(q),
-      )
-      .map(toSummary);
-    return delay(results);
+  searchEvents: ({ category, wilayah, kota, date }) => {
+    const params = new URLSearchParams()
+
+    if (category) params.set("category", category)
+    if (wilayah) params.set("wilayah", wilayah)
+    if (kota) params.set("kota", kota)
+    if (date) params.set("date", date)
+
+    const query = params.toString()
+    return apiRequest(`/events/explore${query ? `?${query}` : ""}`).then((res) =>
+      getApiCollection(res).map(toPublicEventSummaryFromApi),
+    )
   },
   getEvent: (id) =>
     apiRequest(`/events/${id}`)
@@ -830,6 +989,17 @@ export const api = {
       wishlist: [publicCatalog()[2], publicCatalog()[3]].map(toSummary),
       trendingInCity: [publicCatalog()[0], publicCatalog()[1]].map(toSummary),
     }),
+  getEventsByInterest: (categories = []) => {
+    const selected = Array.isArray(categories) ? categories.filter(Boolean) : [categories].filter(Boolean)
+    const params = new URLSearchParams()
+
+    if (selected.length > 0) params.set("categories", selected.join(","))
+
+    const query = params.toString()
+    return apiRequest(`/events/interest${query ? `?${query}` : ""}`).then((res) =>
+      getApiCollection(res).map(toPublicEventSummaryFromApi),
+    )
+  },
   getMyEvents: () =>
     apiRequest("/events?createdBy=me").then((res) => (res.data ?? []).map(toManagedEvent)),
   getMyEvent: (id) =>
@@ -855,6 +1025,27 @@ export const api = {
         revenue: Number(data.revenue) || 0,
       };
     }),
+  createWithdraw: (payload) =>
+    apiRequest("/withdraw", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }).then((res) => res.data ?? res),
+  getMyWithdraws: () =>
+    apiRequest("/withdraw/me").then((res) => getWithdrawCollection(res).map(toWithdrawFromApi)),
+  getAllWithdraws: () =>
+    apiRequest("/withdraw/all").then((res) => getWithdrawCollection(res).map(toWithdrawFromApi)),
+  updateWithdrawStatus: (id, status) =>
+    apiRequest("/withdraw/status", {
+      method: "POST",
+      body: JSON.stringify({
+        id,
+        status,
+      }),
+    }).then((res) => (res.data ? toWithdrawFromApi(res.data) : res)),
+  getAdminFinance: (organizerId) =>
+    apiRequest(`/finance/admin/${organizerId}`).then((res) =>
+      getFinanceCollection(res).map(toFinanceFromApi),
+    ),
   scanTicketQrCode: (qrCode) =>
     apiRequest("/ticket/qr-code/scan", {
       method: "POST",
