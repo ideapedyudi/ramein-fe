@@ -106,17 +106,17 @@ function ScanAttendanceModal({ open, onClose, onScanSuccess }) {
   const { ref } = useZxing(
     open && mode === 'camera'
       ? {
-          paused: submitting || scanLocked,
-          onDecodeResult(result) {
-            submitQrCode(result.getText())
-          },
-          onError() {},
-        }
-      : {
-          paused: true,
-          onDecodeResult() {},
-          onError() {},
+        paused: submitting || scanLocked,
+        onDecodeResult(result) {
+          submitQrCode(result.getText())
         },
+        onError() { },
+      }
+      : {
+        paused: true,
+        onDecodeResult() { },
+        onError() { },
+      },
   )
 
   if (!open) return null
@@ -154,22 +154,20 @@ function ScanAttendanceModal({ open, onClose, onScanSuccess }) {
             <button
               type="button"
               onClick={() => setMode('camera')}
-              className={`inline-flex items-center gap-2 rounded-full px-3 py-2 text-xs font-semibold ${
-                mode === 'camera'
+              className={`inline-flex items-center gap-2 rounded-full px-3 py-2 text-xs font-semibold ${mode === 'camera'
                   ? 'bg-brand-600 text-white'
                   : 'border border-[#e2e2e2] bg-white text-[#4a4a4a]'
-              }`}
+                }`}
             >
               <FaCamera /> Kamera
             </button>
             <button
               type="button"
               onClick={() => setMode('manual')}
-              className={`inline-flex items-center gap-2 rounded-full px-3 py-2 text-xs font-semibold ${
-                mode === 'manual'
+              className={`inline-flex items-center gap-2 rounded-full px-3 py-2 text-xs font-semibold ${mode === 'manual'
                   ? 'bg-brand-600 text-white'
                   : 'border border-[#e2e2e2] bg-white text-[#4a4a4a]'
-              }`}
+                }`}
             >
               <FaKeyboard /> Input Manual
             </button>
@@ -265,18 +263,18 @@ function AttendeeSection({ eventId, onScanSuccess }) {
   useEffect(() => {
     let active = true
 
-    ;(async () => {
-      setError('')
-      setLoadingTab('all')
-      try {
-        const res = await api.getEventAttendees(eventId, 'all')
-        if (active) setAttendeesByTab({ all: res })
-      } catch (err) {
-        if (active) setError(err.message || 'Gagal memuat daftar peserta.')
-      } finally {
-        if (active) setLoadingTab('')
-      }
-    })()
+      ; (async () => {
+        setError('')
+        setLoadingTab('all')
+        try {
+          const res = await api.getEventAttendees(eventId, 'all')
+          if (active) setAttendeesByTab({ all: res })
+        } catch (err) {
+          if (active) setError(err.message || 'Gagal memuat daftar peserta.')
+        } finally {
+          if (active) setLoadingTab('')
+        }
+      })()
 
     return () => {
       active = false
@@ -306,11 +304,10 @@ function AttendeeSection({ eventId, onScanSuccess }) {
               key={tab.value}
               type="button"
               onClick={() => loadAttendees(tab.value)}
-              className={`rounded-full px-3 py-1.5 text-xs font-semibold transition ${
-                activeTab === tab.value
+              className={`rounded-full px-3 py-1.5 text-xs font-semibold transition ${activeTab === tab.value
                   ? 'bg-brand-600 text-white'
                   : 'border border-[#e2e2e2] bg-white text-[#4a4a4a] hover:bg-[#f9f9f9]'
-              }`}
+                }`}
             >
               {tab.label}
             </button>
@@ -346,8 +343,6 @@ function AttendeeSection({ eventId, onScanSuccess }) {
               <tr>
                 <th className="px-4 py-3 font-semibold">Peserta</th>
                 <th className="px-4 py-3 font-semibold">Order ID</th>
-                <th className="px-4 py-3 font-semibold">Tiket</th>
-                <th className="px-4 py-3 font-semibold">Pembayaran</th>
                 <th className="px-4 py-3 font-semibold">Status</th>
                 <th className="px-4 py-3 font-semibold">Waktu</th>
               </tr>
@@ -361,20 +356,11 @@ function AttendeeSection({ eventId, onScanSuccess }) {
                   </td>
                   <td className="px-4 py-3 font-mono text-xs text-gray-500">{attendee.orderId}</td>
                   <td className="px-4 py-3">
-                    <p className="font-medium text-gray-900">{attendee.ticketName}</p>
-                    <p className="text-xs text-gray-500">{attendee.quantity}x</p>
-                  </td>
-                  <td className="px-4 py-3">
-                    <p className="font-medium text-gray-900">{formatIDR(attendee.total)}</p>
-                    <p className="text-xs uppercase text-gray-500">{attendee.paymentProvider}</p>
-                  </td>
-                  <td className="px-4 py-3">
                     <span
-                      className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase ${
-                        isAttendedStatus(attendee.attendanceStatus)
+                      className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase ${isAttendedStatus(attendee.attendanceStatus)
                           ? 'bg-emerald-50 text-emerald-700'
                           : 'bg-amber-50 text-amber-700'
-                      }`}
+                        }`}
                     >
                       {formatAttendeeStatus(attendee.attendanceStatus)}
                     </span>
@@ -529,11 +515,10 @@ function EventKamuDetailPage() {
               <button
                 key={item.key}
                 onClick={() => setTab(item.key)}
-                className={`relative -mb-px whitespace-nowrap border-b-2 px-1 pb-3 pt-2 text-sm font-medium transition ${
-                  tab === item.key
+                className={`relative -mb-px whitespace-nowrap border-b-2 px-1 pb-3 pt-2 text-sm font-medium transition ${tab === item.key
                     ? 'border-brand-600 text-brand-600'
                     : 'border-transparent text-gray-500 hover:text-gray-800'
-                }`}
+                  }`}
               >
                 {item.label}
               </button>

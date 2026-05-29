@@ -668,15 +668,48 @@ const normalizeAttendanceStatus = (value) => {
 const toMyPaidTicketFromApi = (entry) => {
   const items = Array.isArray(entry?.transaction?.items) ? entry.transaction.items : []
   const firstItem = items[0]
-  const quantity = items.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0)
+  const rawTickets = Array.isArray(entry?.tickets)
+    ? entry.tickets
+    : Array.isArray(entry?.transaction?.tickets)
+      ? entry.transaction.tickets
+      : []
+  const quantity =
+    rawTickets.length > 0
+      ? rawTickets.length
+      : items.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0)
   const total = Number(entry?.transaction?.grossAmount) || 0
+  const tickets =
+    rawTickets.length > 0
+      ? rawTickets.map((ticket, index) => ({
+          id: ticket.id,
+          qrCode: ticket.qrCode ?? null,
+          status: normalizeAttendanceStatus(ticket.attendanceStatus),
+          attendanceStatus: ticket.attendanceStatus ?? "not_attended",
+          attendedAt: ticket.attendedAt ?? null,
+          createdAt: ticket.createdAt ?? null,
+          number: index + 1,
+        }))
+      : [
+          {
+            id: entry.id,
+            qrCode: entry.qrCode ?? null,
+            status: normalizeAttendanceStatus(entry.attendanceStatus),
+            attendanceStatus: entry.attendanceStatus ?? "not_attended",
+            attendedAt: entry.attendedAt ?? null,
+            createdAt: entry.createdAt ?? null,
+            number: 1,
+          },
+        ]
+  const cardStatus = tickets.some((ticket) => ticket.status === "active")
+    ? "active"
+    : tickets[0]?.status ?? normalizeAttendanceStatus(entry.attendanceStatus)
 
   return {
     id: entry.id,
     eventId: entry.event?.id ?? entry.eventId,
     transactionId: entry.transactionId ?? entry.transaction?.id ?? null,
     orderId: entry.transaction?.orderId ?? entry.transactionId ?? entry.id,
-    qrCode: entry.qrCode ?? null,
+    qrCode: tickets[0]?.qrCode ?? entry.qrCode ?? null,
     eventName: entry.event?.title ?? "-",
     dateLabel: formatEventDateLabel(entry.event?.startDateTime),
     location:
@@ -687,11 +720,12 @@ const toMyPaidTicketFromApi = (entry) => {
     quantity,
     price: quantity > 0 ? total / quantity : total,
     total,
-    status: normalizeAttendanceStatus(entry.attendanceStatus),
-    attendanceStatus: entry.attendanceStatus ?? "not_attended",
-    attendedAt: entry.attendedAt ?? null,
+    status: cardStatus,
+    attendanceStatus: tickets[0]?.attendanceStatus ?? entry.attendanceStatus ?? "not_attended",
+    attendedAt: tickets[0]?.attendedAt ?? entry.attendedAt ?? null,
     purchasedAt: entry.transaction?.createdAt ?? entry.createdAt ?? null,
     imageUrl: entry.event?.banner ?? null,
+    tickets,
   }
 }
 

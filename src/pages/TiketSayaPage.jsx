@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
   FaCalendarAlt,
+  FaChevronLeft,
+  FaChevronRight,
   FaMapMarkerAlt,
   FaQrcode,
   FaShareAlt,
@@ -32,7 +34,24 @@ const filters = [
 ]
 
 function TicketQrModal({ open, ticket, onClose }) {
-  if (!open || !ticket) return null
+  const [activeIndex, setActiveIndex] = useState(0)
+  const ticketItems = ticket?.tickets?.length
+    ? ticket.tickets
+    : ticket
+      ? [
+          {
+            id: ticket.id,
+            qrCode: ticket.qrCode,
+            status: ticket.status,
+            attendedAt: ticket.attendedAt,
+            number: 1,
+          },
+        ]
+      : []
+  const activeTicket = ticketItems[Math.min(activeIndex, ticketItems.length - 1)]
+  const canSlide = ticketItems.length > 1
+
+  if (!open || !ticket || !activeTicket) return null
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
@@ -53,8 +72,35 @@ function TicketQrModal({ open, ticket, onClose }) {
         </div>
 
         <div className="mt-4 rounded-2xl border border-dashed border-[#d9d9d9] bg-[#fafafa] p-6 text-center">
+          {canSlide && (
+            <div className="mb-4 flex items-center justify-between gap-3">
+              <button
+                type="button"
+                onClick={() => setActiveIndex((index) => Math.max(0, index - 1))}
+                disabled={activeIndex === 0}
+                className="grid h-9 w-9 place-items-center rounded-full border border-[#e2e2e2] bg-white text-[#4a4a4a] disabled:cursor-not-allowed disabled:opacity-40"
+                aria-label="QR tiket sebelumnya"
+              >
+                <FaChevronLeft />
+              </button>
+              <p className="text-xs font-semibold text-[#6d6d6d]">
+                Tiket {activeIndex + 1} dari {ticketItems.length}
+              </p>
+              <button
+                type="button"
+                onClick={() =>
+                  setActiveIndex((index) => Math.min(ticketItems.length - 1, index + 1))
+                }
+                disabled={activeIndex === ticketItems.length - 1}
+                className="grid h-9 w-9 place-items-center rounded-full border border-[#e2e2e2] bg-white text-[#4a4a4a] disabled:cursor-not-allowed disabled:opacity-40"
+                aria-label="QR tiket berikutnya"
+              >
+                <FaChevronRight />
+              </button>
+            </div>
+          )}
           <div className="mx-auto inline-flex rounded-2xl bg-white p-3 shadow-sm">
-            <QRCodeSVG value={ticket.qrCode || ticket.id} size={192} level="M" includeMargin />
+            <QRCodeSVG value={activeTicket.qrCode || activeTicket.id} size={192} level="M" includeMargin />
           </div>
           <p className="mt-3 text-sm font-semibold text-[#1f1f1f]">Tiket siap dipakai untuk check-in</p>
           <p className="mt-1 text-xs text-[#6d6d6d]">Tunjukkan tiket ini ke petugas saat masuk event.</p>
@@ -68,7 +114,7 @@ function TicketQrModal({ open, ticket, onClose }) {
           <div className="rounded-xl border border-[#efefef] p-3">
             <p className="text-[10px] uppercase text-[#9a9a9a]">Status</p>
             <p className="mt-1 font-semibold text-[#1f1f1f]">
-              {statusLabel[ticket.status] ?? ticket.status}
+              {statusLabel[activeTicket.status] ?? activeTicket.status}
             </p>
           </div>
           <div className="rounded-xl border border-[#efefef] p-3">
@@ -78,7 +124,7 @@ function TicketQrModal({ open, ticket, onClose }) {
           <div className="rounded-xl border border-[#efefef] p-3">
             <p className="text-[10px] uppercase text-[#9a9a9a]">Check-in</p>
             <p className="mt-1 font-semibold text-[#1f1f1f]">
-              {ticket.attendedAt ? formatDateTime(ticket.attendedAt) : 'Belum hadir'}
+              {activeTicket.attendedAt ? formatDateTime(activeTicket.attendedAt) : 'Belum hadir'}
             </p>
           </div>
         </div>
@@ -460,6 +506,7 @@ function TiketSayaPage() {
       )}
 
       <TicketQrModal
+        key={selectedTicket?.id ?? 'closed'}
         open={Boolean(selectedTicket)}
         ticket={selectedTicket}
         onClose={() => setSelectedTicket(null)}
