@@ -102,10 +102,10 @@ function ProfileMenu({ user, isAdmin, onLogout, variant = "desktop" }) {
       {open && (
         <div
           role="menu"
-          className="absolute right-0 z-50 mt-2 w-64 origin-top-right overflow-hidden rounded-xl bg-white shadow-[0_10px_30px_rgba(0,0,0,0.15)] ring-1 ring-black/5"
+          className="absolute right-0 z-50 mt-2 flex max-h-[calc(100vh-5rem)] w-64 origin-top-right flex-col overflow-hidden rounded-xl bg-white shadow-[0_10px_30px_rgba(0,0,0,0.15)] ring-1 ring-black/5"
         >
-          <div className="flex items-center gap-3 border-b border-[#f0f0f0] bg-[#f9fbfa] px-4 py-3">
-            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#2ea387] text-sm font-bold text-white">
+          <div className="flex shrink-0 items-center gap-3 border-b border-[#f0f0f0] bg-[#f9fbfa] px-4 py-3">
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#2ea387] text-sm font-bold text-white">
               {initialsOf(user.name)}
             </span>
             <div className="min-w-0">
@@ -120,7 +120,7 @@ function ProfileMenu({ user, isAdmin, onLogout, variant = "desktop" }) {
               <p className="truncate text-xs text-[#6d6d6d]">{user.email}</p>
             </div>
           </div>
-          <div className="py-1">
+          <div className="flex-1 overflow-y-auto py-1">
             {items.map((item) => (
               <Link
                 key={item.to}
@@ -133,7 +133,7 @@ function ProfileMenu({ user, isAdmin, onLogout, variant = "desktop" }) {
               </Link>
             ))}
           </div>
-          <div className="border-t border-[#f0f0f0] py-1">
+          <div className="shrink-0 border-t border-[#f0f0f0] py-1">
             <button
               type="button"
               onClick={() => {
