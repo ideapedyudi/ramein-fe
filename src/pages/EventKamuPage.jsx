@@ -68,7 +68,11 @@ function EventKamuPage() {
             className="block overflow-hidden rounded-2xl border border-[#eee] bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
           >
             <div className="flex flex-col gap-6 p-4 sm:flex-row sm:p-5">
-              <div className="relative h-44 w-full shrink-0 overflow-hidden rounded-xl bg-linear-to-br from-brand-400 to-brand-600 sm:h-44 sm:w-60">
+              <div
+                className={`relative w-full shrink-0 self-start overflow-hidden rounded-xl bg-linear-to-br from-brand-400 to-brand-600 sm:w-60 ${
+                  event.imageUrl ? '' : 'h-44'
+                }`}
+              >
                 <EventImage src={event.imageUrl} alt={event.name} />
                 <span
                   className={`absolute right-3 top-3 rounded-full px-2.5 py-0.5 text-xs font-semibold uppercase ${

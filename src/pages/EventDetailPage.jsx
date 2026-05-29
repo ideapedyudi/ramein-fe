@@ -182,7 +182,7 @@ function EventDetailPage() {
         <div className="grid gap-6 lg:grid-cols-2 lg:gap-8">
           <div className="space-y-5 sm:space-y-6">
             <div
-              className={`relative h-56 overflow-hidden rounded-2xl bg-gradient-to-br sm:h-72 md:h-80 ${event.bannerHue ?? 'from-brand-400 to-brand-600'}`}
+              className={`relative w-full overflow-hidden rounded-2xl bg-gradient-to-br ${event.bannerHue ?? 'from-brand-400 to-brand-600'} ${event.imageUrl ? '' : 'h-56 sm:h-72 md:h-80'}`}
             >
               <EventImage src={event.imageUrl} alt={event.name} loading="eager" />
             </div>

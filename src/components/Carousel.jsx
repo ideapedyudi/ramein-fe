@@ -241,7 +241,7 @@ function Carousel({
         onClickCapture={onClickCapture}
       >
         <div
-          className={`flex ${
+          className={`flex items-start ${
             isTransitionEnabled
               ? 'motion-safe:transition-transform motion-safe:duration-500 motion-safe:ease-[cubic-bezier(0.22,1,0.36,1)]'
               : ''

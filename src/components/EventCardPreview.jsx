@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { formatIDR } from '../lib/format'
 import EventImage from './EventImage'
 
@@ -83,10 +84,24 @@ function EventCardPreview({
   coverEmoji,
   imageUrl,
 }) {
+  const [imgLoaded, setImgLoaded] = useState(false)
+  // Natural ratio once the banner loads; keep a 16:10 box otherwise.
+  const placeholder = !imageUrl
+    ? 'aspect-[16/10]'
+    : imgLoaded
+      ? ''
+      : 'aspect-[16/10] skeleton'
+
   return (
     <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
-      <div className="relative aspect-[16/10] overflow-hidden bg-gradient-to-br from-brand-500 via-brand-400 to-emerald-400">
-        <EventImage src={imageUrl} alt={name || 'Preview event'} />
+      <div
+        className={`relative overflow-hidden bg-gradient-to-br from-brand-500 via-brand-400 to-emerald-400 ${placeholder}`}
+      >
+        <EventImage
+          src={imageUrl}
+          alt={name || 'Preview event'}
+          onLoad={() => setImgLoaded(true)}
+        />
         {coverEmoji && (
           <div className="absolute inset-0 grid place-items-center text-5xl">
             <span>{coverEmoji}</span>

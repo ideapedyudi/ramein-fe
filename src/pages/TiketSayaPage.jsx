@@ -149,7 +149,11 @@ function TicketCard({
 
   return (
     <article className="flex flex-col overflow-hidden rounded-2xl border border-[#eee] bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md sm:flex-row">
-      <div className="relative h-32 w-full shrink-0 overflow-hidden bg-[#f3f3f3] sm:h-44 sm:w-48">
+      <div
+        className={`relative w-full shrink-0 self-start overflow-hidden bg-[#f3f3f3] sm:w-48 ${
+          ticket.imageUrl ? '' : 'h-32'
+        }`}
+      >
         <EventImage src={ticket.imageUrl} alt={ticket.eventName} />
       </div>
       <div className="flex flex-1 flex-col gap-3 p-4 sm:p-5">

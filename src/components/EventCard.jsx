@@ -14,8 +14,8 @@ function EventCard({ event }) {
     >
       <article className="flex flex-col">
         <div
-          className={`relative aspect-video w-full overflow-hidden bg-[#f3f3f3] ${
-            imgLoaded ? '' : 'skeleton'
+          className={`relative w-full overflow-hidden bg-[#f3f3f3] ${
+            imgLoaded ? '' : 'aspect-video skeleton'
           }`}
         >
           <EventImage

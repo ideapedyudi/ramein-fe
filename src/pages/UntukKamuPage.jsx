@@ -226,7 +226,7 @@ function UntukKamuPage() {
             </div>
           )}
 
-          <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+          <div className="mt-4 grid grid-cols-2 items-start gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
             {loadingEvents
               ? Array.from({ length: 12 }).map((_, i) => (
                   <EventCardSkeleton key={i} />

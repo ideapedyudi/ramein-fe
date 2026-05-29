@@ -753,7 +753,11 @@ function EventKamuDetailPage() {
           {tab === 'detail' && (
             <Card>
               <CardHeader title="Informasi Event" />
-              <div className="relative mb-5 h-44 overflow-hidden rounded-xl bg-linear-to-br from-brand-400 to-brand-600 sm:h-56 md:h-64">
+              <div
+                className={`relative mb-5 overflow-hidden rounded-xl bg-linear-to-br from-brand-400 to-brand-600 ${
+                  event.imageUrl ? '' : 'h-44 sm:h-56 md:h-64'
+                }`}
+              >
                 <EventImage src={event.imageUrl} alt={event.name} />
                 <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-black/30 to-transparent" />
               </div>
