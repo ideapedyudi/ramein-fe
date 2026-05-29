@@ -698,6 +698,8 @@ function EventKamuDetailPage() {
     revenue: statistic?.revenue ?? event.revenue ?? 0,
   }
   const isWithdraw = Boolean(event.isWithdraw ?? event.is_withdraw)
+  const isRevenueEmpty = Number(stats.revenue) <= 0
+  const isWithdrawDisabled = isWithdraw || isRevenueEmpty
 
   return (
     <AdminLayout
@@ -826,7 +828,7 @@ function EventKamuDetailPage() {
                   <button
                     type="button"
                     onClick={() => setWithdrawModalOpen(true)}
-                    disabled={isWithdraw}
+                    disabled={isWithdrawDisabled}
                     className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-gray-300"
                   >
                     {isWithdraw ? 'Withdraw' : 'Withdraw'}
