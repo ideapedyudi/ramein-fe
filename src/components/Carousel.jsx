@@ -42,13 +42,18 @@ function Carousel({
   const currentItemsPerView = resolveResponsive(itemsPerView, resolvedViewport)
   const peekPx = typeof peek === 'function' ? peek(resolvedViewport) : peek
   const canLoop = loop && currentItemsPerView === 1 && itemCount > 1
+  // Clone 2 slides on each side (not just 1) so the peek area beside the
+  // boundary clone is always filled — otherwise the loop shows a blank gap.
+  const cloneCount = canLoop ? Math.min(2, itemCount) : 0
 
   const extendedItems = useMemo(() => {
     if (!canLoop || itemCount === 0) return items ?? []
-    return [items[itemCount - 1], ...items, items[0]]
-  }, [canLoop, items, itemCount])
+    const lead = items.slice(itemCount - cloneCount)
+    const trail = items.slice(0, cloneCount)
+    return [...lead, ...items, ...trail]
+  }, [canLoop, items, itemCount, cloneCount])
 
-  const [currentIndex, setCurrentIndex] = useState(canLoop ? 1 : 0)
+  const [currentIndex, setCurrentIndex] = useState(canLoop ? cloneCount : 0)
 
   const maxIndex = Math.max(0, itemCount - currentItemsPerView)
 
@@ -68,7 +73,7 @@ function Carousel({
   const translateX = baseTranslate + dragOffset
 
   const activeIndex = canLoop
-    ? (((currentIndex - 1) % itemCount) + itemCount) % itemCount
+    ? (((currentIndex - cloneCount) % itemCount) + itemCount) % itemCount
     : currentIndex
 
   const goNext = useCallback(() => {
@@ -91,7 +96,7 @@ function Carousel({
 
   const goToDot = (dotIndex) => {
     setIsTransitionEnabled(true)
-    if (canLoop) setCurrentIndex(dotIndex + 1)
+    if (canLoop) setCurrentIndex(dotIndex + cloneCount)
     else setCurrentIndex(Math.min(Math.max(dotIndex, 0), maxIndex))
   }
 
@@ -128,12 +133,14 @@ function Carousel({
 
   const handleTransitionEnd = () => {
     if (!canLoop) return
-    if (currentIndex === 0) {
+    // Stepped onto a leading clone → jump forward by itemCount to the real one.
+    if (currentIndex <= cloneCount - 1) {
       setIsTransitionEnabled(false)
-      setCurrentIndex(itemCount)
-    } else if (currentIndex === itemCount + 1) {
+      setCurrentIndex((i) => i + itemCount)
+    } else if (currentIndex >= itemCount + cloneCount) {
+      // Stepped onto a trailing clone → jump back by itemCount.
       setIsTransitionEnabled(false)
-      setCurrentIndex(1)
+      setCurrentIndex((i) => i - itemCount)
     }
   }
 
@@ -248,7 +255,7 @@ function Carousel({
         >
           {extendedItems.map((item, idx) => {
             const realIndex = canLoop
-              ? (((idx - 1) % itemCount) + itemCount) % itemCount
+              ? (((idx - cloneCount) % itemCount) + itemCount) % itemCount
               : idx
             const isActive = canLoop
               ? idx === currentIndex

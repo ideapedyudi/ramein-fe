@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import PageHeader from "../components/PageHeader";
+import Reveal from "../components/Reveal";
 import SiteFooter from "../components/SiteFooter";
 import SiteLayout from "../components/SiteLayout";
 
@@ -50,7 +51,10 @@ function PricingPage() {
 
       <div className="mx-auto max-w-[1280px] space-y-12 px-4 py-10 sm:space-y-16 sm:px-6 sm:py-12 lg:px-8">
         {/* Hero pricing statement */}
-        <section className="rounded-3xl border border-black/5 bg-white p-6 text-center shadow-sm sm:p-10">
+        <Reveal
+          as="section"
+          className="rounded-3xl border border-black/5 bg-white p-6 text-center shadow-sm sm:p-10"
+        >
           <p className="text-sm font-semibold uppercase tracking-wide text-brand-600">
             Model Harga Ramein
           </p>
@@ -76,10 +80,10 @@ function PricingPage() {
               Jelajahi Event
             </Link>
           </div>
-        </section>
+        </Reveal>
 
         {/* Example breakdown */}
-        <section>
+        <Reveal as="section">
           <h2 className="text-xl font-bold text-gray-900 sm:text-2xl">
             Contoh Perhitungan
           </h2>
@@ -108,10 +112,10 @@ function PricingPage() {
               </div>
             ))}
           </div>
-        </section>
+        </Reveal>
 
         {/* Perks */}
-        <section>
+        <Reveal as="section">
           <h2 className="text-xl font-bold text-gray-900 sm:text-2xl">
             Apa yang Kamu Dapatkan
           </h2>
@@ -129,10 +133,10 @@ function PricingPage() {
               </div>
             ))}
           </div>
-        </section>
+        </Reveal>
 
         {/* FAQ */}
-        <section>
+        <Reveal as="section">
           <h2 className="text-xl font-bold text-gray-900 sm:text-2xl">
             Pertanyaan Umum
           </h2>
@@ -165,10 +169,13 @@ function PricingPage() {
               </p>
             </div>
           </div>
-        </section>
+        </Reveal>
 
         {/* CTA */}
-        <section className="rounded-3xl bg-gradient-to-br from-brand-500 to-brand-700 p-6 text-white sm:p-10">
+        <Reveal
+          as="section"
+          className="rounded-3xl bg-gradient-to-br from-brand-500 to-brand-700 p-6 text-white sm:p-10"
+        >
           <h2 className="text-xl font-bold sm:text-2xl">
             Siap jual tiket tanpa ribet?
           </h2>
@@ -184,7 +191,7 @@ function PricingPage() {
               Buat Event Sekarang
             </Link>
           </div>
-        </section>
+        </Reveal>
       </div>
       <SiteFooter />
     </SiteLayout>

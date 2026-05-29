@@ -1,4 +1,5 @@
 import PageHeader from "../components/PageHeader";
+import Reveal from "../components/Reveal";
 import SiteFooter from "../components/SiteFooter";
 import SiteLayout from "../components/SiteLayout";
 
@@ -28,7 +29,7 @@ function ContactPage() {
 
       <div className="mx-auto grid max-w-[1280px] gap-8 px-4 py-10 sm:px-6 sm:py-12 lg:grid-cols-2 lg:gap-10 lg:px-8">
         {/* WhatsApp — highlighted primary contact */}
-        <div className="flex flex-col justify-between rounded-3xl bg-gradient-to-br from-[#25D366] to-[#128C7E] p-6 text-white shadow-lg sm:p-8">
+        <Reveal className="flex flex-col justify-between rounded-3xl bg-gradient-to-br from-[#25D366] to-[#128C7E] p-6 text-white shadow-lg sm:p-8">
           <div>
             <div className="grid h-14 w-14 place-items-center rounded-2xl bg-white/20 text-3xl">
               💬
@@ -55,10 +56,10 @@ function ContactPage() {
           >
             <span className="text-xl">💬</span> Chat Sekarang
           </a>
-        </div>
+        </Reveal>
 
         {/* Other channels + hours */}
-        <div className="space-y-4">
+        <Reveal delay={120} className="space-y-4">
           {channels.map((c) => (
             <a
               key={c.label}
@@ -87,7 +88,7 @@ function ContactPage() {
               Minggu & Libur Nasional: tutup
             </p>
           </div>
-        </div>
+        </Reveal>
       </div>
       <SiteFooter />
     </SiteLayout>

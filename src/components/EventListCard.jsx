@@ -1,8 +1,11 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { FaRegCalendarAlt } from 'react-icons/fa'
 import { formatIDR } from '../lib/format'
 
 function EventListCard({ event }) {
+  const [imgLoaded, setImgLoaded] = useState(false)
+
   return (
     <Link
       to={`/event/${event.id}`}
@@ -17,7 +20,11 @@ function EventListCard({ event }) {
               src={event.imageUrl}
               alt={event.name}
               loading="lazy"
-              className="absolute inset-0 h-full w-full object-cover transition group-hover:scale-[1.02]"
+              decoding="async"
+              onLoad={() => setImgLoaded(true)}
+              className={`absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-[1.02] ${
+                imgLoaded ? 'opacity-100' : 'opacity-0'
+              }`}
             />
           )}
           {event.badges?.length > 0 && (

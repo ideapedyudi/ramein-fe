@@ -16,12 +16,14 @@ function HeroSlideshow({ slides }) {
       dimInactive
       className="mt-6"
       renderItem={(slide, index) => (
-        <div className="aspect-4838/1459 overflow-hidden rounded-xl">
+        <div className="aspect-4838/1459 overflow-hidden rounded-xl bg-brand-50">
           <img
             src={slide.image}
             alt={slide.title ?? `Banner ${index + 1}`}
             className="h-full w-full object-cover"
-            loading="lazy"
+            loading="eager"
+            decoding="async"
+            fetchpriority={index === 0 ? "high" : "auto"}
             draggable={false}
           />
         </div>

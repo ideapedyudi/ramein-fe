@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import Container from '../components/Container'
+import EventCardSkeleton from '../components/EventCardSkeleton'
 import EventListCard from '../components/EventListCard'
 import SiteFooter from '../components/SiteFooter'
 import SiteLayout from '../components/SiteLayout'
@@ -211,9 +212,11 @@ function JelajahiPage() {
         )}
 
         <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-          {events.map((e) => (
-            <EventListCard key={e.id} event={e} />
-          ))}
+          {loading
+            ? Array.from({ length: 12 }).map((_, i) => (
+                <EventCardSkeleton key={i} />
+              ))
+            : events.map((e) => <EventListCard key={e.id} event={e} />)}
         </div>
 
         {!loading && events.length === 0 && (

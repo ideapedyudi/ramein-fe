@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import PageHeader from "../components/PageHeader";
+import Reveal from "../components/Reveal";
 import SiteFooter from "../components/SiteFooter";
 import SiteLayout from "../components/SiteLayout";
 
@@ -50,30 +51,32 @@ function AboutPage() {
       />
 
       <div className="mx-auto max-w-[1280px] space-y-12 px-4 py-10 sm:space-y-16 sm:px-6 sm:py-12 lg:px-8">
-        <section>
+        <Reveal as="section">
           <h2 className="text-xl font-bold text-gray-900 sm:text-2xl">
             Latar Belakang
           </h2>
-          <p className="mt-3 max-w-3xl text-gray-700 leading-relaxed">
-            Banyak acara — konser, seminar, esports, workshop, festival, sampai
-            acara komunitas — masih mengalami kesulitan dalam penjualan tiket
-            dan pengelolaan peserta. Sebagian besar penyelenggara masih
-            menggunakan sistem manual yang kurang efisien dan sulit dipantau
-            secara real-time.
-          </p>
-          <p className="mt-3 max-w-3xl text-gray-700 leading-relaxed">
-            Ramein hadir sebagai platform digital ticketing yang memungkinkan
-            siapa pun membeli tiket online maupun offline, sekaligus memberi
-            organizer alat untuk membuat, menjual, dan memvalidasi tiket dengan
-            cepat menggunakan QR Code.
-          </p>
-        </section>
+          <div className="mt-3 grid gap-x-10 gap-y-3 text-gray-700 leading-relaxed md:grid-cols-2">
+            <p>
+              Banyak acara — konser, seminar, esports, workshop, festival,
+              sampai acara komunitas — masih mengalami kesulitan dalam penjualan
+              tiket dan pengelolaan peserta. Sebagian besar penyelenggara masih
+              menggunakan sistem manual yang kurang efisien dan sulit dipantau
+              secara real-time.
+            </p>
+            <p>
+              Ramein hadir sebagai platform digital ticketing yang memungkinkan
+              siapa pun membeli tiket online maupun offline, sekaligus memberi
+              organizer alat untuk membuat, menjual, dan memvalidasi tiket
+              dengan cepat menggunakan QR Code.
+            </p>
+          </div>
+        </Reveal>
 
-        <section>
+        <Reveal as="section">
           <h2 className="text-xl font-bold text-gray-900 sm:text-2xl">
             Misi Kami
           </h2>
-          <p className="mt-3 max-w-3xl text-gray-700 leading-relaxed">
+          <p className="mt-3 text-gray-700 leading-relaxed">
             Kami percaya menjual dan membeli tiket seharusnya semudah memesan
             makanan online. Itu yang kami perjuangkan setiap hari:
           </p>
@@ -101,9 +104,9 @@ function AboutPage() {
               </li>
             ))}
           </ul>
-        </section>
+        </Reveal>
 
-        <section>
+        <Reveal as="section">
           <h2 className="text-xl font-bold text-gray-900 sm:text-2xl">
             Keunggulan Platform
           </h2>
@@ -121,9 +124,9 @@ function AboutPage() {
               </div>
             ))}
           </div>
-        </section>
+        </Reveal>
 
-        <section>
+        <Reveal as="section">
           <h2 className="text-xl font-bold text-gray-900 sm:text-2xl">
             Harga Transparan
           </h2>
@@ -169,9 +172,9 @@ function AboutPage() {
               ))}
             </div>
           </div>
-        </section>
+        </Reveal>
 
-        <section>
+        <Reveal as="section">
           <h2 className="text-xl font-bold text-gray-900 sm:text-2xl">
             Tim Kami
           </h2>
@@ -195,9 +198,12 @@ function AboutPage() {
               </div>
             ))}
           </div>
-        </section>
+        </Reveal>
 
-        <section className="rounded-3xl bg-gradient-to-br from-brand-500 to-brand-700 p-6 text-white sm:p-10">
+        <Reveal
+          as="section"
+          className="rounded-3xl bg-gradient-to-br from-brand-500 to-brand-700 p-6 text-white sm:p-10"
+        >
           <h2 className="text-xl font-bold sm:text-2xl">
             Siap meramein-kan harimu?
           </h2>
@@ -219,7 +225,7 @@ function AboutPage() {
               Buat Event
             </Link>
           </div>
-        </section>
+        </Reveal>
       </div>
       <SiteFooter />
     </SiteLayout>

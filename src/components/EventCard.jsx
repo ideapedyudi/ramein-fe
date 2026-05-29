@@ -1,19 +1,30 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { FaRegCalendarAlt } from 'react-icons/fa'
 
 function EventCard({ event }) {
+  const [imgLoaded, setImgLoaded] = useState(false)
+
   return (
     <Link
       to={`/event/${event.id}`}
       className="group block overflow-hidden rounded-xl border border-[#ececec] bg-white shadow-[0_1px_4px_rgba(0,0,0,0.04)] transition hover:-translate-y-0.5 hover:shadow-[0_6px_16px_rgba(0,0,0,0.08)]"
     >
       <article className="flex flex-col">
-        <div className="aspect-video w-full overflow-hidden bg-[#f3f3f3]">
+        <div
+          className={`aspect-video w-full overflow-hidden bg-[#f3f3f3] ${
+            imgLoaded ? '' : 'skeleton'
+          }`}
+        >
           <img
             src={event.image}
             alt={event.title}
             loading="lazy"
-            className="h-full w-full object-cover transition group-hover:scale-[1.02]"
+            decoding="async"
+            onLoad={() => setImgLoaded(true)}
+            className={`h-full w-full object-cover transition duration-500 group-hover:scale-[1.02] ${
+              imgLoaded ? 'opacity-100' : 'opacity-0'
+            }`}
           />
         </div>
         <div className="flex flex-col gap-2 p-3">

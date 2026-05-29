@@ -1,6 +1,7 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 import ProtectedRoute from './components/ProtectedRoute'
 import RouteSeo from './components/RouteSeo'
+import TopProgressBar from './components/TopProgressBar'
 import AboutPage from './pages/AboutPage'
 import BuatEventFestivalPage from './pages/BuatEventFestivalPage'
 import BuatEventGatheringPage from './pages/BuatEventGatheringPage'
@@ -33,6 +34,7 @@ import AdminWithdrawPage from './pages/admin/AdminWithdrawPage'
 function App() {
   return (
     <>
+      <TopProgressBar />
       <RouteSeo />
       <Routes>
         <Route path="/" element={<Navigate to="/home" replace />} />

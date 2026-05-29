@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import Carousel from "../components/Carousel";
 import CategoryCard from "../components/CategoryCard";
 import Container from "../components/Container";
+import EventCardSkeleton from "../components/EventCardSkeleton";
 import EventListCard from "../components/EventListCard";
 import HeroSlideshow from "../components/HeroSlideshow";
 import RegionCard from "../components/RegionCard";
@@ -59,8 +60,10 @@ function HomePage() {
   const renderEventSection = ({ items, loading, error }) => {
     if (loading) {
       return (
-        <div className="rounded-2xl border border-dashed border-[#d9d9d9] bg-white/70 px-5 py-8 text-sm text-[#6d6d6d]">
-          Memuat event...
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <EventCardSkeleton key={i} />
+          ))}
         </div>
       );
     }
