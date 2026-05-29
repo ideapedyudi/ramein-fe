@@ -13,6 +13,7 @@ import {
 } from 'react-icons/fa'
 import { QRCodeSVG } from 'qrcode.react'
 import AdminLayout from '../components/AdminLayout'
+import EventImage from '../components/EventImage'
 import { api } from '../lib/api'
 import { formatDateTime, formatIDR } from '../lib/format'
 
@@ -148,10 +149,8 @@ function TicketCard({
 
   return (
     <article className="flex flex-col overflow-hidden rounded-2xl border border-[#eee] bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md sm:flex-row">
-      <div className="h-32 w-full shrink-0 overflow-hidden bg-[#f3f3f3] sm:h-auto sm:w-48">
-        {ticket.imageUrl && (
-          <img src={ticket.imageUrl} alt={ticket.eventName} className="h-full w-full object-cover" />
-        )}
+      <div className="relative h-32 w-full shrink-0 overflow-hidden bg-[#f3f3f3] sm:h-44 sm:w-48">
+        <EventImage src={ticket.imageUrl} alt={ticket.eventName} />
       </div>
       <div className="flex flex-1 flex-col gap-3 p-4 sm:p-5">
         <div className="flex flex-wrap items-start justify-between gap-2">

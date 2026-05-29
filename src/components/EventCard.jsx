@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { FaRegCalendarAlt } from 'react-icons/fa'
+import EventImage from './EventImage'
 import MarqueeText from './MarqueeText'
 
 function EventCard({ event }) {
@@ -13,19 +14,15 @@ function EventCard({ event }) {
     >
       <article className="flex flex-col">
         <div
-          className={`aspect-video w-full overflow-hidden bg-[#f3f3f3] ${
+          className={`relative aspect-video w-full overflow-hidden bg-[#f3f3f3] ${
             imgLoaded ? '' : 'skeleton'
           }`}
         >
-          <img
+          <EventImage
             src={event.image}
             alt={event.title}
-            loading="lazy"
-            decoding="async"
+            hoverZoom
             onLoad={() => setImgLoaded(true)}
-            className={`h-full w-full object-cover transition duration-500 group-hover:scale-[1.02] ${
-              imgLoaded ? 'opacity-100' : 'opacity-0'
-            }`}
           />
         </div>
         <div className="flex flex-col gap-2 p-3">

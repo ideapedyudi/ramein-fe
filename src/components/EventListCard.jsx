@@ -1,12 +1,10 @@
-import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { FaRegCalendarAlt } from 'react-icons/fa'
 import { formatIDR } from '../lib/format'
+import EventImage from './EventImage'
 import MarqueeText from './MarqueeText'
 
 function EventListCard({ event }) {
-  const [imgLoaded, setImgLoaded] = useState(false)
-
   return (
     <Link
       to={`/event/${event.id}`}
@@ -16,18 +14,7 @@ function EventListCard({ event }) {
         <div
           className={`relative aspect-video w-full overflow-hidden bg-linear-to-br ${event.bannerHue ?? 'from-brand-400 to-brand-600'}`}
         >
-          {event.imageUrl && (
-            <img
-              src={event.imageUrl}
-              alt={event.name}
-              loading="lazy"
-              decoding="async"
-              onLoad={() => setImgLoaded(true)}
-              className={`absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-[1.02] ${
-                imgLoaded ? 'opacity-100' : 'opacity-0'
-              }`}
-            />
-          )}
+          <EventImage src={event.imageUrl} alt={event.name} hoverZoom />
           {event.badges?.length > 0 && (
             <div className="absolute left-2 top-2 flex flex-wrap gap-1">
               {event.badges.slice(0, 2).map((b) => (

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
+import EventImage from '../components/EventImage'
 import SiteFooter from '../components/SiteFooter'
 import SiteLayout from '../components/SiteLayout'
 import { api } from '../lib/api'
@@ -183,13 +184,7 @@ function EventDetailPage() {
             <div
               className={`relative h-56 overflow-hidden rounded-2xl bg-gradient-to-br sm:h-72 md:h-80 ${event.bannerHue ?? 'from-brand-400 to-brand-600'}`}
             >
-              {event.imageUrl && (
-                <img
-                  src={event.imageUrl}
-                  alt={event.name}
-                  className="absolute inset-0 h-full w-full object-cover"
-                />
-              )}
+              <EventImage src={event.imageUrl} alt={event.name} loading="eager" />
             </div>
 
             <Card>

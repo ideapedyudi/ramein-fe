@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import AdminLayout from '../components/AdminLayout'
+import EventImage from '../components/EventImage'
 import { api } from '../lib/api'
 import { formatDateTime, formatNumber } from '../lib/format'
 
@@ -68,14 +69,7 @@ function EventKamuPage() {
           >
             <div className="flex flex-col gap-6 p-4 sm:flex-row sm:p-5">
               <div className="relative h-44 w-full shrink-0 overflow-hidden rounded-xl bg-linear-to-br from-brand-400 to-brand-600 sm:h-44 sm:w-60">
-                {event.imageUrl && (
-                  <img
-                    src={event.imageUrl}
-                    alt={event.name}
-                    loading="lazy"
-                    className="absolute inset-0 h-full w-full object-cover"
-                  />
-                )}
+                <EventImage src={event.imageUrl} alt={event.name} />
                 <span
                   className={`absolute right-3 top-3 rounded-full px-2.5 py-0.5 text-xs font-semibold uppercase ${
                     statusStyles[event.eventType] ?? 'bg-brand-600 text-white'

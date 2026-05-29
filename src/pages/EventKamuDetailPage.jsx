@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom'
 import { FaCamera, FaKeyboard, FaTimes } from 'react-icons/fa'
 import { useZxing } from 'react-zxing'
 import AdminLayout from '../components/AdminLayout'
+import EventImage from '../components/EventImage'
 import { useAuth } from '../context/authContext'
 import { api } from '../lib/api'
 import { formatDateTime, formatIDR, formatNumber } from '../lib/format'
@@ -753,14 +754,8 @@ function EventKamuDetailPage() {
             <Card>
               <CardHeader title="Informasi Event" />
               <div className="relative mb-5 h-44 overflow-hidden rounded-xl bg-linear-to-br from-brand-400 to-brand-600 sm:h-56 md:h-64">
-                {event.imageUrl && (
-                  <img
-                    src={event.imageUrl}
-                    alt={event.name}
-                    className="absolute inset-0 h-full w-full object-cover"
-                  />
-                )}
-                <div className="absolute inset-0 bg-linear-to-t from-black/30 to-transparent" />
+                <EventImage src={event.imageUrl} alt={event.name} />
+                <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-black/30 to-transparent" />
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
                 <Info label="Mulai" value={formatDateTime(event.startDateTime)} />
