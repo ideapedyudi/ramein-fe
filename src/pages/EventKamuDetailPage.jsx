@@ -211,7 +211,7 @@ function ScanAttendanceModal({ open, onClose, onScanSuccess }) {
   )
 }
 
-function AttendeeSection({ eventId }) {
+function AttendeeSection({ eventId, onScanSuccess }) {
   const [activeTab, setActiveTab] = useState('all')
   const [attendeesByTab, setAttendeesByTab] = useState({})
   const [loadingTab, setLoadingTab] = useState('all')
@@ -268,6 +268,7 @@ function AttendeeSection({ eventId }) {
     await Promise.all([
       loadAttendees('all', { force: true }),
       activeTab !== 'all' ? loadAttendees(activeTab, { force: true }) : Promise.resolve(),
+      onScanSuccess?.() ?? Promise.resolve(),
     ])
   }
 
@@ -382,6 +383,24 @@ function EventKamuDetailPage() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(true)
   const [tab, setTab] = useState('detail')
+  const [statistic, setStatistic] = useState(null)
+  const [statisticLoading, setStatisticLoading] = useState(false)
+  const [statisticError, setStatisticError] = useState('')
+
+  const loadStatistic = useCallback(async () => {
+    await Promise.resolve()
+    setStatisticLoading(true)
+    setStatisticError('')
+
+    try {
+      const res = await api.getEventStatistic(eventId)
+      setStatistic(res)
+    } catch (err) {
+      setStatisticError(err.message || 'Gagal memuat statistik event.')
+    } finally {
+      setStatisticLoading(false)
+    }
+  }, [eventId])
 
   useEffect(() => {
     let cancelled = false
@@ -403,6 +422,16 @@ function EventKamuDetailPage() {
     }
   }, [eventId])
 
+  useEffect(() => {
+    if (tab !== 'statistik') return
+
+    const timeoutId = window.setTimeout(() => {
+      loadStatistic()
+    }, 0)
+
+    return () => window.clearTimeout(timeoutId)
+  }, [loadStatistic, tab])
+
   if (loading) {
     return (
       <AdminLayout title="Memuat...">
@@ -422,6 +451,13 @@ function EventKamuDetailPage() {
         </div>
       </AdminLayout>
     )
+  }
+
+  const stats = {
+    terjual: statistic?.terjual ?? event.registered ?? 0,
+    hadir: statistic?.hadir ?? event.attended ?? 0,
+    kuota: statistic?.kuota ?? event.totalQuota ?? 0,
+    revenue: statistic?.revenue ?? event.revenue ?? 0,
   }
 
   return (
@@ -538,18 +574,35 @@ function EventKamuDetailPage() {
           {tab === 'statistik' && (
             <Card>
               <CardHeader title="Statistik" />
+              {statisticError && (
+                <div className="mb-4 rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700">
+                  {statisticError}
+                </div>
+              )}
               <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-                <BigStat label="Terjual" value={formatNumber(event.registered)} accent="text-brand-600" />
-                <BigStat label="Hadir" value={formatNumber(event.attended)} accent="text-emerald-600" />
-                <BigStat label="Kuota" value={formatNumber(event.totalQuota)} accent="text-amber-600" />
+                <BigStat
+                  label={statisticLoading ? 'Memuat terjual...' : 'Terjual'}
+                  value={formatNumber(stats.terjual)}
+                  accent="text-brand-600"
+                />
+                <BigStat
+                  label={statisticLoading ? 'Memuat hadir...' : 'Hadir'}
+                  value={formatNumber(stats.hadir)}
+                  accent="text-emerald-600"
+                />
+                <BigStat
+                  label={statisticLoading ? 'Memuat kuota...' : 'Kuota'}
+                  value={formatNumber(stats.kuota)}
+                  accent="text-amber-600"
+                />
                 <BigStat
                   label="Revenue"
-                  value={event.revenue > 0 ? formatIDR(event.revenue) : formatIDR(0)}
+                  value={formatIDR(stats.revenue)}
                   accent="text-rose-600"
                 />
               </div>
 
-              <AttendeeSection eventId={eventId} />
+              <AttendeeSection eventId={eventId} onScanSuccess={loadStatistic} />
             </Card>
           )}
         </div>

@@ -8,7 +8,7 @@ const idr = new Intl.NumberFormat('id-ID', {
 
 export function formatIDR(value) {
   if (value === null || value === undefined) return '—'
-  if (value === 0) return 'Gratis'
+  if (value === 0) return 0
   return idr.format(value).replace(/\s/g, '')
 }
 

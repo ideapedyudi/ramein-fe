@@ -845,6 +845,16 @@ export const api = {
     apiRequest(`/ticket/event-ticket/${eventId}/${attendanceFilter}`).then((res) =>
       (res.data ?? []).map(toEventAttendeeFromApi),
     ),
+  getEventStatistic: (eventId) =>
+    apiRequest(`/transactions/statistic/event/${eventId}`).then((res) => {
+      const data = res.data ?? res;
+      return {
+        terjual: Number(data.terjual) || 0,
+        hadir: Number(data.hadir) || 0,
+        kuota: Number(data.kuota) || 0,
+        revenue: Number(data.revenue) || 0,
+      };
+    }),
   scanTicketQrCode: (qrCode) =>
     apiRequest("/ticket/qr-code/scan", {
       method: "POST",
