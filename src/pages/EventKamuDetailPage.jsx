@@ -728,7 +728,7 @@ function EventKamuDetailPage() {
       </Link>
 
       <div>
-        <div className="-mx-4 overflow-x-auto border-b border-gray-200 px-4 sm:mx-0 sm:px-0">
+        <div className="scrollbar-hide -mx-4 overflow-x-auto border-b border-gray-200 px-4 sm:mx-0 sm:px-0">
           <div className="flex min-w-max gap-6 sm:gap-8">
             {[
               { key: 'detail', label: 'Detail Event' },
