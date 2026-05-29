@@ -75,9 +75,10 @@ function PricingPage() {
                 <span className="text-brand-600">20%</span> per tiket
               </h2>
               <p className="mt-3 text-gray-600">
-                Kami memotong <strong>20% dari setiap tiket yang terjual</strong>
-                . Dipotong otomatis, jadi pendapatan yang kamu terima sudah
-                bersih. Tanpa biaya bulanan atau biaya tersembunyi.
+                Kami memotong{" "}
+                <strong>20% dari setiap tiket yang terjual</strong>. Dipotong
+                otomatis, jadi pendapatan yang kamu terima sudah bersih. Tanpa
+                biaya bulanan atau biaya tersembunyi.
               </p>
             </div>
 
@@ -102,21 +103,6 @@ function PricingPage() {
                 Diskusikan event kamu →
               </Link>
             </div>
-          </div>
-
-          <div className="mt-6 flex flex-wrap justify-center gap-3">
-            <Link
-              to="/buat-event"
-              className="rounded-full bg-brand-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-700"
-            >
-              Mulai Buat Event
-            </Link>
-            <Link
-              to="/jelajahi"
-              className="rounded-full border border-gray-200 px-6 py-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
-            >
-              Jelajahi Event
-            </Link>
           </div>
         </Reveal>
 
@@ -206,8 +192,8 @@ function PricingPage() {
               </h3>
               <p className="mt-1 text-sm text-gray-600">
                 Untuk tiket gratis (Rp 0), tidak ada fee transaksi karena 20%
-                dari nol tetap nol. Biaya publikasi hanya berlaku bila kamu ingin
-                event ditampilkan publik.
+                dari nol tetap nol. Biaya publikasi hanya berlaku bila kamu
+                ingin event ditampilkan publik.
               </p>
             </div>
             <div className="rounded-2xl border border-black/5 bg-white p-5 shadow-sm">
