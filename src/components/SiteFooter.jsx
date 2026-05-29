@@ -3,9 +3,9 @@ import brandLogo from "../assets/logobrand.png";
 
 function FooterColumn({ title, items }) {
   return (
-    <div>
-      <h5 className="text-2xl font-semibold text-[#202020]">{title}</h5>
-      <ul className="mt-4 space-y-2 text-md text-[#6f6f6f]">
+    <div className="text-center md:text-left">
+      <h5 className="text-lg font-semibold text-[#202020] md:text-2xl">{title}</h5>
+      <ul className="mt-2 space-y-1.5 text-sm text-[#6f6f6f] md:mt-4 md:space-y-2 md:text-md">
         {items.map((item) => (
           <li key={item.label}>
             {item.to ? (
@@ -16,7 +16,9 @@ function FooterColumn({ title, items }) {
                 {item.label}
               </Link>
             ) : (
-              <span className="cursor-default text-[#9a9a9a]">{item.label}</span>
+              <span className="cursor-default text-[#9a9a9a]">
+                {item.label}
+              </span>
             )}
           </li>
         ))}
@@ -37,21 +39,20 @@ const companyItems = [
 ];
 
 const supportItems = [
-  { label: "Help Center" },
   { label: "Terms of Service", to: "/terms" },
   { label: "Privacy Policy", to: "/privacy" },
 ];
 
 function SiteFooter() {
   return (
-    <footer className="mt-16 border-t border-[#e8e8e8] bg-white">
-      <div className="mx-auto grid w-full max-w-370 gap-10 px-2 py-12 md:grid-cols-4 md:px-3">
-        <div>
+    <footer className="mt-10 border-t border-[#e8e8e8] bg-white md:mt-16">
+      <div className="mx-auto grid w-full max-w-370 gap-6 px-4 py-8 md:grid-cols-4 md:gap-10 md:px-3 md:py-12">
+        <div className="flex flex-col items-center text-center md:items-start md:text-left">
           <Link to="/home" className="flex items-center gap-2">
-            <img src={brandLogo} alt="Ramein Logo" className="w-10" />
-            <span className="text-4xl font-bold text-[#2ea387]">Ramein</span>
+            <img src={brandLogo} alt="Ramein Logo" className="w-8 md:w-10" />
+            <span className="text-3xl font-bold text-[#2ea387] md:text-4xl">Ramein</span>
           </Link>
-          <p className="mt-4 max-w-xs text-lg leading-relaxed text-[#6b6b6b]">
+          <p className="mt-2 max-w-xs text-sm leading-relaxed text-[#6b6b6b] md:mt-4 md:text-lg">
             Platform tiket event terpercaya untuk semua momen seru kamu.
           </p>
         </div>
@@ -59,7 +60,7 @@ function SiteFooter() {
         <FooterColumn title="Company" items={companyItems} />
         <FooterColumn title="Support" items={supportItems} />
       </div>
-      <div className="border-t border-[#efefef] py-6 text-center text-lg text-[#888]">
+      <div className="border-t border-[#efefef] py-4 text-center text-xs text-[#888] md:py-6 md:text-lg">
         (c) 2026 Ramein. All rights reserved.
       </div>
     </footer>

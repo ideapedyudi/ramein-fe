@@ -1,51 +1,52 @@
-import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import AuthLayout from '../components/AuthLayout'
-import SocialButton from '../components/SocialButton'
-import { useAuth } from '../context/authContext'
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import AuthLayout from "../components/AuthLayout";
+import { useAuth } from "../context/authContext";
 
 const inputClass =
-  'mt-2 h-10 w-full rounded-xl border border-[#f0f0f0] bg-[#f5f5f5] px-4 text-sm text-[#333333] outline-none placeholder:text-[#9d9d9d] focus:border-emerald-300 md:h-11 md:text-base'
+  "mt-2 h-10 w-full rounded-xl border border-[#f0f0f0] bg-[#f5f5f5] px-4 text-sm text-[#333333] outline-none placeholder:text-[#9d9d9d] focus:border-emerald-300 md:h-11 md:text-base";
 
 function RegisterPage() {
-  const { isLoading, register } = useAuth()
-  const navigate = useNavigate()
+  const { isLoading, register } = useAuth();
+  const navigate = useNavigate();
   const [form, setForm] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    password: '',
-    confirmPassword: '',
+    name: "",
+    email: "",
+    phone: "",
+    password: "",
+    confirmPassword: "",
     agree: false,
-  })
-  const [error, setError] = useState('')
+  });
+  const [error, setError] = useState("");
 
   function update(field) {
     return (e) => {
-      const value = field === 'agree' ? e.target.checked : e.target.value
-      setForm((prev) => ({ ...prev, [field]: value }))
-    }
+      const value = field === "agree" ? e.target.checked : e.target.value;
+      setForm((prev) => ({ ...prev, [field]: value }));
+    };
   }
 
   async function handleSubmit(e) {
-    e.preventDefault()
-    setError('')
+    e.preventDefault();
+    setError("");
 
     if (!form.name || !form.email || !form.phone || !form.password) {
-      setError('Nama, email, nomor telepon, dan password wajib diisi.')
-      return
+      setError("Nama, email, nomor telepon, dan password wajib diisi.");
+      return;
     }
     if (form.password.length < 8) {
-      setError('Password minimal 8 karakter.')
-      return
+      setError("Password minimal 8 karakter.");
+      return;
     }
     if (form.password !== form.confirmPassword) {
-      setError('Konfirmasi password tidak sama.')
-      return
+      setError("Konfirmasi password tidak sama.");
+      return;
     }
     if (!form.agree) {
-      setError('Kamu harus menyetujui Syarat & Ketentuan dan Kebijakan Privasi.')
-      return
+      setError(
+        "Kamu harus menyetujui Syarat & Ketentuan dan Kebijakan Privasi.",
+      );
+      return;
     }
 
     try {
@@ -54,16 +55,18 @@ function RegisterPage() {
         email: form.email,
         phone: form.phone,
         password: form.password,
-      })
+      });
 
       if (accessToken) {
-        navigate(user?.role === 'admin' ? '/dashboard' : '/home', { replace: true })
-        return
+        navigate(user?.role === "admin" ? "/dashboard" : "/home", {
+          replace: true,
+        });
+        return;
       }
 
-      navigate('/login', { replace: true })
+      navigate("/login", { replace: true });
     } catch (err) {
-      setError(err || 'Registrasi gagal. Coba lagi.')
+      setError(err || "Registrasi gagal. Coba lagi.");
     }
   }
 
@@ -78,7 +81,7 @@ function RegisterPage() {
           <input
             type="text"
             value={form.name}
-            onChange={update('name')}
+            onChange={update("name")}
             placeholder="Masukkan nama lengkap"
             className={inputClass}
           />
@@ -88,7 +91,7 @@ function RegisterPage() {
           <input
             type="email"
             value={form.email}
-            onChange={update('email')}
+            onChange={update("email")}
             placeholder="nama@email.com"
             className={inputClass}
           />
@@ -98,7 +101,7 @@ function RegisterPage() {
           <input
             type="tel"
             value={form.phone}
-            onChange={update('phone')}
+            onChange={update("phone")}
             placeholder="0812 3456 7890"
             className={inputClass}
           />
@@ -108,7 +111,7 @@ function RegisterPage() {
           <input
             type="password"
             value={form.password}
-            onChange={update('password')}
+            onChange={update("password")}
             placeholder="Minimal 8 karakter"
             className={inputClass}
           />
@@ -118,30 +121,38 @@ function RegisterPage() {
           <input
             type="password"
             value={form.confirmPassword}
-            onChange={update('confirmPassword')}
+            onChange={update("confirmPassword")}
             placeholder="Ketik ulang password"
             className={inputClass}
           />
         </label>
 
         {error && (
-          <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>
+          <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
+            {error}
+          </p>
         )}
 
         <label className="flex items-start gap-3 pt-1 text-xs leading-tight text-[#666666] md:text-sm">
           <input
             type="checkbox"
             checked={form.agree}
-            onChange={update('agree')}
+            onChange={update("agree")}
             className="mt-2 h-5 w-5 rounded border-[#d5d5d5] text-emerald-600 focus:ring-emerald-500"
           />
           <span>
-            Saya setuju dengan{' '}
-            <a href="#" className="font-semibold text-[#2ea387] hover:underline">
+            Saya setuju dengan{" "}
+            <a
+              href="#"
+              className="font-semibold text-[#2ea387] hover:underline"
+            >
               Syarat & Ketentuan
-            </a>{' '}
-            dan{' '}
-            <a href="#" className="font-semibold text-[#2ea387] hover:underline">
+            </a>{" "}
+            dan{" "}
+            <a
+              href="#"
+              className="font-semibold text-[#2ea387] hover:underline"
+            >
               Kebijakan Privasi
             </a>
           </span>
@@ -151,26 +162,20 @@ function RegisterPage() {
           disabled={isLoading}
           className="h-10 w-full rounded-xl bg-[#2ea387] text-sm font-semibold text-white transition hover:bg-[#288f77] disabled:cursor-not-allowed disabled:opacity-70 md:h-11 md:text-base"
         >
-          {isLoading ? 'Memproses...' : 'Daftar'}
+          {isLoading ? "Memproses..." : "Daftar"}
         </button>
       </form>
-      <div className="my-7 flex items-center gap-3 text-xs text-[#808080] md:text-sm">
-        <div className="h-px flex-1 bg-[#e3e3e3]" />
-        <span>Atau daftar dengan</span>
-        <div className="h-px flex-1 bg-[#e3e3e3]" />
-      </div>
-      <div className="grid grid-cols-2 gap-3">
-        <SocialButton icon="G" label="Google" />
-        <SocialButton icon="f" label="Facebook" />
-      </div>
       <p className="mt-6 text-center text-xs text-[#6f6f6f] md:text-sm">
-        Sudah punya akun?{' '}
-        <Link to="/login" className="font-semibold text-[#2ea387] hover:underline">
+        Sudah punya akun?{" "}
+        <Link
+          to="/login"
+          className="font-semibold text-[#2ea387] hover:underline"
+        >
           Masuk
         </Link>
       </p>
     </AuthLayout>
-  )
+  );
 }
 
-export default RegisterPage
+export default RegisterPage;

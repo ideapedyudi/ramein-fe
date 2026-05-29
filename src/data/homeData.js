@@ -9,6 +9,8 @@ export const navMenus = [
   { label: "Beranda", to: "/home" },
   { label: "Jelajah", to: "/jelajahi" },
   { label: "Untuk Kamu", to: "/untuk-kamu" },
+  { label: "Tentang", to: "/about" },
+  { label: "Hubungi Kami", to: "/contact" },
 ];
 
 export const heroSlides = [
