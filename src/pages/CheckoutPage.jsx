@@ -236,9 +236,7 @@ function CheckoutPage() {
 
   const updateContact = (key) => (e) => setContact((c) => ({ ...c, [key]: e.target.value }))
   const subtotal = (Number(tier?.price) || 0) * qty
-  const serviceFee = subtotal > 0 ? 15000 : 0
-  const platformFee = subtotal > 0 ? 10000 : 0
-  const total = subtotal + serviceFee + platformFee
+  const total = subtotal
 
   useEffect(() => {
     let cancelled = false
@@ -428,8 +426,6 @@ function CheckoutPage() {
 
               <div className="my-5 space-y-1.5 border-t border-gray-100 pt-5 text-sm">
                 <Row label="Subtotal" value={formatIDR(subtotal)} />
-                <Row label="Service Fee" value={formatIDR(serviceFee)} />
-                <Row label="Platform Fee" value={formatIDR(platformFee)} />
               </div>
 
               <div className="flex items-center justify-between border-t border-gray-100 pt-4">
