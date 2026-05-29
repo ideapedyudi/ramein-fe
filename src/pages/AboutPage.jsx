@@ -22,7 +22,7 @@ const values = [
   {
     icon: '🇮🇩',
     title: 'Lokal Indonesia',
-    desc: 'Dibangun oleh tim Indonesia, mendukung wilayah Sumatera, Jawa, Kalimantan, Sulawesi, sampai Indonesia Timur.',
+    desc: 'Dibangun oleh tim Indonesia, mendukung wilayah Sumatra, Jawa, Kalimantan, Sulawesi, sampai Indonesia Timur.',
   },
 ]
 

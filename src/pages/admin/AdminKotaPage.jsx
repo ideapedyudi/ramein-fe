@@ -66,11 +66,11 @@ function AdminKotaPage() {
           curr.map((item) =>
             item.id === editingId
               ? {
-                  ...item,
-                  ...(row ?? {}),
-                  name: row?.name ?? value,
-                  provinsi: row?.provinsi ?? provinsi,
-                }
+                ...item,
+                ...(row ?? {}),
+                name: row?.name ?? value,
+                provinsi: row?.provinsi ?? provinsi,
+              }
               : item,
           ),
         )

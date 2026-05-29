@@ -100,7 +100,7 @@ export const apiCategories = [
 ];
 
 export const apiRegions = [
-  { region: "SUMATERA", eventCount: 250, imageUrl: regionImages.sumatra },
+  { region: "SUMATRA", eventCount: 250, imageUrl: regionImages.sumatra },
   { region: "JABODETABEK", eventCount: 450, imageUrl: regionImages.jakarta },
   { region: "JAWA BARAT", eventCount: 280, imageUrl: regionImages.jabar },
   { region: "DIY-JATENG", eventCount: 220, imageUrl: regionImages.diyjateng },
@@ -690,25 +690,25 @@ const toMyPaidTicketFromApi = (entry) => {
   const tickets =
     rawTickets.length > 0
       ? rawTickets.map((ticket, index) => ({
-          id: ticket.id,
-          qrCode: ticket.qrCode ?? null,
-          status: normalizeAttendanceStatus(ticket.attendanceStatus),
-          attendanceStatus: ticket.attendanceStatus ?? "not_attended",
-          attendedAt: ticket.attendedAt ?? null,
-          createdAt: ticket.createdAt ?? null,
-          number: index + 1,
-        }))
+        id: ticket.id,
+        qrCode: ticket.qrCode ?? null,
+        status: normalizeAttendanceStatus(ticket.attendanceStatus),
+        attendanceStatus: ticket.attendanceStatus ?? "not_attended",
+        attendedAt: ticket.attendedAt ?? null,
+        createdAt: ticket.createdAt ?? null,
+        number: index + 1,
+      }))
       : [
-          {
-            id: entry.id,
-            qrCode: entry.qrCode ?? null,
-            status: normalizeAttendanceStatus(entry.attendanceStatus),
-            attendanceStatus: entry.attendanceStatus ?? "not_attended",
-            attendedAt: entry.attendedAt ?? null,
-            createdAt: entry.createdAt ?? null,
-            number: 1,
-          },
-        ]
+        {
+          id: entry.id,
+          qrCode: entry.qrCode ?? null,
+          status: normalizeAttendanceStatus(entry.attendanceStatus),
+          attendanceStatus: entry.attendanceStatus ?? "not_attended",
+          attendedAt: entry.attendedAt ?? null,
+          createdAt: entry.createdAt ?? null,
+          number: 1,
+        },
+      ]
   const cardStatus = tickets.some((ticket) => ticket.status === "active")
     ? "active"
     : tickets[0]?.status ?? normalizeAttendanceStatus(entry.attendanceStatus)
@@ -932,11 +932,11 @@ const toManagedEvent = (event) => {
     ticketTypes,
     organizer: event.organizer
       ? {
-          ...event.organizer,
-          contactName: event.organizer.contactName ?? event.organizer.contact_name ?? null,
-          contactEmail: event.organizer.contactEmail ?? event.organizer.contact_email ?? null,
-          contactPhone: event.organizer.contactPhone ?? event.organizer.contact_phone ?? null,
-        }
+        ...event.organizer,
+        contactName: event.organizer.contactName ?? event.organizer.contact_name ?? null,
+        contactEmail: event.organizer.contactEmail ?? event.organizer.contact_email ?? null,
+        contactPhone: event.organizer.contactPhone ?? event.organizer.contact_phone ?? null,
+      }
       : null,
     registered: sold,
     attended: 0,
