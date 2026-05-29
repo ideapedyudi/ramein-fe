@@ -60,46 +60,43 @@ function EventKamuPage() {
         </Link>
       }
     >
-      <div className="space-y-5">
+      <div className="grid grid-cols-1 items-start gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {events.map((event) => (
           <Link
             key={event.id}
             to={`/event-kamu/${event.id}`}
-            className="block overflow-hidden rounded-2xl border border-[#eee] bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+            className="flex flex-col overflow-hidden rounded-2xl border border-[#eee] bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
           >
-            <div className="flex flex-col gap-6 p-4 sm:flex-row sm:p-5">
-              <div
-                className={`relative w-full shrink-0 self-start overflow-hidden rounded-xl bg-linear-to-br from-brand-400 to-brand-600 sm:w-60 ${
-                  event.imageUrl ? '' : 'h-44'
+            <div
+              className={`relative w-full overflow-hidden bg-linear-to-br from-brand-400 to-brand-600 ${
+                event.imageUrl ? '' : 'aspect-video'
+              }`}
+            >
+              <EventImage src={event.imageUrl} alt={event.name} />
+              <span
+                className={`absolute right-3 top-3 rounded-full px-2.5 py-0.5 text-xs font-semibold uppercase ${
+                  statusStyles[event.eventType] ?? 'bg-brand-600 text-white'
                 }`}
               >
-                <EventImage src={event.imageUrl} alt={event.name} />
-                <span
-                  className={`absolute right-3 top-3 rounded-full px-2.5 py-0.5 text-xs font-semibold uppercase ${
-                    statusStyles[event.eventType] ?? 'bg-brand-600 text-white'
-                  }`}
-                >
-                  {event.eventType}
-                </span>
-              </div>
+                {event.eventType}
+              </span>
+            </div>
 
-              <div className="flex flex-1 flex-col">
-                <h2 className="text-xl font-bold text-gray-900">{event.name}</h2>
-                <div className="mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-600">
-                  <span>{formatDateTime(event.dateLabel)}</span>
-                  <span>{event.city}</span>
-                  <span>{event.category}</span>
-                  <span>{event.visibility ?? (event.isPublished ? 'Published' : 'Draft')}</span>
-                </div>
-                <div className="mt-4 grid grid-cols-3 gap-4 border-t border-gray-100 pt-4">
-                  <Stat label="Terjual" value={formatNumber(event.registered)} accent="text-brand-600" />
-                  <Stat label="Kuota" value={formatNumber(event.totalQuota)} accent="text-emerald-600" />
-                  <Stat
-                    label="Visibility"
-                    value={event.visibility ?? (event.isPublished ? 'Published' : 'Draft')}
-                    accent="text-emerald-600"
-                  />
-                </div>
+            <div className="flex flex-1 flex-col p-4">
+              <h2 className="line-clamp-1 text-base font-bold text-gray-900">{event.name}</h2>
+              <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-600">
+                <span>{formatDateTime(event.dateLabel)}</span>
+                <span>{event.city}</span>
+                <span>{event.category}</span>
+              </div>
+              <div className="mt-3 grid grid-cols-3 gap-3 border-t border-gray-100 pt-3">
+                <Stat label="Terjual" value={formatNumber(event.registered)} accent="text-brand-600" />
+                <Stat label="Kuota" value={formatNumber(event.totalQuota)} accent="text-emerald-600" />
+                <Stat
+                  label="Visibility"
+                  value={event.visibility ?? (event.isPublished ? 'Published' : 'Draft')}
+                  accent="text-emerald-600"
+                />
               </div>
             </div>
           </Link>
