@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
+import { useEffect, useState } from "react";
+import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
   FaArrowLeft,
   FaBars,
@@ -15,39 +15,39 @@ import {
   FaSignOutAlt,
   FaTachometerAlt,
   FaTicketAlt,
-  FaTimes,
   FaUserShield,
-} from 'react-icons/fa'
-import { useAuth } from '../context/authContext'
+} from "react-icons/fa";
+import { useAuth } from "../context/authContext";
+import brandLogo from "../assets/logobrand2.png";
 
-function initialsOf(name = '') {
-  const parts = name.trim().split(/\s+/).slice(0, 2)
-  return parts.map((p) => p[0]?.toUpperCase() ?? '').join('') || '?'
+function initialsOf(name = "") {
+  const parts = name.trim().split(/\s+/).slice(0, 2);
+  return parts.map((p) => p[0]?.toUpperCase() ?? "").join("") || "?";
 }
 
 // Regular user navigation — buying tickets, hosting RSVP/private events.
 const userNav = [
-  { to: '/tiket-saya', label: 'Tiket Saya', icon: FaTicketAlt },
-  { to: '/transaksi', label: 'Transaksi', icon: FaReceipt },
-  { to: '/event-kamu', label: 'Event Saya', icon: FaCalendarAlt },
-  { to: '/buat-event', label: 'Buat Event', icon: FaPlusCircle },
-  { to: '/withdraw', label: 'Withdraw', icon: FaMoneyBillWave },
-]
+  { to: "/tiket-saya", label: "Tiket Saya", icon: FaTicketAlt },
+  { to: "/transaksi", label: "Transaksi", icon: FaReceipt },
+  { to: "/event-kamu", label: "Event Saya", icon: FaCalendarAlt },
+  { to: "/buat-event", label: "Buat Event", icon: FaPlusCircle },
+  { to: "/withdraw", label: "Withdraw", icon: FaMoneyBillWave },
+];
 
 // Internal staff (admin) — manages master data and can create events
 // on behalf of registered organizers.
 const adminNav = [
-  { to: '/dashboard', label: 'Dashboard', icon: FaTachometerAlt, exact: true },
-  { to: '/admin/kategori', label: 'Kategori', icon: FaListUl },
-  { to: '/admin/kota', label: 'Kota', icon: FaCity },
-  { to: '/admin/organizer', label: 'Organizer', icon: FaBuilding },
-  { to: '/admin/finance', label: 'Finance', icon: FaChartLine },
-  { to: '/event-kamu', label: 'Event Dikelola', icon: FaCalendarAlt },
-  { to: '/buat-event', label: 'Buat Event', icon: FaPlusCircle },
-  { to: '/admin/withdraw', label: 'Withdraw', icon: FaMoneyBillWave },
-]
+  { to: "/dashboard", label: "Dashboard", icon: FaTachometerAlt, exact: true },
+  { to: "/admin/kategori", label: "Kategori", icon: FaListUl },
+  { to: "/admin/kota", label: "Kota", icon: FaCity },
+  { to: "/admin/organizer", label: "Organizer", icon: FaBuilding },
+  { to: "/admin/finance", label: "Finance", icon: FaChartLine },
+  { to: "/event-kamu", label: "Event Dikelola", icon: FaCalendarAlt },
+  { to: "/buat-event", label: "Buat Event", icon: FaPlusCircle },
+  { to: "/admin/withdraw", label: "Withdraw", icon: FaMoneyBillWave },
+];
 
-const footerNav = [{ to: '/pengaturan', label: 'Pengaturan', icon: FaCog }]
+const footerNav = [{ to: "/pengaturan", label: "Pengaturan", icon: FaCog }];
 
 function SidebarLinks({ items, onNavigate }) {
   return (
@@ -61,8 +61,8 @@ function SidebarLinks({ items, onNavigate }) {
           className={({ isActive }) =>
             `flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition ${
               isActive
-                ? 'bg-brand-50 text-brand-700'
-                : 'text-[#4a4a4a] hover:bg-[#f4f4f4] hover:text-[#1f1f1f]'
+                ? "bg-brand-50 text-brand-700"
+                : "text-[#4a4a4a] hover:bg-[#f4f4f4] hover:text-[#1f1f1f]"
             }`
           }
         >
@@ -71,11 +71,11 @@ function SidebarLinks({ items, onNavigate }) {
         </NavLink>
       ))}
     </nav>
-  )
+  );
 }
 
 function SidebarContent({ user, isAdmin, onLogout, onNavigate }) {
-  const mainNav = isAdmin ? adminNav : userNav
+  const mainNav = isAdmin ? adminNav : userNav;
   return (
     <div className="flex h-full flex-col">
       <Link
@@ -83,13 +83,13 @@ function SidebarContent({ user, isAdmin, onLogout, onNavigate }) {
         onClick={onNavigate}
         className="flex items-center gap-2 border-b border-[#eee] px-5 py-4"
       >
-        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#2ea387] text-base font-bold text-white">
-          R
-        </div>
+        <img src={brandLogo} alt="brand logo" className="w-10" />
         <div className="flex flex-col leading-tight">
-          <span className="text-base font-extrabold text-[#1f1f1f]">Ramein</span>
+          <span className="text-base font-extrabold text-[#1f1f1f]">
+            Ramein
+          </span>
           <span className="text-[10px] font-semibold uppercase tracking-wider text-[#2ea387]">
-            {isAdmin ? 'Admin · Master Data' : 'My Account'}
+            {isAdmin ? "Admin · Master Data" : "My Account"}
           </span>
         </div>
       </Link>
@@ -137,22 +137,22 @@ function SidebarContent({ user, isAdmin, onLogout, onNavigate }) {
         </button>
       </div>
     </div>
-  )
+  );
 }
 
 function AdminLayout({ title, subtitle, actions, children }) {
-  const { user, isAdmin, logout } = useAuth()
-  const location = useLocation()
-  const navigate = useNavigate()
-  const [mobileOpen, setMobileOpen] = useState(false)
+  const { user, isAdmin, logout } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
-    setMobileOpen(false)
-  }, [location.pathname])
+    setMobileOpen(false);
+  }, [location.pathname]);
 
   function handleLogout() {
-    logout()
-    navigate('/home')
+    logout();
+    navigate("/home");
   }
 
   return (
@@ -190,18 +190,24 @@ function AdminLayout({ title, subtitle, actions, children }) {
             <FaBars />
           </button>
           <div className="min-w-0 flex-1">
-            <h1 className="truncate text-lg font-bold text-[#1f1f1f] sm:text-xl">{title}</h1>
+            <h1 className="truncate text-lg font-bold text-[#1f1f1f] sm:text-xl">
+              {title}
+            </h1>
             {subtitle && (
-              <p className="truncate text-xs text-[#6d6d6d] sm:text-sm">{subtitle}</p>
+              <p className="truncate text-xs text-[#6d6d6d] sm:text-sm">
+                {subtitle}
+              </p>
             )}
           </div>
-          {actions && <div className="flex shrink-0 items-center gap-2">{actions}</div>}
+          {actions && (
+            <div className="flex shrink-0 items-center gap-2">{actions}</div>
+          )}
         </header>
 
         <main className="p-4 sm:p-6 lg:p-8">{children}</main>
       </div>
     </div>
-  )
+  );
 }
 
-export default AdminLayout
+export default AdminLayout;
