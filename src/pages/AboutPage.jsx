@@ -141,11 +141,12 @@ function AboutPage() {
                   Biaya layanan
                 </p>
                 <p className="mt-2 text-4xl font-extrabold text-gray-900 sm:text-5xl">
-                  Cuma <span className="text-brand-600">1%</span> per tiket
+                  <span className="text-brand-600">20%</span> per tiket
                 </p>
                 <p className="mt-3 max-w-md text-gray-600">
-                  Gratis bikin event, tanpa biaya bulanan. Kamu hanya dipotong
-                  1% setiap tiket terjual — sisanya milikmu.
+                  Gratis bikin event, tanpa biaya bulanan. Fee 20% per tiket
+                  terjual, plus biaya publikasi khusus bila ingin event tampil
+                  publik.
                 </p>
               </div>
               <span className="mt-6 inline-flex items-center gap-1 font-semibold text-brand-700">

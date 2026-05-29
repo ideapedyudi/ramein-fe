@@ -26,7 +26,7 @@ const routeSeo = {
   '/pricing': {
     title: 'Harga & Biaya Ramein',
     description:
-      'Model harga sederhana dan transparan: Ramein hanya memotong 1% dari setiap pembelian tiket. Gratis membuat event.',
+      'Model harga transparan: fee 20% per tiket terjual, plus biaya publikasi khusus per event bila ingin event tampil publik. Gratis membuat event.',
   },
   '/contact': {
     title: 'Kontak Ramein',
