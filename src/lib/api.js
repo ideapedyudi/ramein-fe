@@ -675,6 +675,8 @@ const normalizeAttendanceStatus = (value) => {
 const toMyPaidTicketFromApi = (entry) => {
   const items = Array.isArray(entry?.transaction?.items) ? entry.transaction.items : []
   const firstItem = items[0]
+  const eventType = String(entry?.event?.eventType ?? entry?.event?.event_type ?? "").toLowerCase()
+  const isOnlineEvent = eventType === "online"
   const rawTickets = Array.isArray(entry?.tickets)
     ? entry.tickets
     : Array.isArray(entry?.transaction?.tickets)
@@ -719,9 +721,14 @@ const toMyPaidTicketFromApi = (entry) => {
     qrCode: tickets[0]?.qrCode ?? entry.qrCode ?? null,
     eventName: entry.event?.title ?? "-",
     dateLabel: formatEventDateLabel(entry.event?.startDateTime),
+    eventType,
+    eventOnlineLabel: isOnlineEvent
+      ? entry.event?.labelOnline ?? entry.event?.label_online ?? "Online Event"
+      : null,
+    eventOnlineUrl: isOnlineEvent ? entry.event?.urlOnline ?? entry.event?.url_online ?? null : null,
     location:
-      entry.event?.eventType === "online"
-        ? entry.event?.labelOnline ?? "Online Event"
+      isOnlineEvent
+        ? entry.event?.labelOnline ?? entry.event?.label_online ?? "Online Event"
         : [entry.event?.city?.name, entry.event?.organizer?.name].filter(Boolean).join(" • ") || "-",
     tier: firstItem?.ticketName ?? "-",
     quantity,

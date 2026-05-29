@@ -4,6 +4,7 @@ import {
   FaCalendarAlt,
   FaChevronLeft,
   FaChevronRight,
+  FaLink,
   FaMapMarkerAlt,
   FaQrcode,
   FaShareAlt,
@@ -133,7 +134,17 @@ function TicketQrModal({ open, ticket, onClose }) {
   )
 }
 
-function TicketCard({ ticket, onShowQr, onShareSocialMedia, sharing }) {
+function TicketCard({
+  ticket,
+  onShowQr,
+  onOpenOnlineEvent,
+  onShareSocialMedia,
+  sharing,
+  openingOnlineLink,
+}) {
+  const isOnlineTicket = ticket.eventType === 'online'
+  const canOpenOnlineLink = Boolean(ticket.eventOnlineUrl) && !openingOnlineLink
+
   return (
     <article className="flex flex-col overflow-hidden rounded-2xl border border-[#eee] bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md sm:flex-row">
       <div className="h-32 w-full shrink-0 overflow-hidden bg-[#f3f3f3] sm:h-auto sm:w-48">
@@ -189,14 +200,35 @@ function TicketCard({ ticket, onShowQr, onShareSocialMedia, sharing }) {
         </div>
 
         <div className="flex flex-wrap gap-2 pt-1">
-          <button
-            type="button"
-            onClick={() => onShowQr(ticket)}
-            disabled={ticket.status !== 'active'}
-            className="inline-flex items-center gap-2 rounded-lg bg-brand-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-gray-300"
-          >
-            <FaQrcode /> Tampilkan QR
-          </button>
+          {isOnlineTicket ? (
+            <a
+              href={ticket.eventOnlineUrl || '#'}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(event) => {
+                event.preventDefault()
+                if (!canOpenOnlineLink) return
+                onOpenOnlineEvent(ticket)
+              }}
+              aria-disabled={!canOpenOnlineLink}
+              className={`inline-flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-semibold text-white transition ${
+                canOpenOnlineLink
+                  ? 'bg-brand-600 hover:bg-brand-700'
+                  : 'cursor-not-allowed bg-gray-300'
+              }`}
+            >
+              <FaLink /> {openingOnlineLink ? 'Membuka Link...' : 'Tampilkan Link'}
+            </a>
+          ) : (
+            <button
+              type="button"
+              onClick={() => onShowQr(ticket)}
+              disabled={ticket.status !== 'active'}
+              className="inline-flex items-center gap-2 rounded-lg bg-brand-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-gray-300"
+            >
+              <FaQrcode /> Tampilkan QR
+            </button>
+          )}
           <button
             type="button"
             onClick={() => onShareSocialMedia(ticket)}
@@ -355,6 +387,8 @@ function TiketSayaPage() {
   const [error, setError] = useState('')
   const [selectedTicket, setSelectedTicket] = useState(null)
   const [sharingTicketId, setSharingTicketId] = useState('')
+  const [openingOnlineTicketId, setOpeningOnlineTicketId] = useState('')
+  const [autoScannedOnlineTicketIds, setAutoScannedOnlineTicketIds] = useState(() => new Set())
   const [shareNotice, setShareNotice] = useState(null)
 
   useEffect(() => {
@@ -437,6 +471,107 @@ function TiketSayaPage() {
     }
   }
 
+  function markTicketAsAttended(ticket, qrCode, attendedAt) {
+    const fallbackAttendedAt = attendedAt ?? new Date().toISOString()
+
+    const nextTickets = (ticket.tickets ?? []).map((item) => {
+      const shouldUpdate = qrCode ? item.qrCode === qrCode : item.status === 'active'
+      if (!shouldUpdate) return item
+
+      return {
+        ...item,
+        status: 'used',
+        attendanceStatus: 'attended',
+        attendedAt: item.attendedAt ?? fallbackAttendedAt,
+      }
+    })
+
+    const cardStatus = nextTickets.some((item) => item.status === 'active') ? 'active' : 'used'
+    const firstTicket = nextTickets[0] ?? null
+
+    return {
+      ...ticket,
+      status: cardStatus,
+      attendanceStatus: firstTicket?.attendanceStatus ?? ticket.attendanceStatus,
+      attendedAt: firstTicket?.attendedAt ?? ticket.attendedAt ?? fallbackAttendedAt,
+      tickets: nextTickets,
+    }
+  }
+
+  function hasAnyAttendedEntry(ticket) {
+    const normalizedStatus = String(ticket.attendanceStatus ?? '').toLowerCase()
+    if (normalizedStatus === 'attended' || normalizedStatus === 'hadir' || ticket.status === 'used') {
+      return true
+    }
+
+    if (ticket.attendedAt) return true
+
+    return (ticket.tickets ?? []).some((item) => {
+      const itemStatus = String(item.attendanceStatus ?? item.status ?? '').toLowerCase()
+      return item.attendedAt || itemStatus === 'attended' || itemStatus === 'hadir' || itemStatus === 'used'
+    })
+  }
+
+  async function handleOpenOnlineEvent(ticket) {
+    const eventLink = String(ticket.eventOnlineUrl ?? '').trim()
+    if (!eventLink) {
+      setShareNotice({
+        type: 'error',
+        text: 'Link event online belum tersedia.',
+      })
+      return
+    }
+
+    setOpeningOnlineTicketId(ticket.id)
+    setShareNotice(null)
+
+    const ticketItems = Array.isArray(ticket.tickets) ? ticket.tickets : []
+    const activeTicket = ticketItems.find((item) => item.status === 'active' && item.qrCode)
+    const fallbackTicket = ticketItems.find((item) => item.qrCode)
+    const targetQrCode = activeTicket?.qrCode ?? fallbackTicket?.qrCode ?? ticket.qrCode ?? null
+    const alreadyScannedOnline = autoScannedOnlineTicketIds.has(ticket.id)
+    const alreadyAttended = hasAnyAttendedEntry(ticket)
+    const shouldAutoScan =
+      ticket.status === 'active' && Boolean(targetQrCode) && !alreadyScannedOnline && !alreadyAttended
+    let attendanceMarked = false
+    let attendanceMessage = ''
+    const attendedAt = new Date().toISOString()
+
+    try {
+      if (shouldAutoScan) {
+        const result = await api.scanTicketQrCode(targetQrCode)
+        attendanceMarked = true
+        attendanceMessage = result?.message ?? ''
+        setAutoScannedOnlineTicketIds((prev) => new Set(prev).add(ticket.id))
+
+        setTickets((prev) =>
+          prev.map((item) => (item.id === ticket.id ? markTicketAsAttended(item, targetQrCode, attendedAt) : item)),
+        )
+      }
+    } catch (err) {
+      setShareNotice({
+        type: 'info',
+        text: err.message || 'Link event dibuka, tapi status hadir belum berhasil diproses otomatis.',
+      })
+    } finally {
+      window.open(eventLink, '_blank', 'noopener,noreferrer')
+
+      if (attendanceMarked) {
+        setShareNotice({
+          type: 'success',
+          text: attendanceMessage || 'Link event dibuka dan status hadir berhasil diproses.',
+        })
+      } else if (!shouldAutoScan) {
+        setShareNotice({
+          type: 'info',
+          text: 'Link event online dibuka.',
+        })
+      }
+
+      setOpeningOnlineTicketId('')
+    }
+  }
+
   return (
     <AdminLayout title="Tiket Saya" subtitle="Semua tiket berbayar yang sudah kamu beli">
       <div className="mb-4 flex flex-wrap items-center gap-2">
@@ -498,8 +633,10 @@ function TiketSayaPage() {
               key={ticket.id}
               ticket={ticket}
               onShowQr={setSelectedTicket}
+              onOpenOnlineEvent={handleOpenOnlineEvent}
               onShareSocialMedia={handleShareSocialMedia}
               sharing={sharingTicketId === ticket.id}
+              openingOnlineLink={openingOnlineTicketId === ticket.id}
             />
           ))}
         </div>
