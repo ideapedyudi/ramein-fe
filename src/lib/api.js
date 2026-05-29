@@ -725,7 +725,7 @@ const toMyPaidTicketFromApi = (entry) => {
     eventOnlineLabel: isOnlineEvent
       ? entry.event?.labelOnline ?? entry.event?.label_online ?? "Online Event"
       : null,
-    eventOnlineUrl: isOnlineEvent ? entry.event?.urlOnline ?? entry.event?.url_online ?? null : null,
+    eventOnlineUrl: entry.event?.urlOnline ?? entry.event?.url_online ?? null,
     location:
       isOnlineEvent
         ? entry.event?.labelOnline ?? entry.event?.label_online ?? "Online Event"

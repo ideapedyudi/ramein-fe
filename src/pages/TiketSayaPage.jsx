@@ -142,8 +142,9 @@ function TicketCard({
   sharing,
   openingOnlineLink,
 }) {
-  const isOnlineTicket = ticket.eventType === 'online'
-  const canOpenOnlineLink = Boolean(ticket.eventOnlineUrl) && !openingOnlineLink
+  const onlineUrl = String(ticket.eventOnlineUrl ?? '').trim()
+  const hasOnlineUrl = onlineUrl.length > 0
+  const canOpenOnlineLink = hasOnlineUrl && !openingOnlineLink
 
   return (
     <article className="flex flex-col overflow-hidden rounded-2xl border border-[#eee] bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md sm:flex-row">
@@ -200,9 +201,9 @@ function TicketCard({
         </div>
 
         <div className="flex flex-wrap gap-2 pt-1">
-          {isOnlineTicket ? (
+          {hasOnlineUrl ? (
             <a
-              href={ticket.eventOnlineUrl || '#'}
+              href={onlineUrl || '#'}
               target="_blank"
               rel="noopener noreferrer"
               onClick={(event) => {
