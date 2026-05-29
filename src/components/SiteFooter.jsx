@@ -30,7 +30,7 @@ function FooterColumn({ title, items }) {
 const productItems = [
   { label: "Explore Events", to: "/jelajahi" },
   { label: "Create Event", to: "/buat-event" },
-  { label: "Pricing" },
+  { label: "Pricing", to: "/pricing" },
 ];
 
 const companyItems = [

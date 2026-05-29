@@ -23,10 +23,15 @@ const routeSeo = {
     description:
       'Kenali Ramein, platform tiket event yang membantu orang menemukan pengalaman seru setiap hari.',
   },
+  '/pricing': {
+    title: 'Harga & Biaya Ramein',
+    description:
+      'Model harga sederhana dan transparan: Ramein hanya memotong 1% dari setiap pembelian tiket. Gratis membuat event.',
+  },
   '/contact': {
     title: 'Kontak Ramein',
     description:
-      'Hubungi tim Ramein untuk pertanyaan, kerja sama, atau bantuan terkait event dan pembelian tiket.',
+      'Hubungi tim Ramein lewat WhatsApp untuk pertanyaan, kerja sama, atau bantuan terkait event dan pembelian tiket.',
   },
   '/terms': {
     title: 'Syarat dan Ketentuan',

@@ -1,7 +1,12 @@
-import { useState } from "react";
 import PageHeader from "../components/PageHeader";
 import SiteFooter from "../components/SiteFooter";
 import SiteLayout from "../components/SiteLayout";
+
+const WHATSAPP_NUMBER = "6281200000000";
+const WHATSAPP_DISPLAY = "+62 812 0000 0000";
+const WHATSAPP_LINK = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
+  "Halo Ramein, saya punya saran/pertanyaan tentang ",
+)}`;
 
 const channels = [
   {
@@ -10,63 +15,49 @@ const channels = [
     value: "halo@ramein.fun",
     href: "mailto:halo@ramein.fun",
   },
-  {
-    icon: "💬",
-    label: "WhatsApp",
-    value: "+62 812 0000 0000",
-    href: "https://wa.me/6281200000000",
-  },
   { icon: "📍", label: "Alamat", value: "Bandung, Indonesia", href: null },
 ];
 
-function Field({ label, name, type = "text", placeholder, value, onChange }) {
-  return (
-    <label className="block">
-      <span className="mb-1.5 block text-sm font-medium text-gray-700">
-        {label}
-      </span>
-      <input
-        required
-        type={type}
-        name={name}
-        placeholder={placeholder}
-        value={value}
-        onChange={onChange}
-        className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
-      />
-    </label>
-  );
-}
-
 function ContactPage() {
-  const [form, setForm] = useState({
-    name: "",
-    email: "",
-    subject: "",
-    message: "",
-  });
-  const [submitting, setSubmitting] = useState(false);
-  const [sent, setSent] = useState(false);
-
-  const update = (key) => (e) =>
-    setForm((f) => ({ ...f, [key]: e.target.value }));
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setSubmitting(true);
-    await new Promise((r) => setTimeout(r, 600));
-    setSubmitting(false);
-    setSent(true);
-  };
-
   return (
     <SiteLayout>
       <PageHeader
         title="Hubungi Kami"
-        subtitle="Ada pertanyaan atau butuh bantuan? Tim Ramein siap membantu."
+        subtitle="Ada pertanyaan atau butuh bantuan? Tim Ramein siap membantu lewat WhatsApp."
       />
 
       <div className="mx-auto grid max-w-[1280px] gap-8 px-4 py-10 sm:px-6 sm:py-12 lg:grid-cols-2 lg:gap-10 lg:px-8">
+        {/* WhatsApp — highlighted primary contact */}
+        <div className="flex flex-col justify-between rounded-3xl bg-gradient-to-br from-[#25D366] to-[#128C7E] p-6 text-white shadow-lg sm:p-8">
+          <div>
+            <div className="grid h-14 w-14 place-items-center rounded-2xl bg-white/20 text-3xl">
+              💬
+            </div>
+            <h2 className="mt-4 text-2xl font-bold sm:text-3xl">
+              Chat via WhatsApp
+            </h2>
+            <span className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1 text-sm font-semibold">
+              💡 Punya saran atau pertanyaan?
+            </span>
+            <p className="mt-3 max-w-md text-white/90">
+              Punya <strong>saran</strong> untuk Ramein atau ada{" "}
+              <strong>pertanyaan</strong> seputar event, tiket, atau kerja sama?
+              Langsung chat tim kami lewat WhatsApp — kami balas secepatnya di
+              jam operasional.
+            </p>
+            <p className="mt-4 text-lg font-semibold">{WHATSAPP_DISPLAY}</p>
+          </div>
+          <a
+            href={WHATSAPP_LINK}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-6 inline-flex items-center justify-center gap-2 rounded-full bg-white px-6 py-3 text-base font-semibold text-[#128C7E] shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+          >
+            <span className="text-xl">💬</span> Chat Sekarang
+          </a>
+        </div>
+
+        {/* Other channels + hours */}
         <div className="space-y-4">
           {channels.map((c) => (
             <a
@@ -96,66 +87,6 @@ function ContactPage() {
               Minggu & Libur Nasional: tutup
             </p>
           </div>
-        </div>
-
-        <div className="rounded-2xl border border-black/5 bg-white p-4 shadow-sm sm:p-6">
-          <h2 className="text-lg font-semibold text-gray-900">Kirim Pesan</h2>
-          <p className="mt-1 text-sm text-gray-600">
-            Isi form di bawah, tim kami akan membalas dalam 1×24 jam.
-          </p>
-
-          {sent ? (
-            <div className="mt-6 rounded-xl bg-brand-50 p-4 text-sm text-brand-700">
-              ✓ Terima kasih{form.name ? `, ${form.name}` : ""}! Pesan kamu
-              sudah masuk.
-            </div>
-          ) : (
-            <form onSubmit={handleSubmit} className="mt-5 space-y-4">
-              <Field
-                label="Nama"
-                name="name"
-                placeholder="Nama lengkap kamu"
-                value={form.name}
-                onChange={update("name")}
-              />
-              <Field
-                label="Email"
-                name="email"
-                type="email"
-                placeholder="nama@email.com"
-                value={form.email}
-                onChange={update("email")}
-              />
-              <Field
-                label="Subjek"
-                name="subject"
-                placeholder="Tentang apa pesan kamu?"
-                value={form.subject}
-                onChange={update("subject")}
-              />
-              <label className="block">
-                <span className="mb-1.5 block text-sm font-medium text-gray-700">
-                  Pesan
-                </span>
-                <textarea
-                  required
-                  name="message"
-                  rows={5}
-                  value={form.message}
-                  onChange={update("message")}
-                  placeholder="Tulis pesan kamu di sini..."
-                  className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
-                />
-              </label>
-              <button
-                type="submit"
-                disabled={submitting}
-                className="w-full rounded-lg bg-brand-600 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-brand-700 disabled:opacity-60"
-              >
-                {submitting ? "Mengirim..." : "Kirim Pesan"}
-              </button>
-            </form>
-          )}
         </div>
       </div>
       <SiteFooter />

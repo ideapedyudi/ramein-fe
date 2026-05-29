@@ -16,6 +16,7 @@ import JelajahiPage from './pages/JelajahiPage'
 import LoginPage from './pages/LoginPage'
 import OrderSuccessPage from './pages/OrderSuccessPage'
 import PengaturanPage from './pages/PengaturanPage'
+import PricingPage from './pages/PricingPage'
 import PrivacyPage from './pages/PrivacyPage'
 import RegisterPage from './pages/RegisterPage'
 import TermsPage from './pages/TermsPage'
@@ -40,6 +41,7 @@ function App() {
         <Route path="/event/:eventId" element={<EventDetailPage />} />
 
         <Route path="/about" element={<AboutPage />} />
+        <Route path="/pricing" element={<PricingPage />} />
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/terms" element={<TermsPage />} />
         <Route path="/privacy" element={<PrivacyPage />} />

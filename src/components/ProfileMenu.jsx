@@ -7,7 +7,6 @@ import {
   FaSignOutAlt,
   FaTachometerAlt,
   FaTicketAlt,
-  FaUserShield,
 } from "react-icons/fa";
 
 function initialsOf(name = "") {
@@ -53,69 +52,47 @@ function ProfileMenu({ user, isAdmin, onLogout, variant = "desktop" }) {
         { label: "Pengaturan", to: "/pengaturan", icon: FaCog },
       ];
 
-  if (variant === "mobile") {
-    return (
-      <div className="flex flex-col gap-1">
-        <div className="flex items-center gap-3 rounded-lg bg-white/10 px-3 py-2.5">
-          <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white text-sm font-bold text-[#2ea387]">
-            {initialsOf(user.name)}
-          </span>
-          <div className="min-w-0 flex-1">
-            <p className="flex items-center gap-1.5 truncate text-sm font-semibold text-white">
-              {user.name}
-              {isAdmin && <FaUserShield className="text-xs text-white/80" />}
-            </p>
-            <p className="truncate text-xs text-white/70">{user.email}</p>
-          </div>
-        </div>
-        {items.map((item) => (
-          <Link
-            key={item.to}
-            to={item.to}
-            className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-semibold text-white/95 transition hover:bg-white/10"
-          >
-            <item.icon className="text-base" />
-            {item.label}
-          </Link>
-        ))}
-        <button
-          type="button"
-          onClick={onLogout}
-          className="mt-1 flex items-center gap-2 rounded-lg bg-white px-3 py-2.5 text-sm font-semibold text-[#2ea387] transition hover:bg-emerald-50"
-        >
-          <FaSignOutAlt className="text-base" />
-          Keluar
-        </button>
-      </div>
-    );
-  }
+  const isAvatar = variant === "avatar";
 
   return (
     <div ref={wrapperRef} className="relative">
-      <button
-        type="button"
-        onClick={() => setOpen((v) => !v)}
-        aria-haspopup="menu"
-        aria-expanded={open}
-        className="flex items-center gap-2 rounded-full bg-white/10 py-1 pr-3 pl-1 text-sm font-semibold text-white transition hover:bg-white/15"
-      >
-        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-xs font-bold text-[#2ea387]">
-          {initialsOf(user.name)}
-        </span>
-        <span className="max-w-30 truncate">{user.name}</span>
-        <svg
-          className={`h-3.5 w-3.5 transition ${open ? "rotate-180" : ""}`}
-          viewBox="0 0 20 20"
-          fill="currentColor"
-          aria-hidden="true"
+      {isAvatar ? (
+        <button
+          type="button"
+          onClick={() => setOpen((v) => !v)}
+          aria-haspopup="menu"
+          aria-expanded={open}
+          aria-label="Menu profil"
+          className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-sm font-bold text-[#2ea387] ring-2 ring-white/40 transition hover:ring-white/70"
         >
-          <path
-            fillRule="evenodd"
-            d="M5.23 7.21a.75.75 0 011.06.02L10 11.06l3.71-3.83a.75.75 0 111.08 1.04l-4.25 4.39a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z"
-            clipRule="evenodd"
-          />
-        </svg>
-      </button>
+          {initialsOf(user.name)}
+        </button>
+      ) : (
+        <button
+          type="button"
+          onClick={() => setOpen((v) => !v)}
+          aria-haspopup="menu"
+          aria-expanded={open}
+          className="flex items-center gap-2 rounded-full bg-white/10 py-1 pr-3 pl-1 text-sm font-semibold text-white transition hover:bg-white/15"
+        >
+          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-xs font-bold text-[#2ea387]">
+            {initialsOf(user.name)}
+          </span>
+          <span className="max-w-30 truncate">{user.name}</span>
+          <svg
+            className={`h-3.5 w-3.5 transition ${open ? "rotate-180" : ""}`}
+            viewBox="0 0 20 20"
+            fill="currentColor"
+            aria-hidden="true"
+          >
+            <path
+              fillRule="evenodd"
+              d="M5.23 7.21a.75.75 0 011.06.02L10 11.06l3.71-3.83a.75.75 0 111.08 1.04l-4.25 4.39a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z"
+              clipRule="evenodd"
+            />
+          </svg>
+        </button>
+      )}
 
       {open && (
         <div

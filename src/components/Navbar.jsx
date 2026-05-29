@@ -75,19 +75,29 @@ function Navbar() {
             )}
           </div>
 
-          <button
-            type="button"
-            onClick={() => setMobileOpen((v) => !v)}
-            aria-label={mobileOpen ? "Tutup menu" : "Buka menu"}
-            aria-expanded={mobileOpen}
-            className="flex h-10 w-10 items-center justify-center rounded-lg text-white hover:bg-white/10 md:hidden"
-          >
-            {mobileOpen ? (
-              <FaTimes className="text-xl" />
-            ) : (
-              <FaBars className="text-xl" />
+          <div className="flex items-center gap-2 md:hidden">
+            {isAuthenticated && (
+              <ProfileMenu
+                user={user}
+                isAdmin={isAdmin}
+                onLogout={handleLogout}
+                variant="avatar"
+              />
             )}
-          </button>
+            <button
+              type="button"
+              onClick={() => setMobileOpen((v) => !v)}
+              aria-label={mobileOpen ? "Tutup menu" : "Buka menu"}
+              aria-expanded={mobileOpen}
+              className="flex h-10 w-10 items-center justify-center rounded-lg text-white hover:bg-white/10"
+            >
+              {mobileOpen ? (
+                <FaTimes className="text-xl" />
+              ) : (
+                <FaBars className="text-xl" />
+              )}
+            </button>
+          </div>
         </div>
 
         {mobileOpen && (
@@ -111,33 +121,24 @@ function Navbar() {
                   </NavLink>
                 ))}
 
-                <div className="mt-2 border-t border-white/10 pt-3">
-                  {isAuthenticated ? (
-                    <ProfileMenu
-                      user={user}
-                      isAdmin={isAdmin}
-                      onLogout={handleLogout}
-                      variant="mobile"
-                    />
-                  ) : (
-                    <div className="flex flex-col gap-2">
-                      <Link
-                        to="/login"
-                        onClick={closeMobile}
-                        className="rounded-xl border border-white/30 px-4 py-2.5 text-center text-sm font-semibold text-white transition hover:bg-white/10"
-                      >
-                        Masuk
-                      </Link>
-                      <Link
-                        to="/register"
-                        onClick={closeMobile}
-                        className="rounded-xl bg-white px-4 py-2.5 text-center text-sm font-semibold text-[#2ea387] transition hover:bg-emerald-50"
-                      >
-                        Daftar
-                      </Link>
-                    </div>
-                  )}
-                </div>
+                {!isAuthenticated && (
+                  <div className="mt-2 flex flex-col gap-2 border-t border-white/10 pt-3">
+                    <Link
+                      to="/login"
+                      onClick={closeMobile}
+                      className="rounded-xl border border-white/30 px-4 py-2.5 text-center text-sm font-semibold text-white transition hover:bg-white/10"
+                    >
+                      Masuk
+                    </Link>
+                    <Link
+                      to="/register"
+                      onClick={closeMobile}
+                      className="rounded-xl bg-white px-4 py-2.5 text-center text-sm font-semibold text-[#2ea387] transition hover:bg-emerald-50"
+                    >
+                      Daftar
+                    </Link>
+                  </div>
+                )}
               </nav>
             </Container>
           </div>
