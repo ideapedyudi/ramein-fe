@@ -1,8 +1,25 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
+import { FaCamera, FaKeyboard, FaTimes } from 'react-icons/fa'
+import { useZxing } from 'react-zxing'
 import AdminLayout from '../components/AdminLayout'
 import { api } from '../lib/api'
 import { formatDateTime, formatIDR, formatNumber } from '../lib/format'
+
+const attendeeTabs = [
+  { value: 'all', label: 'Semua' },
+  { value: 'tidak_hadir', label: 'Tidak Hadir' },
+  { value: 'hadir', label: 'Hadir' },
+]
+
+function isAttendedStatus(value) {
+  const status = String(value ?? '').toLowerCase()
+  return status === 'hadir' || status === 'attended'
+}
+
+function formatAttendeeStatus(value) {
+  return isAttendedStatus(value) ? 'Hadir' : 'Tidak Hadir'
+}
 
 function Card({ children }) {
   return (
@@ -32,6 +49,333 @@ function BigStat({ label, value, accent }) {
   )
 }
 
+function ScanAttendanceModal({ open, onClose, onScanSuccess }) {
+  const [mode, setMode] = useState('camera')
+  const [manualQr, setManualQr] = useState('')
+  const [submitError, setSubmitError] = useState('')
+  const [submitMessage, setSubmitMessage] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+  const [scanLocked, setScanLocked] = useState(false)
+
+  const submitQrCode = useCallback(
+    async (value) => {
+      const qrCode = String(value ?? '').trim()
+      if (!qrCode || submitting || scanLocked) return
+
+      setSubmitting(true)
+      setSubmitError('')
+      setSubmitMessage('')
+      setScanLocked(true)
+
+      try {
+        const result = await api.scanTicketQrCode(qrCode)
+        setSubmitMessage(result?.message ?? 'Scan kehadiran berhasil diproses.')
+        setManualQr(qrCode)
+        onScanSuccess?.()
+      } catch (err) {
+        setSubmitError(err.message || 'Gagal memproses scan QR.')
+      } finally {
+        setSubmitting(false)
+        setTimeout(() => setScanLocked(false), 1200)
+      }
+    },
+    [onScanSuccess, scanLocked, submitting],
+  )
+
+  const { ref } = useZxing(
+    open && mode === 'camera'
+      ? {
+          paused: submitting || scanLocked,
+          onDecodeResult(result) {
+            submitQrCode(result.getText())
+          },
+          onError() {},
+        }
+      : {
+          paused: true,
+          onDecodeResult() {},
+          onError() {},
+        },
+  )
+
+  if (!open) return null
+
+  function handleClose() {
+    setMode('camera')
+    setManualQr('')
+    setSubmitError('')
+    setSubmitMessage('')
+    setSubmitting(false)
+    setScanLocked(false)
+    onClose()
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+      <div className="w-full max-w-2xl rounded-2xl bg-white shadow-xl">
+        <div className="flex items-start justify-between border-b border-gray-100 p-5">
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900">Scan Kehadiran</h3>
+            <p className="text-sm text-gray-500">Scan QR peserta atau masukkan kode QR secara manual.</p>
+          </div>
+          <button
+            type="button"
+            onClick={handleClose}
+            className="rounded-lg p-2 text-gray-500 hover:bg-gray-100"
+            aria-label="Tutup modal scan"
+          >
+            <FaTimes />
+          </button>
+        </div>
+
+        <div className="p-5">
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => setMode('camera')}
+              className={`inline-flex items-center gap-2 rounded-full px-3 py-2 text-xs font-semibold ${
+                mode === 'camera'
+                  ? 'bg-brand-600 text-white'
+                  : 'border border-[#e2e2e2] bg-white text-[#4a4a4a]'
+              }`}
+            >
+              <FaCamera /> Kamera
+            </button>
+            <button
+              type="button"
+              onClick={() => setMode('manual')}
+              className={`inline-flex items-center gap-2 rounded-full px-3 py-2 text-xs font-semibold ${
+                mode === 'manual'
+                  ? 'bg-brand-600 text-white'
+                  : 'border border-[#e2e2e2] bg-white text-[#4a4a4a]'
+              }`}
+            >
+              <FaKeyboard /> Input Manual
+            </button>
+          </div>
+
+          {mode === 'camera' ? (
+            <div className="mt-4">
+              <div className="overflow-hidden rounded-2xl border border-gray-200 bg-black">
+                <video ref={ref} className="h-[320px] w-full object-cover" />
+              </div>
+              <p className="mt-3 text-xs text-gray-500">
+                Arahkan kamera ke QR peserta. Scan akan langsung diproses.
+              </p>
+            </div>
+          ) : (
+            <form
+              className="mt-4 space-y-3"
+              onSubmit={(event) => {
+                event.preventDefault()
+                submitQrCode(manualQr)
+              }}
+            >
+              <div>
+                <label htmlFor="manual-qr" className="mb-1 block text-xs font-medium text-gray-600">
+                  Kode QR
+                </label>
+                <input
+                  id="manual-qr"
+                  type="text"
+                  value={manualQr}
+                  onChange={(event) => setManualQr(event.target.value)}
+                  placeholder="EVP-..."
+                  className="w-full rounded-xl border border-[#e2e2e2] px-3 py-2 text-sm outline-none focus:border-brand-500"
+                />
+              </div>
+              <button
+                type="submit"
+                disabled={submitting || !manualQr.trim()}
+                className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-gray-300"
+              >
+                {submitting ? 'Memproses...' : 'Submit Scan'}
+              </button>
+            </form>
+          )}
+
+          {submitMessage && (
+            <div className="mt-4 rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+              {submitMessage}
+            </div>
+          )}
+
+          {submitError && (
+            <div className="mt-4 rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700">
+              {submitError}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function AttendeeSection({ eventId }) {
+  const [activeTab, setActiveTab] = useState('all')
+  const [attendeesByTab, setAttendeesByTab] = useState({})
+  const [loadingTab, setLoadingTab] = useState('all')
+  const [error, setError] = useState('')
+  const [scanModalOpen, setScanModalOpen] = useState(false)
+
+  const loadAttendees = useCallback(
+    async (tab, { force = false } = {}) => {
+      if (!force && attendeesByTab[tab]) {
+        setActiveTab(tab)
+        return
+      }
+
+      setActiveTab(tab)
+      setError('')
+      setLoadingTab(tab)
+
+      try {
+        const res = await api.getEventAttendees(eventId, tab)
+        setAttendeesByTab((current) => ({ ...current, [tab]: res }))
+      } catch (err) {
+        setError(err.message || 'Gagal memuat daftar peserta.')
+      } finally {
+        setLoadingTab('')
+      }
+    },
+    [attendeesByTab, eventId],
+  )
+
+  useEffect(() => {
+    let active = true
+
+    ;(async () => {
+      setError('')
+      setLoadingTab('all')
+      try {
+        const res = await api.getEventAttendees(eventId, 'all')
+        if (active) setAttendeesByTab({ all: res })
+      } catch (err) {
+        if (active) setError(err.message || 'Gagal memuat daftar peserta.')
+      } finally {
+        if (active) setLoadingTab('')
+      }
+    })()
+
+    return () => {
+      active = false
+    }
+  }, [eventId])
+
+  const attendees = attendeesByTab[activeTab] ?? []
+
+  async function handleScanSuccess() {
+    await Promise.all([
+      loadAttendees('all', { force: true }),
+      activeTab !== 'all' ? loadAttendees(activeTab, { force: true }) : Promise.resolve(),
+    ])
+  }
+
+  return (
+    <div className="mt-6 border-t border-gray-100 pt-6">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h3 className="text-base font-semibold text-gray-900">Peserta Terdaftar</h3>
+          <p className="text-sm text-gray-500">Daftar pembeli tiket berdasarkan status kehadiran.</p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {attendeeTabs.map((tab) => (
+            <button
+              key={tab.value}
+              type="button"
+              onClick={() => loadAttendees(tab.value)}
+              className={`rounded-full px-3 py-1.5 text-xs font-semibold transition ${
+                activeTab === tab.value
+                  ? 'bg-brand-600 text-white'
+                  : 'border border-[#e2e2e2] bg-white text-[#4a4a4a] hover:bg-[#f9f9f9]'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+          <button
+            type="button"
+            onClick={() => setScanModalOpen(true)}
+            className="inline-flex items-center gap-2 rounded-full bg-gray-900 px-3 py-1.5 text-xs font-semibold text-white hover:bg-black"
+          >
+            <FaCamera /> Scan Kehadiran
+          </button>
+        </div>
+      </div>
+
+      {error && (
+        <div className="mt-4 rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700">
+          {error}
+        </div>
+      )}
+
+      {loadingTab === activeTab ? (
+        <div className="mt-4 rounded-xl border border-dashed border-gray-200 bg-gray-50 px-4 py-6 text-center text-sm text-gray-500">
+          Memuat peserta...
+        </div>
+      ) : attendees.length === 0 ? (
+        <div className="mt-4 rounded-xl border border-dashed border-gray-200 bg-gray-50 px-4 py-6 text-center text-sm text-gray-500">
+          Belum ada peserta untuk filter ini.
+        </div>
+      ) : (
+        <div className="mt-4 overflow-x-auto rounded-xl border border-gray-100">
+          <table className="w-full min-w-[820px] text-left text-sm">
+            <thead className="bg-gray-50 text-[11px] uppercase tracking-wide text-gray-500">
+              <tr>
+                <th className="px-4 py-3 font-semibold">Peserta</th>
+                <th className="px-4 py-3 font-semibold">Order ID</th>
+                <th className="px-4 py-3 font-semibold">Tiket</th>
+                <th className="px-4 py-3 font-semibold">Pembayaran</th>
+                <th className="px-4 py-3 font-semibold">Status</th>
+                <th className="px-4 py-3 font-semibold">Waktu</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {attendees.map((attendee) => (
+                <tr key={attendee.id}>
+                  <td className="px-4 py-3">
+                    <p className="font-medium text-gray-900">{attendee.name}</p>
+                    <p className="text-xs text-gray-500">{attendee.email}</p>
+                  </td>
+                  <td className="px-4 py-3 font-mono text-xs text-gray-500">{attendee.orderId}</td>
+                  <td className="px-4 py-3">
+                    <p className="font-medium text-gray-900">{attendee.ticketName}</p>
+                    <p className="text-xs text-gray-500">{attendee.quantity}x</p>
+                  </td>
+                  <td className="px-4 py-3">
+                    <p className="font-medium text-gray-900">{formatIDR(attendee.total)}</p>
+                    <p className="text-xs uppercase text-gray-500">{attendee.paymentProvider}</p>
+                  </td>
+                  <td className="px-4 py-3">
+                    <span
+                      className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase ${
+                        isAttendedStatus(attendee.attendanceStatus)
+                          ? 'bg-emerald-50 text-emerald-700'
+                          : 'bg-amber-50 text-amber-700'
+                      }`}
+                    >
+                      {formatAttendeeStatus(attendee.attendanceStatus)}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 text-xs text-gray-500">
+                    {formatDateTime(attendee.attendedAt ?? attendee.registeredAt)}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      <ScanAttendanceModal
+        open={scanModalOpen}
+        onClose={() => setScanModalOpen(false)}
+        onScanSuccess={handleScanSuccess}
+      />
+    </div>
+  )
+}
+
 function EventKamuDetailPage() {
   const { eventId } = useParams()
   const [event, setEvent] = useState(null)
@@ -41,8 +385,6 @@ function EventKamuDetailPage() {
 
   useEffect(() => {
     let cancelled = false
-    setLoading(true)
-    setError('')
     api
       .getMyEvent(eventId)
       .then((res) => {
@@ -107,10 +449,11 @@ function EventKamuDetailPage() {
               <button
                 key={item.key}
                 onClick={() => setTab(item.key)}
-                className={`relative -mb-px whitespace-nowrap border-b-2 px-1 pb-3 pt-2 text-sm font-medium transition ${tab === item.key
-                  ? 'border-brand-600 text-brand-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-800'
-                  }`}
+                className={`relative -mb-px whitespace-nowrap border-b-2 px-1 pb-3 pt-2 text-sm font-medium transition ${
+                  tab === item.key
+                    ? 'border-brand-600 text-brand-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-800'
+                }`}
               >
                 {item.label}
               </button>
@@ -205,6 +548,8 @@ function EventKamuDetailPage() {
                   accent="text-rose-600"
                 />
               </div>
+
+              <AttendeeSection eventId={eventId} />
             </Card>
           )}
         </div>

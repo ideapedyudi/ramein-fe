@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import AdminLayout from '../components/AdminLayout'
 import { api } from '../lib/api'
-import { formatDateTime, formatIDR, formatNumber } from '../lib/format'
+import { formatDateTime, formatNumber } from '../lib/format'
 
 const statusStyles = {
   active: 'bg-emerald-500 text-white',
@@ -28,8 +28,7 @@ function EventKamuPage() {
 
   useEffect(() => {
     let cancelled = false
-    setLoading(true)
-    setError('')
+
     api
       .getMyEvents()
       .then((res) => {
@@ -41,6 +40,7 @@ function EventKamuPage() {
       .finally(() => {
         if (!cancelled) setLoading(false)
       })
+
     return () => {
       cancelled = true
     }
@@ -77,8 +77,9 @@ function EventKamuPage() {
                   />
                 )}
                 <span
-                  className={`absolute right-3 top-3 rounded-full px-2.5 py-0.5 text-xs font-semibold uppercase ${statusStyles[event.eventType] ?? 'bg-brand-600 text-white'
-                    }`}
+                  className={`absolute right-3 top-3 rounded-full px-2.5 py-0.5 text-xs font-semibold uppercase ${
+                    statusStyles[event.eventType] ?? 'bg-brand-600 text-white'
+                  }`}
                 >
                   {event.eventType}
                 </span>
@@ -95,7 +96,11 @@ function EventKamuPage() {
                 <div className="mt-4 grid grid-cols-3 gap-4 border-t border-gray-100 pt-4">
                   <Stat label="Terjual" value={formatNumber(event.registered)} accent="text-brand-600" />
                   <Stat label="Kuota" value={formatNumber(event.totalQuota)} accent="text-emerald-600" />
-                  <Stat label="Visibility" value={event.visibility ?? (event.isPublished ? 'Published' : 'Draft')} accent="text-emerald-600" />
+                  <Stat
+                    label="Visibility"
+                    value={event.visibility ?? (event.isPublished ? 'Published' : 'Draft')}
+                    accent="text-emerald-600"
+                  />
                 </div>
               </div>
             </div>

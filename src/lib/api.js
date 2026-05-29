@@ -440,111 +440,6 @@ export const eventCatalog = [
   investorRoundtable,
 ];
 
-const userMyTickets = [
-  {
-    id: "TKT-2026-0001",
-    eventId: "java-jazz-2026",
-    eventName: "Java Jazz Festival 2026",
-    dateLabel: "15 Mei 2026",
-    location: "Jakarta International Expo",
-    tier: "VIP",
-    quantity: 2,
-    price: 1500000,
-    status: "active",
-    purchasedAt: "2026-04-12",
-    imageUrl: javaJazz.imageUrl,
-  },
-  {
-    id: "TKT-2026-0002",
-    eventId: "ml-championship-2026",
-    eventName: "Mobile Legends Championship",
-    dateLabel: "20 Mei 2026",
-    location: "ICE BSD City",
-    tier: "Regular",
-    quantity: 1,
-    price: 150000,
-    status: "active",
-    purchasedAt: "2026-04-20",
-    imageUrl: mlChampionship.imageUrl,
-  },
-  {
-    id: "TKT-2026-0003",
-    eventId: "uiux-workshop-2026",
-    eventName: "UI/UX Design Workshop",
-    dateLabel: "25 Apr 2026",
-    location: "Online (Zoom)",
-    tier: "Free Pass",
-    quantity: 1,
-    price: 0,
-    status: "used",
-    purchasedAt: "2026-04-01",
-    imageUrl: uiUxWorkshop.imageUrl,
-  },
-];
-
-const userMyTransactions = [
-  {
-    id: "ORD-2026-0001",
-    eventName: "Java Jazz Festival 2026",
-    tier: "VIP",
-    quantity: 2,
-    subtotal: 3000000,
-    fees: 25000,
-    total: 3025000,
-    paymentMethod: "BCA Virtual Account",
-    status: "paid",
-    createdAt: "2026-04-12 14:32",
-  },
-  {
-    id: "ORD-2026-0002",
-    eventName: "Mobile Legends Championship",
-    tier: "Regular",
-    quantity: 1,
-    subtotal: 150000,
-    fees: 25000,
-    total: 175000,
-    paymentMethod: "GoPay",
-    status: "paid",
-    createdAt: "2026-04-20 09:18",
-  },
-  {
-    id: "ORD-2026-0003",
-    eventName: "UI/UX Design Workshop",
-    tier: "Free Pass",
-    quantity: 1,
-    subtotal: 0,
-    fees: 0,
-    total: 0,
-    paymentMethod: "RSVP",
-    status: "paid",
-    createdAt: "2026-04-01 19:42",
-  },
-  {
-    id: "ORD-2026-0004",
-    eventName: "Tech Startup Summit 2026",
-    tier: "Pro Pass",
-    quantity: 1,
-    subtotal: 2500000,
-    fees: 25000,
-    total: 2525000,
-    paymentMethod: "Bank Transfer",
-    status: "pending",
-    createdAt: "2026-05-02 11:05",
-  },
-  {
-    id: "ORD-2026-0005",
-    eventName: "Soundrenaline Festival",
-    tier: "Festival Pass",
-    quantity: 1,
-    subtotal: 500000,
-    fees: 25000,
-    total: 525000,
-    paymentMethod: "OVO",
-    status: "failed",
-    createdAt: "2026-05-05 21:11",
-  },
-];
-
 let userMyEvents = [
   {
     ...javaJazz,
@@ -643,16 +538,16 @@ const formatEventTimeRange = (start, end) => {
 
   const endText = sameDay
     ? new Intl.DateTimeFormat("id-ID", {
-        hour: "2-digit",
-        minute: "2-digit",
-      }).format(endDate)
+      hour: "2-digit",
+      minute: "2-digit",
+    }).format(endDate)
     : new Intl.DateTimeFormat("id-ID", {
-        day: "2-digit",
-        month: "long",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-      }).format(endDate)
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    }).format(endDate)
 
   return `${startText} - ${endText}`
 }
@@ -713,6 +608,113 @@ const getApiCollection = (payload) => {
   if (Array.isArray(payload)) return payload
   if (Array.isArray(payload?.data)) return payload.data
   return []
+}
+
+const normalizeTransactionStatus = (value) => {
+  const status = String(value ?? "").toLowerCase()
+
+  if (["capture", "settlement", "success", "paid"].includes(status)) return "paid"
+  if (["pending", "authorize"].includes(status)) return "pending"
+  if (["deny", "cancel", "expire", "failure", "failed"].includes(status)) return "failed"
+  if (status === "refund" || status === "refunded") return "refunded"
+
+  return status || "pending"
+}
+
+const toMyTransactionSummaryFromApi = (transaction) => {
+  const items = Array.isArray(transaction?.items) ? transaction.items : []
+  const firstItem = items[0]
+  const quantity = items.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0)
+
+  return {
+    id: transaction.id,
+    orderId: transaction.orderId ?? transaction.id,
+    eventName: transaction.event?.title ?? "-",
+    eventStartDate: transaction.event?.startDateTime ?? null,
+    tier: firstItem?.ticketName ?? "-",
+    quantity,
+    total: Number(transaction.grossAmount) || 0,
+    paymentMethod: transaction.paymentProvider
+      ? String(transaction.paymentProvider).toUpperCase()
+      : "-",
+    status: normalizeTransactionStatus(
+      transaction.midtransTransactionStatus ?? transaction.status,
+    ),
+    createdAt: transaction.createdAt ?? null,
+    paidAt: transaction.paidAt ?? null,
+    redirectUrl: transaction.redirectUrl ?? null,
+    items,
+  }
+}
+
+const getTransactionCollection = (payload) => {
+  if (Array.isArray(payload)) return payload
+  if (Array.isArray(payload?.data)) return payload.data
+  if (payload?.data && typeof payload.data === "object") return [payload.data]
+  if (payload && typeof payload === "object") return [payload]
+  return []
+}
+
+const normalizeAttendanceStatus = (value) => {
+  const status = String(value ?? "").toLowerCase()
+
+  if (status === "attended") return "used"
+  if (["not_attended", "paid", "active"].includes(status)) return "active"
+  if (status === "refunded") return "refunded"
+
+  return status || "active"
+}
+
+const toMyPaidTicketFromApi = (entry) => {
+  const items = Array.isArray(entry?.transaction?.items) ? entry.transaction.items : []
+  const firstItem = items[0]
+  const quantity = items.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0)
+  const total = Number(entry?.transaction?.grossAmount) || 0
+
+  return {
+    id: entry.id,
+    eventId: entry.event?.id ?? entry.eventId,
+    transactionId: entry.transactionId ?? entry.transaction?.id ?? null,
+    orderId: entry.transaction?.orderId ?? entry.transactionId ?? entry.id,
+    qrCode: entry.qrCode ?? null,
+    eventName: entry.event?.title ?? "-",
+    dateLabel: formatEventDateLabel(entry.event?.startDateTime),
+    location:
+      entry.event?.eventType === "online"
+        ? entry.event?.labelOnline ?? "Online Event"
+        : [entry.event?.city?.name, entry.event?.organizer?.name].filter(Boolean).join(" • ") || "-",
+    tier: firstItem?.ticketName ?? "-",
+    quantity,
+    price: quantity > 0 ? total / quantity : total,
+    total,
+    status: normalizeAttendanceStatus(entry.attendanceStatus),
+    attendanceStatus: entry.attendanceStatus ?? "not_attended",
+    attendedAt: entry.attendedAt ?? null,
+    purchasedAt: entry.transaction?.createdAt ?? entry.createdAt ?? null,
+    imageUrl: entry.event?.banner ?? null,
+  }
+}
+
+const toEventAttendeeFromApi = (entry) => {
+  const items = Array.isArray(entry?.transaction?.items) ? entry.transaction.items : []
+  const firstItem = items[0]
+  const quantity = items.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0)
+  const rawStatus = String(entry.attendanceStatus ?? "not_attended").toLowerCase()
+
+  return {
+    id: entry.id,
+    userId: entry.user?.id ?? entry.userId ?? null,
+    name: entry.user?.name ?? "-",
+    email: entry.user?.email ?? "-",
+    orderId: entry.transaction?.orderId ?? entry.transactionId ?? "-",
+    ticketName: firstItem?.ticketName ?? "-",
+    paymentProvider: entry.transaction?.paymentProvider ?? "-",
+    total: Number(entry.transaction?.grossAmount) || 0,
+    quantity,
+    attendanceStatus: rawStatus,
+    attendedAt: entry.attendedAt ?? null,
+    registeredAt: entry.createdAt ?? null,
+  }
 }
 
 const publicCatalog = () =>
@@ -829,14 +831,33 @@ export const api = {
       trendingInCity: [publicCatalog()[0], publicCatalog()[1]].map(toSummary),
     }),
   getMyEvents: () =>
-    apiRequest("/events").then((res) => (res.data ?? []).map(toManagedEvent)),
+    apiRequest("/events?createdBy=me").then((res) => (res.data ?? []).map(toManagedEvent)),
   getMyEvent: (id) =>
     apiRequest(`/events/${id}`).then((res) => (res.data ? toManagedEvent(res.data) : null)),
-  getMyTickets: () => delay(userMyTickets),
-  getMyTicket: (id) => delay(userMyTickets.find((t) => t.id === id) ?? null),
-  getMyTransactions: () => delay(userMyTransactions),
+  getMyTickets: () =>
+    apiRequest("/ticket").then((res) => (res.data ?? []).map(toMyPaidTicketFromApi)),
+  getMyTicket: (id) =>
+    apiRequest("/ticket").then((res) => {
+      const tickets = (res.data ?? []).map(toMyPaidTicketFromApi)
+      return tickets.find((ticket) => ticket.id === id) ?? null
+    }),
+  getEventAttendees: (eventId, attendanceFilter = "all") =>
+    apiRequest(`/ticket/event-ticket/${eventId}/${attendanceFilter}`).then((res) =>
+      (res.data ?? []).map(toEventAttendeeFromApi),
+    ),
+  scanTicketQrCode: (qrCode) =>
+    apiRequest("/ticket/qr-code/scan", {
+      method: "POST",
+      body: JSON.stringify({ qrCode }),
+    }).then((res) => res.data ?? res),
+  getMyTransactions: () =>
+    apiRequest("/transactions/me").then((res) =>
+      getTransactionCollection(res).map(toMyTransactionSummaryFromApi),
+    ),
   getMyTransaction: (id) =>
-    delay(userMyTransactions.find((t) => t.id === id) ?? null),
+    apiRequest(`/transactions/${id}`).then((res) =>
+      res?.data ? toMyTransactionSummaryFromApi(res.data) : null,
+    ),
 
   // Admin master-data CRUD
   getMasterCategories: () =>
@@ -912,10 +933,10 @@ export const api = {
       : null;
     const organizer = partner
       ? {
-          id: partner.id,
-          name: partner.name,
-          initial: partner.name.charAt(0).toUpperCase(),
-        }
+        id: partner.id,
+        name: partner.name,
+        initial: partner.name.charAt(0).toUpperCase(),
+      }
       : { id: "me", name: "Kamu", initial: "K" };
     const newEvent = {
       id: `evt-${Date.now()}`,

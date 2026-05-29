@@ -1,14 +1,28 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { FaCalendarAlt, FaMapMarkerAlt, FaQrcode, FaTicketAlt } from 'react-icons/fa'
+import {
+  FaCalendarAlt,
+  FaMapMarkerAlt,
+  FaQrcode,
+  FaShareAlt,
+  FaTicketAlt,
+  FaTimes,
+} from 'react-icons/fa'
+import { QRCodeSVG } from 'qrcode.react'
 import AdminLayout from '../components/AdminLayout'
 import { api } from '../lib/api'
-import { formatIDR } from '../lib/format'
+import { formatDateTime, formatIDR } from '../lib/format'
 
 const statusStyle = {
   active: 'bg-emerald-50 text-emerald-700 ring-emerald-200',
   used: 'bg-gray-100 text-gray-600 ring-gray-200',
   refunded: 'bg-amber-50 text-amber-700 ring-amber-200',
+}
+
+const statusLabel = {
+  active: 'aktif',
+  used: 'sudah dipakai',
+  refunded: 'refund',
 }
 
 const filters = [
@@ -17,7 +31,63 @@ const filters = [
   { value: 'used', label: 'Sudah Dipakai' },
 ]
 
-function TicketCard({ ticket }) {
+function TicketQrModal({ open, ticket, onClose }) {
+  if (!open || !ticket) return null
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+      <div className="w-full max-w-md rounded-2xl bg-white p-5 shadow-xl">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wider text-[#9a9a9a]">QR Tiket</p>
+            <h3 className="mt-1 text-lg font-bold text-[#1f1f1f]">{ticket.eventName}</h3>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-lg p-2 text-[#6d6d6d] hover:bg-[#f6f6f6]"
+            aria-label="Tutup modal QR"
+          >
+            <FaTimes />
+          </button>
+        </div>
+
+        <div className="mt-4 rounded-2xl border border-dashed border-[#d9d9d9] bg-[#fafafa] p-6 text-center">
+          <div className="mx-auto inline-flex rounded-2xl bg-white p-3 shadow-sm">
+            <QRCodeSVG value={ticket.qrCode || ticket.id} size={192} level="M" includeMargin />
+          </div>
+          <p className="mt-3 text-sm font-semibold text-[#1f1f1f]">Tiket siap dipakai untuk check-in</p>
+          <p className="mt-1 text-xs text-[#6d6d6d]">Tunjukkan tiket ini ke petugas saat masuk event.</p>
+        </div>
+
+        <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
+          <div className="rounded-xl border border-[#efefef] p-3">
+            <p className="text-[10px] uppercase text-[#9a9a9a]">Order ID</p>
+            <p className="mt-1 font-mono text-xs text-[#1f1f1f]">{ticket.orderId}</p>
+          </div>
+          <div className="rounded-xl border border-[#efefef] p-3">
+            <p className="text-[10px] uppercase text-[#9a9a9a]">Status</p>
+            <p className="mt-1 font-semibold text-[#1f1f1f]">
+              {statusLabel[ticket.status] ?? ticket.status}
+            </p>
+          </div>
+          <div className="rounded-xl border border-[#efefef] p-3">
+            <p className="text-[10px] uppercase text-[#9a9a9a]">Tanggal Event</p>
+            <p className="mt-1 font-semibold text-[#1f1f1f]">{ticket.dateLabel}</p>
+          </div>
+          <div className="rounded-xl border border-[#efefef] p-3">
+            <p className="text-[10px] uppercase text-[#9a9a9a]">Check-in</p>
+            <p className="mt-1 font-semibold text-[#1f1f1f]">
+              {ticket.attendedAt ? formatDateTime(ticket.attendedAt) : 'Belum hadir'}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function TicketCard({ ticket, onShowQr, onShareSocialMedia, sharing }) {
   return (
     <article className="flex flex-col overflow-hidden rounded-2xl border border-[#eee] bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md sm:flex-row">
       <div className="h-32 w-full shrink-0 overflow-hidden bg-[#f3f3f3] sm:h-auto sm:w-48">
@@ -29,7 +99,7 @@ function TicketCard({ ticket }) {
         <div className="flex flex-wrap items-start justify-between gap-2">
           <div className="min-w-0">
             <p className="text-[10px] font-mono uppercase tracking-wider text-[#9a9a9a]">
-              {ticket.id}
+              {ticket.orderId}
             </p>
             <h3 className="mt-0.5 truncate text-base font-bold text-[#1f1f1f] sm:text-lg">
               {ticket.eventName}
@@ -40,7 +110,7 @@ function TicketCard({ ticket }) {
               statusStyle[ticket.status] ?? 'bg-gray-100 text-gray-600 ring-gray-200'
             }`}
           >
-            {ticket.status}
+            {statusLabel[ticket.status] ?? ticket.status}
           </span>
         </div>
 
@@ -66,17 +136,28 @@ function TicketCard({ ticket }) {
           </div>
           <div>
             <p className="text-[10px] uppercase text-[#9a9a9a]">Total</p>
-            <p className="mt-0.5 text-sm font-semibold text-[#1f1f1f]">{formatIDR(ticket.price * ticket.quantity)}</p>
+            <p className="mt-0.5 text-sm font-semibold text-[#1f1f1f]">
+              {formatIDR(ticket.total)}
+            </p>
           </div>
         </div>
 
         <div className="flex flex-wrap gap-2 pt-1">
           <button
             type="button"
+            onClick={() => onShowQr(ticket)}
             disabled={ticket.status !== 'active'}
             className="inline-flex items-center gap-2 rounded-lg bg-brand-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-gray-300"
           >
             <FaQrcode /> Tampilkan QR
+          </button>
+          <button
+            type="button"
+            onClick={() => onShareSocialMedia(ticket)}
+            disabled={sharing}
+            className="inline-flex items-center gap-2 rounded-lg border border-sky-200 bg-sky-50 px-3 py-2 text-xs font-semibold text-sky-700 transition hover:bg-sky-100 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            <FaShareAlt /> {sharing ? 'Menyiapkan...' : 'Pamerin'}
           </button>
           <Link
             to={`/event/${ticket.eventId}`}
@@ -90,45 +171,270 @@ function TicketCard({ ticket }) {
   )
 }
 
+function wrapCanvasText(ctx, text, x, y, maxWidth, lineHeight, maxLines = 3) {
+  const words = String(text ?? '').split(' ')
+  const lines = []
+  let current = ''
+
+  words.forEach((word) => {
+    const trial = current ? `${current} ${word}` : word
+    if (ctx.measureText(trial).width <= maxWidth) {
+      current = trial
+    } else if (current) {
+      lines.push(current)
+      current = word
+    } else {
+      lines.push(word)
+      current = ''
+    }
+  })
+
+  if (current) lines.push(current)
+
+  lines.slice(0, maxLines).forEach((line, index) => {
+    const visible = index === maxLines - 1 && lines.length > maxLines ? `${line}...` : line
+    ctx.fillText(visible, x, y + lineHeight * index)
+  })
+}
+
+function loadImage(src) {
+  return new Promise((resolve, reject) => {
+    if (!src) {
+      reject(new Error('Image source missing'))
+      return
+    }
+
+    const image = new Image()
+    image.crossOrigin = 'anonymous'
+    image.onload = () => resolve(image)
+    image.onerror = () => reject(new Error('Failed to load image'))
+    image.src = src
+  })
+}
+
+async function buildSocialShareBlob(ticket) {
+  const width = 1080
+  const height = 1920
+  const canvas = document.createElement('canvas')
+  canvas.width = width
+  canvas.height = height
+  const ctx = canvas.getContext('2d')
+
+  if (!ctx) throw new Error('Canvas tidak tersedia.')
+
+  const gradient = ctx.createLinearGradient(0, 0, width, height)
+  gradient.addColorStop(0, '#171717')
+  gradient.addColorStop(0.45, '#2563eb')
+  gradient.addColorStop(1, '#06b6d4')
+  ctx.fillStyle = gradient
+  ctx.fillRect(0, 0, width, height)
+
+  try {
+    const image = await loadImage(ticket.imageUrl)
+    ctx.save()
+    ctx.globalAlpha = 0.32
+    const imageRatio = image.width / image.height
+    const canvasRatio = width / 720
+    let drawWidth = width
+    let drawHeight = width / imageRatio
+
+    if (imageRatio < canvasRatio) {
+      drawHeight = 720
+      drawWidth = drawHeight * imageRatio
+    }
+
+    ctx.drawImage(image, (width - drawWidth) / 2, 0, drawWidth, drawHeight)
+    ctx.restore()
+  } catch {
+    // Keep the gradient-only background when the event image cannot be loaded.
+  }
+
+  ctx.fillStyle = 'rgba(255,255,255,0.14)'
+  ctx.fillRect(72, 72, width - 144, height - 144)
+
+  ctx.fillStyle = '#ffffff'
+  ctx.font = '600 42px Inter, Arial, sans-serif'
+  ctx.fillText('Aku baru beli tiket di', 108, 162)
+
+  ctx.font = '700 68px Inter, Arial, sans-serif'
+  ctx.fillText('ramein.fun', 108, 238)
+
+  ctx.fillStyle = '#f5f5f5'
+  ctx.font = '700 72px Inter, Arial, sans-serif'
+  wrapCanvasText(ctx, ticket.eventName, 108, 980, width - 216, 88, 3)
+
+  ctx.fillStyle = '#e0f2fe'
+  ctx.font = '500 38px Inter, Arial, sans-serif'
+  ctx.fillText(ticket.dateLabel, 108, 1270)
+  wrapCanvasText(ctx, ticket.location, 108, 1328, width - 216, 48, 2)
+
+  ctx.fillStyle = '#ffffff'
+  ctx.font = '600 44px Inter, Arial, sans-serif'
+  ctx.fillText(`${ticket.tier} • ${ticket.quantity}x`, 108, 1460)
+  ctx.fillText(formatIDR(ticket.total), 108, 1528)
+
+  ctx.fillStyle = '#111827'
+  ctx.fillRect(108, 1640, width - 216, 132)
+  ctx.fillStyle = '#ffffff'
+  ctx.font = '700 46px Inter, Arial, sans-serif'
+  ctx.fillText('Beli ticket kamu di ramein.fun', 154, 1722)
+
+  ctx.fillStyle = 'rgba(255,255,255,0.75)'
+  ctx.font = '500 28px Inter, Arial, sans-serif'
+  ctx.fillText('#Ramein #EventSeru #TicketReady', 108, 1830)
+
+  const blob = await new Promise((resolve, reject) => {
+    canvas.toBlob((result) => {
+      if (result) resolve(result)
+      else reject(new Error('Gagal membuat gambar share.'))
+    }, 'image/png')
+  })
+
+  return blob
+}
+
+function downloadBlob(blob, fileName) {
+  const url = URL.createObjectURL(blob)
+  const anchor = document.createElement('a')
+  anchor.href = url
+  anchor.download = fileName
+  anchor.click()
+  setTimeout(() => URL.revokeObjectURL(url), 1000)
+}
+
 function TiketSayaPage() {
   const [tickets, setTickets] = useState([])
   const [filter, setFilter] = useState('all')
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+  const [selectedTicket, setSelectedTicket] = useState(null)
+  const [sharingTicketId, setSharingTicketId] = useState('')
+  const [shareNotice, setShareNotice] = useState(null)
 
   useEffect(() => {
     let cancelled = false
-    api.getMyTickets().then((res) => {
-      if (!cancelled) setTickets(res)
-    })
+
+    api
+      .getMyTickets()
+      .then((res) => {
+        if (!cancelled) setTickets(res)
+      })
+      .catch((err) => {
+        if (!cancelled) setError(err.message || 'Gagal memuat tiket.')
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false)
+      })
+
     return () => {
       cancelled = true
     }
   }, [])
 
+  useEffect(() => {
+    if (shareNotice?.type !== 'success') return undefined
+
+    const timeoutId = window.setTimeout(() => {
+      setShareNotice(null)
+    }, 3000)
+
+    return () => window.clearTimeout(timeoutId)
+  }, [shareNotice])
+
   const filtered = useMemo(() => {
     if (filter === 'all') return tickets
-    return tickets.filter((t) => t.status === filter)
+    return tickets.filter((ticket) => ticket.status === filter)
   }, [filter, tickets])
 
+  async function handleShareSocialMedia(ticket) {
+    setSharingTicketId(ticket.id)
+    setShareNotice(null)
+
+    try {
+      const blob = await buildSocialShareBlob(ticket)
+      const file = new File([blob], `ramein-share-${ticket.id}.png`, { type: 'image/png' })
+      const promoText = `Aku baru beli tiket ${ticket.eventName}. Beli ticket kamu di ramein.fun`
+
+      if (
+        navigator.share &&
+        navigator.canShare &&
+        navigator.canShare({ files: [file] })
+      ) {
+        await navigator.share({
+          files: [file],
+          title: `Share ${ticket.eventName}`,
+          text: promoText,
+        })
+        setShareNotice({
+          type: 'success',
+          text: 'Gambar share sudah dibuka di share sheet. Pilih social media yang ingin dipakai.',
+        })
+      } else {
+        downloadBlob(blob, `ramein-share-${ticket.id}.png`)
+
+        if (navigator.clipboard?.writeText) {
+          await navigator.clipboard.writeText(promoText)
+        }
+
+        setShareNotice({
+          type: 'info',
+          text: 'Gambar share sudah diunduh. Teks promo siap dipakai untuk caption atau status.',
+        })
+      }
+    } catch (err) {
+      setShareNotice({
+        type: 'error',
+        text: err.message || 'Gagal menyiapkan gambar share.',
+      })
+    } finally {
+      setSharingTicketId('')
+    }
+  }
+
   return (
-    <AdminLayout title="Tiket Saya" subtitle="Semua tiket yang sudah kamu beli">
+    <AdminLayout title="Tiket Saya" subtitle="Semua tiket berbayar yang sudah kamu beli">
       <div className="mb-4 flex flex-wrap items-center gap-2">
-        {filters.map((f) => (
+        {filters.map((item) => (
           <button
-            key={f.value}
+            key={item.value}
             type="button"
-            onClick={() => setFilter(f.value)}
+            onClick={() => setFilter(item.value)}
             className={`rounded-full px-4 py-1.5 text-xs font-semibold transition ${
-              filter === f.value
+              filter === item.value
                 ? 'bg-brand-600 text-white'
                 : 'border border-[#e2e2e2] bg-white text-[#4a4a4a] hover:bg-[#f9f9f9]'
             }`}
           >
-            {f.label}
+            {item.label}
           </button>
         ))}
       </div>
 
-      {filtered.length === 0 ? (
+      {error && (
+        <div className="mb-4 rounded-2xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700">
+          {error}
+        </div>
+      )}
+
+      {shareNotice && (
+        <div
+          className={`mb-4 rounded-2xl px-4 py-3 text-sm ${
+            shareNotice.type === 'success'
+              ? 'border border-emerald-100 bg-emerald-50 text-emerald-700'
+              : shareNotice.type === 'error'
+                ? 'border border-red-100 bg-red-50 text-red-700'
+                : 'border border-sky-100 bg-sky-50 text-sky-700'
+          }`}
+        >
+          {shareNotice.text}
+        </div>
+      )}
+
+      {loading ? (
+        <div className="rounded-2xl border border-dashed border-[#d5d5d5] bg-white p-10 text-center text-sm text-[#6d6d6d]">
+          Memuat tiket...
+        </div>
+      ) : filtered.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-[#d5d5d5] bg-white p-10 text-center">
           <FaTicketAlt className="mx-auto text-3xl text-[#c5c5c5]" />
           <p className="mt-3 text-sm font-medium text-[#4a4a4a]">Belum ada tiket di kategori ini.</p>
@@ -141,11 +447,23 @@ function TiketSayaPage() {
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-4">
-          {filtered.map((t) => (
-            <TicketCard key={t.id} ticket={t} />
+          {filtered.map((ticket) => (
+            <TicketCard
+              key={ticket.id}
+              ticket={ticket}
+              onShowQr={setSelectedTicket}
+              onShareSocialMedia={handleShareSocialMedia}
+              sharing={sharingTicketId === ticket.id}
+            />
           ))}
         </div>
       )}
+
+      <TicketQrModal
+        open={Boolean(selectedTicket)}
+        ticket={selectedTicket}
+        onClose={() => setSelectedTicket(null)}
+      />
     </AdminLayout>
   )
 }
