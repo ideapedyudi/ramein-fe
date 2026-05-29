@@ -304,6 +304,22 @@ function CheckoutPage() {
         return
       }
 
+      const orderReference = String(result?.orderId ?? result?.order_id ?? result?.id ?? '').trim()
+      if (orderReference && typeof window !== 'undefined') {
+        try {
+          window.localStorage.setItem(
+            `checkout_meta_${orderReference}`,
+            JSON.stringify({
+              eventId: event.id,
+              total,
+              savedAt: Date.now(),
+            }),
+          )
+        } catch {
+          // Ignore storage errors; payment flow should continue.
+        }
+      }
+
       if (!result?.redirectUrl) {
         throw new Error('Redirect URL pembayaran tidak tersedia.')
       }

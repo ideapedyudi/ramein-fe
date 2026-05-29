@@ -21,18 +21,48 @@ function CopyButton({ value }) {
 
 function OrderSuccessPage() {
   const [params] = useSearchParams()
-  const eventId = params.get('eventId')
-  const orderId = params.get('orderId') ?? ''
-  const total = Number(params.get('total') ?? '0')
+  const orderId = params.get('orderId') ?? params.get('order_id') ?? ''
+  const totalQuery = params.get('total') ?? params.get('gross_amount')
+  const initialTotal = Number(totalQuery ?? '0')
+  const [eventId, setEventId] = useState(params.get('eventId') ?? '')
+  const [total, setTotal] = useState(Number.isFinite(initialTotal) ? initialTotal : 0)
   const [event, setEvent] = useState(null)
   const [error, setError] = useState('')
 
   useEffect(() => {
-    let cancelled = false
-    if (!eventId) {
+    if (eventId) return
+    if (!orderId || typeof window === 'undefined') {
       setError('Missing event')
       return
     }
+
+    try {
+      const rawMeta = window.localStorage.getItem(`checkout_meta_${orderId}`)
+      if (!rawMeta) {
+        setError('Missing event')
+        return
+      }
+
+      const meta = JSON.parse(rawMeta)
+      if (!meta?.eventId) {
+        setError('Missing event')
+        return
+      }
+
+      setEventId(String(meta.eventId))
+      if (!params.get('total') && Number.isFinite(Number(meta.total))) {
+        setTotal(Number(meta.total))
+      }
+    } catch {
+      setError('Missing event')
+    }
+  }, [eventId, orderId, params])
+
+  useEffect(() => {
+    let cancelled = false
+    if (!eventId) return
+
+    setError('')
     api.getEvent(eventId).then((res) => {
       if (cancelled) return
       if (!res) {
