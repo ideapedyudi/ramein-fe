@@ -948,6 +948,17 @@ export const api = {
       wishlist: [publicCatalog()[2], publicCatalog()[3]].map(toSummary),
       trendingInCity: [publicCatalog()[0], publicCatalog()[1]].map(toSummary),
     }),
+  getEventsByInterest: (categories = []) => {
+    const selected = Array.isArray(categories) ? categories.filter(Boolean) : [categories].filter(Boolean)
+    const params = new URLSearchParams()
+
+    if (selected.length > 0) params.set("categories", selected.join(","))
+
+    const query = params.toString()
+    return apiRequest(`/events/interest${query ? `?${query}` : ""}`).then((res) =>
+      getApiCollection(res).map(toPublicEventSummaryFromApi),
+    )
+  },
   getMyEvents: () =>
     apiRequest("/events?createdBy=me").then((res) => (res.data ?? []).map(toManagedEvent)),
   getMyEvent: (id) =>
