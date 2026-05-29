@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   FaCalendarAlt,
+  FaChartLine,
   FaCog,
   FaMoneyBillWave,
   FaReceipt,
@@ -42,6 +43,7 @@ function ProfileMenu({ user, isAdmin, onLogout, variant = "desktop" }) {
         { label: "Kategori", to: "/admin/kategori", icon: FaReceipt },
         { label: "Kota", to: "/admin/kota", icon: FaReceipt },
         { label: "Organizer", to: "/admin/organizer", icon: FaCalendarAlt },
+        { label: "Finance", to: "/admin/finance", icon: FaChartLine },
         { label: "Event Dikelola", to: "/event-kamu", icon: FaCalendarAlt },
         { label: "Buat Event", to: "/buat-event", icon: FaTicketAlt },
         { label: "Withdraw", to: "/admin/withdraw", icon: FaMoneyBillWave },

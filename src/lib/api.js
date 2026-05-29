@@ -792,6 +792,43 @@ const getWithdrawCollection = (payload) => {
   return []
 }
 
+const toFinanceFromApi = (entry) => ({
+  id: entry.id,
+  userId: entry.user_id ?? entry.userId ?? entry.user?.id ?? null,
+  eventId: entry.event_id ?? entry.eventId ?? entry.event?.id ?? null,
+  transactionId: entry.transaksi_id ?? entry.transactionId ?? null,
+  organizerId: entry.organizer_id ?? entry.organizerId ?? entry.organizer?.id ?? null,
+  grossAmount: Number(entry.gross_amount ?? entry.grossAmount) || 0,
+  adminIncome: Number(entry.admin_income ?? entry.adminIncome) || 0,
+  transactionTime: entry.time_transaksi ?? entry.transactionTime ?? null,
+  publishedBy: entry.published_by ?? entry.publishedBy ?? "-",
+  createdAt: entry.created_at ?? entry.createdAt ?? null,
+  updatedAt: entry.updated_at ?? entry.updatedAt ?? null,
+  user: {
+    id: entry.user?.id ?? entry.user_id ?? entry.userId ?? null,
+    name: entry.user?.name ?? "-",
+    email: entry.user?.email ?? "-",
+  },
+  event: {
+    id: entry.event?.id ?? entry.event_id ?? entry.eventId ?? null,
+    title: entry.event?.title ?? "-",
+  },
+  organizer: {
+    id: entry.organizer?.id ?? entry.organizer_id ?? entry.organizerId ?? null,
+    name: entry.organizer?.name ?? "-",
+  },
+})
+
+const getFinanceCollection = (payload) => {
+  if (Array.isArray(payload)) return payload
+  if (Array.isArray(payload?.data)) return payload.data
+  if (Array.isArray(payload?.data?.finance)) return payload.data.finance
+  if (Array.isArray(payload?.data?.items)) return payload.data.items
+  if (Array.isArray(payload?.finance)) return payload.finance
+  if (Array.isArray(payload?.items)) return payload.items
+  return []
+}
+
 const publicCatalog = () =>
   eventCatalog.filter((e) => e.visibility === "public");
 
@@ -948,6 +985,10 @@ export const api = {
         status,
       }),
     }).then((res) => (res.data ? toWithdrawFromApi(res.data) : res)),
+  getAdminFinance: (organizerId) =>
+    apiRequest(`/finance/admin/${organizerId}`).then((res) =>
+      getFinanceCollection(res).map(toFinanceFromApi),
+    ),
   scanTicketQrCode: (qrCode) =>
     apiRequest("/ticket/qr-code/scan", {
       method: "POST",
