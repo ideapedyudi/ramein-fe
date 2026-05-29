@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { api } from '../lib/api'
 import { formatIDR } from '../lib/format'
 
@@ -217,6 +217,7 @@ function PaymentModal({ open, transaction, onClose }) {
 
 function CheckoutPage() {
   const [params] = useSearchParams()
+  const navigate = useNavigate()
   const eventId = params.get('eventId')
   const tierId = params.get('tierId')
   const qty = Number(params.get('qty') ?? '1')
@@ -234,6 +235,10 @@ function CheckoutPage() {
   const [contact, setContact] = useState({ email: '', firstName: '', lastName: '', phone: '' })
 
   const updateContact = (key) => (e) => setContact((c) => ({ ...c, [key]: e.target.value }))
+  const subtotal = (Number(tier?.price) || 0) * qty
+  const serviceFee = subtotal > 0 ? 15000 : 0
+  const platformFee = subtotal > 0 ? 10000 : 0
+  const total = subtotal + serviceFee + platformFee
 
   useEffect(() => {
     let cancelled = false
@@ -259,6 +264,12 @@ function CheckoutPage() {
     }
   }, [eventId, tierId, initialError])
 
+  useEffect(() => {
+    if (!tier || total > 0) return
+
+    navigate('/home', { replace: true })
+  }, [navigate, tier, total])
+
   if (error) {
     return (
       <div className="mx-auto max-w-[1280px] px-4 py-20 text-center">
@@ -274,13 +285,14 @@ function CheckoutPage() {
     return <div className="mx-auto max-w-[1280px] px-4 py-20 text-center text-gray-500">Memuat...</div>
   }
 
-  const subtotal = tier.price * qty
-  const serviceFee = subtotal > 0 ? 15000 : 0
-  const platformFee = subtotal > 0 ? 10000 : 0
-  const total = subtotal + serviceFee + platformFee
-
   const handleSubmit = async (e) => {
     e.preventDefault()
+
+    if (total <= 0) {
+      navigate('/home', { replace: true })
+      return
+    }
+
     setSubmitting(true)
     setSubmitError('')
 

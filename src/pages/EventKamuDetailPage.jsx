@@ -49,6 +49,27 @@ function BigStat({ label, value, accent }) {
   )
 }
 
+function getPublicEventUrl(eventId) {
+  return `${window.location.origin}/event/${eventId}`
+}
+
+async function copyText(value) {
+  if (navigator.clipboard?.writeText) {
+    await navigator.clipboard.writeText(value)
+    return
+  }
+
+  const textarea = document.createElement('textarea')
+  textarea.value = value
+  textarea.setAttribute('readonly', '')
+  textarea.style.position = 'fixed'
+  textarea.style.opacity = '0'
+  document.body.appendChild(textarea)
+  textarea.select()
+  document.execCommand('copy')
+  document.body.removeChild(textarea)
+}
+
 function ScanAttendanceModal({ open, onClose, onScanSuccess }) {
   const [mode, setMode] = useState('camera')
   const [manualQr, setManualQr] = useState('')
@@ -386,6 +407,7 @@ function EventKamuDetailPage() {
   const [statistic, setStatistic] = useState(null)
   const [statisticLoading, setStatisticLoading] = useState(false)
   const [statisticError, setStatisticError] = useState('')
+  const [shareMessage, setShareMessage] = useState('')
 
   const loadStatistic = useCallback(async () => {
     await Promise.resolve()
@@ -401,6 +423,19 @@ function EventKamuDetailPage() {
       setStatisticLoading(false)
     }
   }, [eventId])
+
+  async function handleShareLink() {
+    const publicUrl = getPublicEventUrl(eventId)
+
+    try {
+      await copyText(publicUrl)
+      setShareMessage('Link event disalin.')
+    } catch {
+      setShareMessage(publicUrl)
+    }
+
+    window.setTimeout(() => setShareMessage(''), 2500)
+  }
 
   useEffect(() => {
     let cancelled = false
@@ -465,9 +500,18 @@ function EventKamuDetailPage() {
       title={event.name ?? '-'}
       subtitle={`${formatDateTime(event.startDateTime)} - ${event.city}`}
       actions={
-        <button className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs font-medium hover:bg-gray-50 sm:text-sm">
-          Share Link
-        </button>
+        <div className="text-right">
+          <button
+            type="button"
+            onClick={handleShareLink}
+            className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs font-medium hover:bg-gray-50 sm:text-sm"
+          >
+            Share Link
+          </button>
+          {shareMessage && (
+            <p className="mt-2 max-w-[240px] break-words text-xs text-emerald-600">{shareMessage}</p>
+          )}
+        </div>
       }
     >
       <Link to="/event-kamu" className="mb-4 inline-block text-sm text-gray-600 hover:text-brand-600">
