@@ -879,7 +879,14 @@ let masterOrganizers = [
 ];
 
 const toManagedEvent = (event) => {
-  const ticketTypes = event.ticketTypes ?? [];
+  const ticketTypes = getEventTicketTypes(event).map((ticket) => ({
+    ...ticket,
+    eventId: ticket.eventId ?? ticket.event_id ?? event.id,
+    saleStartAt: ticket.saleStartAt ?? ticket.sale_start_at ?? null,
+    saleEndAt: ticket.saleEndAt ?? ticket.sale_end_at ?? null,
+    createdAt: ticket.createdAt ?? ticket.created_at ?? null,
+    updatedAt: ticket.updatedAt ?? ticket.updated_at ?? null,
+  }));
   const totalQuota = ticketTypes.reduce((sum, ticket) => sum + (Number(ticket.quota) || 0), 0);
   const sold = ticketTypes.reduce((sum, ticket) => sum + (Number(ticket.sold) || 0), 0);
   const revenue = ticketTypes.reduce(
@@ -892,17 +899,44 @@ const toManagedEvent = (event) => {
 
   return {
     ...event,
-    name: event.title,
+    name: event.title ?? event.name ?? "-",
+    title: event.title ?? event.name ?? "-",
+    categoryId: event.categoryId ?? event.category_id ?? null,
+    organizerId: event.organizerId ?? event.organizer_id ?? null,
+    createdBy: event.createdBy ?? event.created_by ?? null,
+    cityId: event.cityId ?? event.city_id ?? null,
     category: event.category?.name ?? "-",
     city: event.city?.name ?? "-",
-    dateLabel: event.startDateTime,
-    imageUrl: event.banner,
+    addressDetail: event.addressDetail ?? event.address_detail ?? "-",
+    dateLabel: event.startDateTime ?? event.start_datetime ?? null,
+    startDateTime: event.startDateTime ?? event.start_datetime ?? null,
+    endDateTime: event.endDateTime ?? event.end_datetime ?? null,
+    imageUrl: event.banner ?? event.imageUrl ?? null,
+    banner: event.banner ?? event.imageUrl ?? null,
+    eventType: event.eventType ?? event.event_type ?? "-",
+    labelOnline: event.labelOnline ?? event.label_online ?? null,
+    urlOnline: event.urlOnline ?? event.url_online ?? null,
+    paymentType: event.paymentType ?? event.payment_type ?? null,
+    visibility: event.visibility ?? "public",
+    isPublished: Boolean(event.isPublished ?? event.is_published),
+    publishedBy: event.publishedBy ?? event.published_by ?? null,
+    createdAt: event.createdAt ?? event.created_at ?? null,
+    updatedAt: event.updatedAt ?? event.updated_at ?? null,
+    ticketTypes,
+    organizer: event.organizer
+      ? {
+          ...event.organizer,
+          contactName: event.organizer.contactName ?? event.organizer.contact_name ?? null,
+          contactEmail: event.organizer.contactEmail ?? event.organizer.contact_email ?? null,
+          contactPhone: event.organizer.contactPhone ?? event.organizer.contact_phone ?? null,
+        }
+      : null,
     registered: sold,
     attended: 0,
     revenue,
     totalQuota,
     startingPrice: prices.length ? Math.min(...prices) : 0,
-    status: event.status ?? (event.isPublished ? "active" : "draft"),
+    status: event.status ?? (event.isPublished ?? event.is_published ? "active" : "draft"),
     isWithdraw: Boolean(event.is_withdraw ?? event.isWithdraw),
   };
 };

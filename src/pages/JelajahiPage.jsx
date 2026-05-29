@@ -35,11 +35,37 @@ function JelajahiPage() {
   const [error, setError] = useState('')
 
   const filters = {
-    category: params.get('category') ?? undefined,
-    wilayah: params.get('wilayah') ?? undefined,
-    kota: params.get('kota') ?? undefined,
-    date: params.get('date') ?? undefined,
+    category: params.get('category') ?? params.get('kategori') ?? undefined,
+    wilayah: params.get('wilayah') ?? params.get('region') ?? undefined,
+    kota: params.get('kota') ?? params.get('city') ?? undefined,
+    date: params.get('date') ?? params.get('tanggal') ?? undefined,
   }
+
+  useEffect(() => {
+    const aliases = [
+      ['kategori', 'category'],
+      ['region', 'wilayah'],
+      ['city', 'kota'],
+      ['tanggal', 'date'],
+    ]
+    const next = new URLSearchParams(params)
+    let changed = false
+
+    aliases.forEach(([legacyKey, canonicalKey]) => {
+      const legacyValue = params.get(legacyKey)
+      if (!legacyValue) return
+
+      if (!next.has(canonicalKey)) {
+        next.set(canonicalKey, legacyValue)
+      }
+      next.delete(legacyKey)
+      changed = true
+    })
+
+    if (changed) {
+      setParams(next, { replace: true })
+    }
+  }, [params, setParams])
 
   useEffect(() => {
     let cancelled = false

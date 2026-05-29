@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 function RegionCard({ region }) {
   return (
     <Link
-      to={`/jelajahi?region=${encodeURIComponent(region.name)}`}
+      to={`/jelajahi?wilayah=${encodeURIComponent(region.name)}`}
       className="group relative block overflow-hidden rounded-3xl transition hover:-translate-y-0.5 hover:shadow-lg"
     >
       <img
