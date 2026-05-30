@@ -14,6 +14,7 @@ import {
 import { QRCodeSVG } from 'qrcode.react'
 import AdminLayout from '../components/AdminLayout'
 import EventImage from '../components/EventImage'
+import MarqueeText from '../components/MarqueeText'
 import { api } from '../lib/api'
 import { formatDateTime, formatIDR } from '../lib/format'
 
@@ -148,7 +149,7 @@ function TicketCard({
   const canOpenOnlineLink = hasOnlineUrl && !openingOnlineLink
 
   return (
-    <article className="flex flex-col overflow-hidden rounded-2xl border border-[#eee] bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+    <article className="group flex flex-col overflow-hidden rounded-2xl border border-[#eee] bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
       <div
         className={`relative w-full overflow-hidden bg-[#f3f3f3] ${
           ticket.imageUrl ? '' : 'aspect-video'
@@ -162,8 +163,8 @@ function TicketCard({
             <p className="text-[10px] font-mono uppercase tracking-wider text-[#9a9a9a]">
               {ticket.orderId}
             </p>
-            <h3 className="mt-0.5 truncate text-base font-bold text-[#1f1f1f] sm:text-lg">
-              {ticket.eventName}
+            <h3 className="mt-0.5 text-base font-bold text-[#1f1f1f] sm:text-lg">
+              <MarqueeText text={ticket.eventName} />
             </h3>
           </div>
           <span

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import AdminLayout from '../components/AdminLayout'
 import EventImage from '../components/EventImage'
+import MarqueeText from '../components/MarqueeText'
 import { api } from '../lib/api'
 import { formatDateTime, formatNumber } from '../lib/format'
 
@@ -65,7 +66,7 @@ function EventKamuPage() {
           <Link
             key={event.id}
             to={`/event-kamu/${event.id}`}
-            className="flex flex-col overflow-hidden rounded-2xl border border-[#eee] bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+            className="group flex flex-col overflow-hidden rounded-2xl border border-[#eee] bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
           >
             <div
               className={`relative w-full overflow-hidden bg-linear-to-br from-brand-400 to-brand-600 ${
@@ -83,7 +84,9 @@ function EventKamuPage() {
             </div>
 
             <div className="flex flex-1 flex-col p-4">
-              <h2 className="line-clamp-1 text-base font-bold text-gray-900">{event.name}</h2>
+              <h2 className="text-base font-bold text-gray-900">
+                <MarqueeText text={event.name} />
+              </h2>
               <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-600">
                 <span>{formatDateTime(event.dateLabel)}</span>
                 <span>{event.city}</span>

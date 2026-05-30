@@ -754,8 +754,8 @@ function EventKamuDetailPage() {
             <Card>
               <CardHeader title="Informasi Event" />
               <div
-                className={`relative mb-5 overflow-hidden rounded-xl bg-linear-to-br from-brand-400 to-brand-600 ${
-                  event.imageUrl ? '' : 'h-44 sm:h-56 md:h-64'
+                className={`relative mx-auto mb-5 w-full max-w-md overflow-hidden rounded-xl bg-linear-to-br from-brand-400 to-brand-600 ${
+                  event.imageUrl ? '' : 'h-44 sm:h-56'
                 }`}
               >
                 <EventImage src={event.imageUrl} alt={event.name} />
