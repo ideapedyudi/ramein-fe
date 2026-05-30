@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom'
 import { FaCamera, FaKeyboard, FaTimes } from 'react-icons/fa'
 import { useZxing } from 'react-zxing'
 import AdminLayout from '../components/AdminLayout'
+import EventImage from '../components/EventImage'
 import { useAuth } from '../context/authContext'
 import { api } from '../lib/api'
 import { formatDateTime, formatIDR, formatNumber } from '../lib/format'
@@ -752,35 +753,29 @@ function EventKamuDetailPage() {
           {tab === 'detail' && (
             <Card>
               <CardHeader title="Informasi Event" />
-              <div
-                className={`relative mb-5 w-full overflow-hidden rounded-xl bg-linear-to-br from-brand-400 to-brand-600 ${
-                  event.imageUrl ? '' : 'h-44 sm:h-56 md:h-64'
-                }`}
-              >
-                {event.imageUrl && (
-                  <img
-                    src={event.imageUrl}
-                    alt={event.name}
-                    loading="lazy"
-                    decoding="async"
-                    className="h-44 w-full object-cover sm:h-56 md:h-64"
-                  />
-                )}
-                <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-black/30 to-transparent" />
-              </div>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <Info label="Mulai" value={formatDateTime(event.startDateTime)} />
-                <Info label="Selesai" value={formatDateTime(event.endDateTime)} />
-                <Info label="Kota" value={event.city} />
-                <Info label="Alamat" value={event.addressDetail} />
-                <Info label="Kategori" value={event.category} />
-                <Info label="Organizer" value={event.organizer?.name} />
-                <Info label="Status">
-                  <span className="inline-flex rounded-full bg-amber-50 px-2 py-0.5 text-xs font-semibold uppercase text-amber-700">
-                    {event.status ?? '-'}
-                  </span>
-                </Info>
-                <Info label="Published" value={event.isPublished ? 'Ya' : 'Belum'} />
+              <div className="grid items-start gap-5 lg:grid-cols-2 lg:gap-6">
+                <div
+                  className={`relative overflow-hidden rounded-xl bg-linear-to-br from-brand-400 to-brand-600 ${
+                    event.imageUrl ? '' : 'aspect-video'
+                  }`}
+                >
+                  <EventImage src={event.imageUrl} alt={event.name} />
+                  <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-black/30 to-transparent" />
+                </div>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <Info label="Mulai" value={formatDateTime(event.startDateTime)} />
+                  <Info label="Selesai" value={formatDateTime(event.endDateTime)} />
+                  <Info label="Kota" value={event.city} />
+                  <Info label="Alamat" value={event.addressDetail} />
+                  <Info label="Kategori" value={event.category} />
+                  <Info label="Organizer" value={event.organizer?.name} />
+                  <Info label="Status">
+                    <span className="inline-flex rounded-full bg-amber-50 px-2 py-0.5 text-xs font-semibold uppercase text-amber-700">
+                      {event.status ?? '-'}
+                    </span>
+                  </Info>
+                  <Info label="Published" value={event.isPublished ? 'Ya' : 'Belum'} />
+                </div>
               </div>
               <div className="mt-5 border-t border-gray-100 pt-4">
                 <p className="text-xs font-medium text-gray-500">Deskripsi</p>
