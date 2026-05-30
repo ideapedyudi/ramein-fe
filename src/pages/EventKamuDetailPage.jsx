@@ -3,7 +3,6 @@ import { Link, useParams } from 'react-router-dom'
 import { FaCamera, FaKeyboard, FaTimes } from 'react-icons/fa'
 import { useZxing } from 'react-zxing'
 import AdminLayout from '../components/AdminLayout'
-import EventImage from '../components/EventImage'
 import { useAuth } from '../context/authContext'
 import { api } from '../lib/api'
 import { formatDateTime, formatIDR, formatNumber } from '../lib/format'
@@ -754,11 +753,19 @@ function EventKamuDetailPage() {
             <Card>
               <CardHeader title="Informasi Event" />
               <div
-                className={`relative mx-auto mb-5 w-full max-w-md overflow-hidden rounded-xl bg-linear-to-br from-brand-400 to-brand-600 ${
-                  event.imageUrl ? '' : 'h-44 sm:h-56'
+                className={`relative mb-5 w-full overflow-hidden rounded-xl bg-linear-to-br from-brand-400 to-brand-600 ${
+                  event.imageUrl ? '' : 'h-44 sm:h-56 md:h-64'
                 }`}
               >
-                <EventImage src={event.imageUrl} alt={event.name} />
+                {event.imageUrl && (
+                  <img
+                    src={event.imageUrl}
+                    alt={event.name}
+                    loading="lazy"
+                    decoding="async"
+                    className="h-44 w-full object-cover sm:h-56 md:h-64"
+                  />
+                )}
                 <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-black/30 to-transparent" />
               </div>
               <div className="grid gap-4 sm:grid-cols-2">

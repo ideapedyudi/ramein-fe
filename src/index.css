@@ -44,6 +44,54 @@ body {
   }
 }
 
+/* Enter animations for navbar dropdown / mobile menu / hamburger icon. */
+@media (prefers-reduced-motion: no-preference) {
+  .animate-dropdown {
+    animation: dropdown-in 0.16s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .animate-menu {
+    animation: menu-in 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  /* Staggered per-item entrance (set animation-delay inline). */
+  .animate-menu-item {
+    opacity: 0;
+    animation: menu-in 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .animate-icon-swap {
+    animation: icon-swap 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+}
+@keyframes dropdown-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+@keyframes menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes icon-swap {
+  from {
+    opacity: 0;
+    transform: rotate(-90deg) scale(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: rotate(0) scale(1);
+  }
+}
+
 /* Skeleton placeholder with a GPU-friendly sliding shimmer (transform only). */
 .skeleton {
   position: relative;

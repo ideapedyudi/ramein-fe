@@ -1,12 +1,11 @@
-import Navbar from './Navbar'
-
+/**
+ * Passthrough wrapper kept for backwards-compatibility. The page chrome
+ * (background + Navbar) now lives in PublicLayout, which stays mounted across
+ * navigations so navbar animations can run. Pages can keep wrapping their
+ * content in <SiteLayout> without rendering a second navbar.
+ */
 function SiteLayout({ children }) {
-  return (
-    <div className="min-h-screen bg-[#f5f5f5]">
-      <Navbar />
-      {children}
-    </div>
-  )
+  return <>{children}</>
 }
 
 export default SiteLayout

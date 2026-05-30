@@ -1,6 +1,7 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 import GuestRoute from './components/GuestRoute'
 import ProtectedRoute from './components/ProtectedRoute'
+import PublicLayout from './components/PublicLayout'
 import RouteSeo from './components/RouteSeo'
 import TopProgressBar from './components/TopProgressBar'
 import AboutPage from './pages/AboutPage'
@@ -39,18 +40,22 @@ function App() {
       <RouteSeo />
       <Routes>
         <Route path="/" element={<Navigate to="/home" replace />} />
-        <Route path="/home" element={<HomePage />} />
 
-        <Route path="/jelajah" element={<Navigate to="/jelajahi" replace />} />
-        <Route path="/jelajahi" element={<JelajahiPage />} />
-        <Route path="/untuk-kamu" element={<UntukKamuPage />} />
-        <Route path="/event/:eventId" element={<EventDetailPage />} />
+        {/* Public site — Navbar stays mounted across these routes */}
+        <Route element={<PublicLayout />}>
+          <Route path="/home" element={<HomePage />} />
 
-        <Route path="/about" element={<AboutPage />} />
-        <Route path="/pricing" element={<PricingPage />} />
-        <Route path="/contact" element={<ContactPage />} />
-        <Route path="/terms" element={<TermsPage />} />
-        <Route path="/privacy" element={<PrivacyPage />} />
+          <Route path="/jelajah" element={<Navigate to="/jelajahi" replace />} />
+          <Route path="/jelajahi" element={<JelajahiPage />} />
+          <Route path="/untuk-kamu" element={<UntukKamuPage />} />
+          <Route path="/event/:eventId" element={<EventDetailPage />} />
+
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/pricing" element={<PricingPage />} />
+          <Route path="/contact" element={<ContactPage />} />
+          <Route path="/terms" element={<TermsPage />} />
+          <Route path="/privacy" element={<PrivacyPage />} />
+        </Route>
 
         <Route path="/checkout" element={<CheckoutPage />} />
         <Route path="/order/success" element={<OrderSuccessPage />} />

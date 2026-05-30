@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { NavLink, Link, useNavigate } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import { NavLink, Link, useLocation, useNavigate } from "react-router-dom";
 import { FaBars, FaTimes } from "react-icons/fa";
 import brandLogo from "../assets/logobrand2.png";
 import { navMenus } from "../data/homeData";
@@ -17,13 +17,67 @@ const topLinks = [
 function Navbar() {
   const { user, isAuthenticated, isAdmin, logout } = useAuth();
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
   const closeMobile = () => setMobileOpen(false);
+
+  const navRef = useRef(null);
+  const indicatorRef = useRef(null);
+  const linkRefs = useRef([]);
+  const indicatorReady = useRef(false);
 
   function handleLogout() {
     logout();
     navigate("/home");
   }
+
+  // Slide the active-link highlight to the current route. We mutate the
+  // indicator's style imperatively (no state) so the CSS transition animates
+  // the move and it stays a layout-effect-free, render-cheap operation.
+  useEffect(() => {
+    function moveIndicator() {
+      const nav = navRef.current;
+      const indicator = indicatorRef.current;
+      if (!nav || !indicator) return;
+
+      const activeIndex = navMenus.findIndex(
+        (menu) => pathname === menu.to || pathname.startsWith(`${menu.to}/`),
+      );
+      const el = linkRefs.current[activeIndex];
+
+      if (!el) {
+        indicator.style.opacity = "0";
+        return;
+      }
+
+      const navRect = nav.getBoundingClientRect();
+      const rect = el.getBoundingClientRect();
+
+      // First placement (page load/reload) snaps without animating; later
+      // route changes keep the CSS transition so the highlight slides.
+      if (!indicatorReady.current) {
+        indicator.style.transition = "none";
+      }
+
+      indicator.style.transform = `translate(${rect.left - navRect.left}px, ${
+        rect.top - navRect.top
+      }px)`;
+      indicator.style.width = `${rect.width}px`;
+      indicator.style.height = `${rect.height}px`;
+      indicator.style.opacity = "1";
+
+      if (!indicatorReady.current) {
+        // Commit the snapped position, then restore the stylesheet transition.
+        void indicator.offsetWidth;
+        indicator.style.transition = "";
+        indicatorReady.current = true;
+      }
+    }
+
+    moveIndicator();
+    window.addEventListener("resize", moveIndicator);
+    return () => window.removeEventListener("resize", moveIndicator);
+  }, [pathname]);
 
   return (
     <header className="sticky top-0 z-50">
@@ -52,16 +106,25 @@ function Navbar() {
             </span>
           </Link>
 
-          <nav className="scrollbar-hide hidden items-center gap-1 rounded-full bg-[#58b59f]/70 px-1 py-1 md:flex md:gap-2 md:px-2">
-            {navMenus.map((menu) => (
+          <nav
+            ref={navRef}
+            className="scrollbar-hide relative hidden items-center gap-1 rounded-full bg-[#58b59f]/70 px-1 py-1 md:flex md:gap-2 md:px-2"
+          >
+            <span
+              ref={indicatorRef}
+              aria-hidden="true"
+              className="pointer-events-none absolute left-0 top-0 z-0 rounded-full bg-white/15 opacity-0 transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
+            />
+            {navMenus.map((menu, i) => (
               <NavLink
                 key={menu.to}
                 to={menu.to}
+                ref={(el) => {
+                  linkRefs.current[i] = el;
+                }}
                 className={({ isActive }) =>
-                  `shrink-0 rounded-full px-3 py-2 text-sm font-semibold transition md:px-5 ${
-                    isActive
-                      ? "bg-white/15 text-white"
-                      : "text-white/95 hover:bg-white/10"
+                  `relative z-10 shrink-0 rounded-full px-3 py-2 text-sm font-semibold transition md:px-5 ${
+                    isActive ? "text-white" : "text-white/95 hover:bg-white/10"
                   }`
                 }
               >
@@ -111,26 +174,32 @@ function Navbar() {
               aria-expanded={mobileOpen}
               className="flex h-10 w-10 items-center justify-center rounded-lg text-white hover:bg-white/10"
             >
-              {mobileOpen ? (
-                <FaTimes className="text-xl" />
-              ) : (
-                <FaBars className="text-xl" />
-              )}
+              <span
+                key={mobileOpen ? 'close' : 'open'}
+                className="animate-icon-swap inline-flex"
+              >
+                {mobileOpen ? (
+                  <FaTimes className="text-xl" />
+                ) : (
+                  <FaBars className="text-xl" />
+                )}
+              </span>
             </button>
           </div>
         </div>
 
         {mobileOpen && (
-          <div className="border-t border-white/10 bg-[#32a08c] md:hidden">
+          <div className="animate-menu origin-top border-t border-white/10 bg-[#32a08c] md:hidden">
             <Container className="py-3">
               <nav className="flex flex-col gap-1">
-                {navMenus.map((menu) => (
+                {navMenus.map((menu, i) => (
                   <NavLink
                     key={menu.to}
                     to={menu.to}
                     onClick={closeMobile}
+                    style={{ animationDelay: `${i * 45}ms` }}
                     className={({ isActive }) =>
-                      `rounded-lg px-3 py-2.5 text-sm font-semibold transition ${
+                      `animate-menu-item rounded-lg px-3 py-2.5 text-sm font-semibold transition ${
                         isActive
                           ? "bg-white/15 text-white"
                           : "text-white/95 hover:bg-white/10"
