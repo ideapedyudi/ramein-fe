@@ -963,6 +963,14 @@ export const api = {
       method: "POST",
       body: JSON.stringify({ eventId, items }),
     }).then((res) => res.data ?? res),
+  createFeedback: ({ rating, review }) =>
+    apiRequest("/feedback", {
+      method: "POST",
+      body: JSON.stringify({
+        rating,
+        review,
+      }),
+    }).then((res) => res.data ?? res),
   getCategories: () => delay(apiCategories),
   getRegions: () => delay(apiRegions),
   searchEvents: ({ category, wilayah, kota, date }) => {
