@@ -222,7 +222,7 @@ function TicketCard({
                   : 'cursor-not-allowed bg-gray-300'
               }`}
             >
-              <FaLink /> {openingOnlineLink ? 'Membuka Link...' : 'Tampilkan Link'}
+              <FaLink /> {openingOnlineLink ? 'Membuka Link...' : 'Akses Link'}
             </a>
           ) : (
             <button
