@@ -4,39 +4,12 @@ import { api } from '../lib/api'
 import { formatIDR } from '../lib/format'
 
 const ratingOptions = [
-  'Sangat Puas',
-  'Puas',
-  'Cukup Puas',
-  'Tidak Puas',
-  'Sangat Tidak Puas',
+  { value: 'Sangat Puas', emoji: '😍' },
+  { value: 'Puas', emoji: '🙂' },
+  { value: 'Cukup Puas', emoji: '😐' },
+  { value: 'Tidak Puas', emoji: '🙁' },
+  { value: 'Sangat Tidak Puas', emoji: '😠' },
 ]
-
-const getFeedbackStorageKey = (orderId) => `transaction_feedback_${orderId}`
-const getFeedbackPromptKey = (orderId) => `transaction_feedback_prompt_${orderId}`
-
-function readFeedback(orderId) {
-  if (!orderId || typeof window === 'undefined') return null
-
-  try {
-    const raw = window.localStorage.getItem(getFeedbackStorageKey(orderId))
-    return raw ? JSON.parse(raw) : null
-  } catch {
-    return null
-  }
-}
-
-function saveFeedback(orderId, feedback) {
-  if (!orderId || typeof window === 'undefined') return
-
-  window.localStorage.setItem(getFeedbackStorageKey(orderId), JSON.stringify(feedback))
-  window.localStorage.setItem(getFeedbackPromptKey(orderId), 'submitted')
-}
-
-function markFeedbackPrompt(orderId, value) {
-  if (!orderId || typeof window === 'undefined') return
-
-  window.localStorage.setItem(getFeedbackPromptKey(orderId), value)
-}
 
 function CopyButton({ value }) {
   return (
@@ -122,20 +95,23 @@ function FeedbackModal({
             <p className="text-sm font-semibold text-gray-900">Rating</p>
             <div className="mt-3 grid gap-2 sm:grid-cols-2">
               {ratingOptions.map((option) => {
-                const isActive = feedback.rating === option
+                const isActive = feedback.rating === option.value
 
                 return (
                   <button
-                    key={option}
+                    key={option.value}
                     type="button"
-                    onClick={() => onChange('rating', option)}
+                    onClick={() => onChange('rating', option.value)}
                     className={`rounded-2xl border px-4 py-3 text-left text-sm font-medium transition ${
                       isActive
                         ? 'border-brand-500 bg-brand-50 text-brand-700 ring-2 ring-brand-100'
                         : 'border-gray-200 text-gray-700 hover:border-brand-200 hover:bg-gray-50'
                     }`}
                   >
-                    {option}
+                    <span className="flex items-center gap-3">
+                      <span className="text-xl leading-none">{option.emoji}</span>
+                      <span>{option.value}</span>
+                    </span>
                   </button>
                 )
               })}
@@ -196,9 +172,8 @@ function OrderSuccessPage() {
   const [feedbackSubmitting, setFeedbackSubmitting] = useState(false)
   const [feedbackError, setFeedbackError] = useState('')
   const [feedbackNotice, setFeedbackNotice] = useState('')
-  const [savedFeedback, setSavedFeedback] = useState(null)
   const [feedback, setFeedback] = useState({
-    rating: ratingOptions[0],
+    rating: ratingOptions[0].value,
     review: '',
   })
 
@@ -251,24 +226,13 @@ function OrderSuccessPage() {
   }, [eventId])
 
   useEffect(() => {
-    const existingFeedback = readFeedback(orderId)
-    if (existingFeedback) {
-      setSavedFeedback(existingFeedback)
-      setFeedback({
-        rating: existingFeedback.rating ?? ratingOptions[0],
-        review: existingFeedback.review ?? '',
-      })
-    }
-  }, [orderId])
+    if (!event || !orderId) return
 
-  useEffect(() => {
-    if (!event || !orderId || typeof window === 'undefined') return
-    if (readFeedback(orderId)) return
-
-    const promptState = window.localStorage.getItem(getFeedbackPromptKey(orderId))
-    if (!promptState) {
-      setFeedbackOpen(true)
-    }
+    setFeedback({
+      rating: ratingOptions[0].value,
+      review: '',
+    })
+    setFeedbackOpen(true)
   }, [event, orderId])
 
   useEffect(() => {
@@ -288,9 +252,6 @@ function OrderSuccessPage() {
   const closeFeedbackModal = () => {
     setFeedbackOpen(false)
     setFeedbackError('')
-    if (!savedFeedback) {
-      markFeedbackPrompt(orderId, 'dismissed')
-    }
   }
 
   const openFeedbackModal = () => {
@@ -318,11 +279,9 @@ function OrderSuccessPage() {
         review: trimmedReview,
         submittedAt: new Date().toISOString(),
       }
-
-      saveFeedback(orderId, nextFeedback)
-      setSavedFeedback(nextFeedback)
       setFeedbackNotice('Feedback berhasil dikirim. Terima kasih.')
       setFeedbackOpen(false)
+      setFeedback(nextFeedback)
     } catch (submitError) {
       setFeedbackError(submitError.message || 'Feedback belum berhasil dikirim. Coba lagi.')
     } finally {
@@ -443,24 +402,13 @@ function OrderSuccessPage() {
                 onClick={openFeedbackModal}
                 className="rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-semibold text-white hover:bg-gray-800"
               >
-                {savedFeedback ? 'Ubah feedback' : 'Beri feedback'}
+                Beri feedback
               </button>
             </div>
-
-            {savedFeedback ? (
-              <div className="mt-4 rounded-2xl border border-amber-100 bg-white px-4 py-4 text-sm">
-                <p className="text-gray-500">Rating</p>
-                <p className="mt-1 font-semibold text-gray-900">{savedFeedback.rating}</p>
-                <p className="mt-4 text-gray-500">Review</p>
-                <p className="mt-1 text-gray-700">
-                  {savedFeedback.review || 'Tidak ada review tambahan.'}
-                </p>
-              </div>
-            ) : (
-              <p className="mt-4 text-sm text-gray-600">
-                Modal feedback akan muncul otomatis sekali setelah transaksi selesai.
-              </p>
-            )}
+            <p className="mt-4 text-sm text-gray-600">
+              Modal feedback akan langsung muncul setiap selesai transaksi, dan tombol ini bisa
+              dipakai kapan saja untuk kirim feedback lagi.
+            </p>
           </div>
 
           <div className="mt-8 flex flex-wrap gap-3">
