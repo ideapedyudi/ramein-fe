@@ -102,11 +102,10 @@ function FeedbackModal({
                     key={option.value}
                     type="button"
                     onClick={() => onChange('rating', option.value)}
-                    className={`rounded-2xl border px-4 py-3 text-left text-sm font-medium transition ${
-                      isActive
-                        ? 'border-brand-500 bg-brand-50 text-brand-700 ring-2 ring-brand-100'
-                        : 'border-gray-200 text-gray-700 hover:border-brand-200 hover:bg-gray-50'
-                    }`}
+                    className={`rounded-2xl border px-4 py-3 text-left text-sm font-medium transition ${isActive
+                      ? 'border-brand-500 bg-brand-50 text-brand-700 ring-2 ring-brand-100'
+                      : 'border-gray-200 text-gray-700 hover:border-brand-200 hover:bg-gray-50'
+                      }`}
                   >
                     <span className="flex items-center gap-3">
                       <span className="text-xl leading-none">{option.emoji}</span>
@@ -405,10 +404,6 @@ function OrderSuccessPage() {
                 Beri feedback
               </button>
             </div>
-            <p className="mt-4 text-sm text-gray-600">
-              Modal feedback akan langsung muncul setiap selesai transaksi, dan tombol ini bisa
-              dipakai kapan saja untuk kirim feedback lagi.
-            </p>
           </div>
 
           <div className="mt-8 flex flex-wrap gap-3">
