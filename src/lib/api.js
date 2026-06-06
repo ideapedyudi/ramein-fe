@@ -1,22 +1,22 @@
 // Event images — swap any individual source by changing one import below.
-import jazzImg from "../assets/eventtest.png";
-import concertImg from "../assets/eventtest.png";
-import esportsImg from "../assets/eventtest.png";
-import workshopImg from "../assets/eventtest.png";
-import festivalImg from "../assets/eventtest.png";
-import techImg from "../assets/eventtest.png";
-import foodImg from "../assets/eventtest.png";
-import ticketImg from "../assets/eventtest.png";
+import jazzImg from "../assets/eventtest.webp";
+import concertImg from "../assets/eventtest.webp";
+import esportsImg from "../assets/eventtest.webp";
+import workshopImg from "../assets/eventtest.webp";
+import festivalImg from "../assets/eventtest.webp";
+import techImg from "../assets/eventtest.webp";
+import foodImg from "../assets/eventtest.webp";
+import ticketImg from "../assets/eventtest.webp";
 
 // Region images — swap any individual source by changing one import below.
-import sumatraImg from "../assets/sumatra.png";
-import jakartaImg from "../assets/jakarta.png";
-import jabarImg from "../assets/jabar.png";
-import diyjatengImg from "../assets/jateng.png";
-import jatimImg from "../assets/jatim.png";
-import kalimantanImg from "../assets/kalimantan.png";
-import sulawesiImg from "../assets/sulawesi.png";
-import indtimurImg from "../assets/bali.png";
+import sumatraImg from "../assets/sumatra.webp";
+import jakartaImg from "../assets/jakarta.webp";
+import jabarImg from "../assets/jabar.webp";
+import diyjatengImg from "../assets/jateng.webp";
+import jatimImg from "../assets/jatim.webp";
+import kalimantanImg from "../assets/kalimantan.webp";
+import sulawesiImg from "../assets/sulawesi.webp";
+import indtimurImg from "../assets/bali.webp";
 import { apiRequest } from "./http";
 
 const eventImages = {

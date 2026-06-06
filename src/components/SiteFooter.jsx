@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import brandLogo from "../assets/logobrand.png";
+import brandLogo from "../assets/logobrand.webp";
 
 function FooterColumn({ title, items }) {
   return (

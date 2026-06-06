@@ -437,7 +437,7 @@ function TiketSayaPage() {
 
     try {
       const blob = await buildSocialShareBlob(ticket)
-      const file = new File([blob], `ramein-share-${ticket.id}.png`, { type: 'image/png' })
+      const file = new File([blob], `ramein-share-${ticket.id}.webp`, { type: 'image/png' })
       const promoText = `Aku baru beli tiket ${ticket.eventName}. Beli ticket kamu di ramein.fun`
 
       if (
@@ -455,7 +455,7 @@ function TiketSayaPage() {
           text: 'Gambar share sudah dibuka di share sheet. Pilih social media yang ingin dipakai.',
         })
       } else {
-        downloadBlob(blob, `ramein-share-${ticket.id}.png`)
+        downloadBlob(blob, `ramein-share-${ticket.id}.webp`)
 
         if (navigator.clipboard?.writeText) {
           await navigator.clipboard.writeText(promoText)

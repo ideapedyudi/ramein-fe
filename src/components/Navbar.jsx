@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { NavLink, Link, useLocation, useNavigate } from "react-router-dom";
 import { FaBars, FaTimes } from "react-icons/fa";
-import brandLogo from "../assets/logobrand2.png";
+import brandLogo from "../assets/logobrand2.webp";
 import { navMenus } from "../data/homeData";
 import { useAuth } from "../context/authContext";
 import Container from "./Container";

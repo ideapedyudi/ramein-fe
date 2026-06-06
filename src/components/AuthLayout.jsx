@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import brandLogo from "../assets/logobrand2.png";
+import brandLogo from "../assets/logobrand2.webp";
 
 function Brand() {
   return (
