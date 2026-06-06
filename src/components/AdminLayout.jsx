@@ -8,6 +8,7 @@ import {
   FaChartLine,
   FaCity,
   FaCog,
+  FaComments,
   FaListUl,
   FaMoneyBillWave,
   FaPlusCircle,
@@ -42,6 +43,7 @@ const adminNav = [
   { to: "/admin/kota", label: "Kota", icon: FaCity },
   { to: "/admin/organizer", label: "Organizer", icon: FaBuilding },
   { to: "/admin/finance", label: "Finance", icon: FaChartLine },
+  { to: "/admin/feedback", label: "Feedback", icon: FaComments },
   { to: "/event-kamu", label: "Event Dikelola", icon: FaCalendarAlt },
   { to: "/buat-event", label: "Buat Event", icon: FaPlusCircle },
 ];
@@ -146,7 +148,11 @@ function AdminLayout({ title, subtitle, actions, children }) {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
-    setMobileOpen(false);
+    const timer = setTimeout(() => {
+      setMobileOpen(false);
+    }, 0);
+
+    return () => clearTimeout(timer);
   }, [location.pathname]);
 
   function handleLogout() {

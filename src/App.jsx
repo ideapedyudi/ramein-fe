@@ -27,6 +27,7 @@ import TiketSayaPage from './pages/TiketSayaPage'
 import TransaksiPage from './pages/TransaksiPage'
 import UntukKamuPage from './pages/UntukKamuPage'
 import WithdrawPage from './pages/WithdrawPage'
+import AdminFeedbackPage from './pages/admin/AdminFeedbackPage'
 import AdminFinancePage from './pages/admin/AdminFinancePage'
 import AdminKategoriPage from './pages/admin/AdminKategoriPage'
 import AdminKotaPage from './pages/admin/AdminKotaPage'
@@ -174,6 +175,14 @@ function App() {
         element={
           <ProtectedRoute requireAdmin>
             <AdminFinancePage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/feedback"
+        element={
+          <ProtectedRoute requireAdmin>
+            <AdminFeedbackPage />
           </ProtectedRoute>
         }
       />

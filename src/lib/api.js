@@ -843,6 +843,24 @@ const getFinanceCollection = (payload) => {
   return []
 }
 
+const toFeedbackFromApi = (entry) => ({
+  id: entry.id,
+  rating: entry.rating ?? "-",
+  review: entry.review ?? "-",
+  createdAt: entry.createdAt ?? entry.created_at ?? null,
+  updatedAt: entry.updatedAt ?? entry.updated_at ?? null,
+})
+
+const getFeedbackCollection = (payload) => {
+  if (Array.isArray(payload)) return payload
+  if (Array.isArray(payload?.data)) return payload.data
+  if (Array.isArray(payload?.data?.feedback)) return payload.data.feedback
+  if (Array.isArray(payload?.data?.feedbacks)) return payload.data.feedbacks
+  if (Array.isArray(payload?.feedback)) return payload.feedback
+  if (Array.isArray(payload?.feedbacks)) return payload.feedbacks
+  return []
+}
+
 const publicCatalog = () =>
   eventCatalog.filter((e) => e.visibility === "public");
 
@@ -971,6 +989,8 @@ export const api = {
         review,
       }),
     }).then((res) => res.data ?? res),
+  getFeedbacks: () =>
+    apiRequest("/feedback").then((res) => getFeedbackCollection(res).map(toFeedbackFromApi)),
   getCategories: () => delay(apiCategories),
   getRegions: () => delay(apiRegions),
   searchEvents: ({ category, wilayah, kota, date }) => {

@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import {
   FaCalendarAlt,
   FaChartLine,
+  FaComments,
   FaCog,
   FaMoneyBillWave,
   FaReceipt,
@@ -43,6 +44,7 @@ function ProfileMenu({ user, isAdmin, onLogout, variant = "desktop" }) {
         { label: "Kota", to: "/admin/kota", icon: FaReceipt },
         { label: "Organizer", to: "/admin/organizer", icon: FaCalendarAlt },
         { label: "Finance", to: "/admin/finance", icon: FaChartLine },
+        { label: "Feedback", to: "/admin/feedback", icon: FaComments },
         { label: "Event Dikelola", to: "/event-kamu", icon: FaCalendarAlt },
         { label: "Buat Event", to: "/buat-event", icon: FaTicketAlt },
         { label: "Pengaturan", to: "/pengaturan", icon: FaCog },
