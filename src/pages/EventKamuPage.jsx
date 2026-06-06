@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { FaEdit, FaTrashAlt } from 'react-icons/fa'
 import AdminLayout from '../components/AdminLayout'
 import EventImage from '../components/EventImage'
 import MarqueeText from '../components/MarqueeText'
@@ -27,26 +28,44 @@ function EventKamuPage() {
   const [events, setEvents] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [deletingId, setDeletingId] = useState(null)
 
-  useEffect(() => {
-    let cancelled = false
-
-    api
-      .getMyEvents()
-      .then((res) => {
-        if (!cancelled) setEvents(res)
-      })
-      .catch((err) => {
-        if (!cancelled) setError(err.message || 'Gagal memuat event.')
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false)
-      })
-
-    return () => {
-      cancelled = true
+  const loadEvents = useCallback(async () => {
+    setLoading(true)
+    setError('')
+    try {
+      const res = await api.getMyEvents()
+      setEvents(res)
+    } catch (err) {
+      setError(err.message || 'Gagal memuat event.')
+    } finally {
+      setLoading(false)
     }
   }, [])
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      loadEvents()
+    }, 0)
+
+    return () => clearTimeout(timer)
+  }, [loadEvents])
+
+  async function handleDelete(event) {
+    const confirmed = window.confirm(`Hapus event "${event.name}"?`)
+    if (!confirmed) return
+
+    setDeletingId(event.id)
+    setError('')
+    try {
+      await api.deleteEvent(event.id)
+      setEvents((current) => current.filter((item) => item.id !== event.id))
+    } catch (err) {
+      setError(err.message || 'Gagal menghapus event.')
+    } finally {
+      setDeletingId(null)
+    }
+  }
 
   return (
     <AdminLayout
@@ -63,12 +82,12 @@ function EventKamuPage() {
     >
       <div className="grid grid-cols-1 items-start gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {events.map((event) => (
-          <Link
+          <article
             key={event.id}
-            to={`/event-kamu/${event.id}`}
             className="group flex flex-col overflow-hidden rounded-2xl border border-[#eee] bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
           >
-            <div
+            <Link
+              to={`/event-kamu/${event.id}`}
               className={`relative w-full overflow-hidden bg-linear-to-br from-brand-400 to-brand-600 ${
                 event.imageUrl ? '' : 'aspect-video'
               }`}
@@ -81,12 +100,12 @@ function EventKamuPage() {
               >
                 {event.eventType}
               </span>
-            </div>
+            </Link>
 
             <div className="flex flex-1 flex-col p-4">
-              <h2 className="text-base font-bold text-gray-900">
+              <Link to={`/event-kamu/${event.id}`} className="text-base font-bold text-gray-900 hover:text-brand-700">
                 <MarqueeText text={event.name} />
-              </h2>
+              </Link>
               <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-600">
                 <span>{formatDateTime(event.dateLabel)}</span>
                 <span>{event.city}</span>
@@ -101,8 +120,26 @@ function EventKamuPage() {
                   accent="text-emerald-600"
                 />
               </div>
+              <div className="mt-4 flex flex-wrap gap-2 border-t border-gray-100 pt-3">
+                <Link
+                  to={`/event-kamu/${event.id}/edit`}
+                  className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-gray-200 px-3 py-2 text-xs font-semibold text-gray-700 transition hover:bg-gray-50"
+                >
+                  <FaEdit className="text-[11px]" />
+                  Edit
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => handleDelete(event)}
+                  disabled={deletingId === event.id}
+                  className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-red-100 px-3 py-2 text-xs font-semibold text-red-600 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  <FaTrashAlt className="text-[11px]" />
+                  {deletingId === event.id ? 'Menghapus...' : 'Delete'}
+                </button>
+              </div>
             </div>
-          </Link>
+          </article>
         ))}
       </div>
 

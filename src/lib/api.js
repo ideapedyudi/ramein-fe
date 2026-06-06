@@ -1064,6 +1064,39 @@ export const api = {
     apiRequest("/events?createdBy=me").then((res) => (res.data ?? []).map(toManagedEvent)),
   getMyEvent: (id) =>
     apiRequest(`/events/${id}`).then((res) => (res.data ? toManagedEvent(res.data) : null)),
+  updateEvent: (id, payload) =>
+    apiRequest(`/events/${id}`, {
+      method: "PUT",
+      body: JSON.stringify({
+        title: payload.title,
+        description: payload.description,
+        category_id: payload.categoryId,
+        organizer_id: payload.organizerId,
+        city_id: payload.cityId,
+        address_detail: payload.addressDetail,
+        banner: payload.banner,
+        event_type: payload.eventType,
+        label_online: payload.labelOnline,
+        url_online: payload.urlOnline,
+        payment_type: payload.paymentType,
+        start_datetime: payload.startDateTime,
+        end_datetime: payload.endDateTime,
+        status: payload.status,
+        is_published: payload.isPublished,
+        ticket_types: payload.ticketTypes.map((ticket) => ({
+          name: ticket.name,
+          price: ticket.price,
+          quota: ticket.quota,
+          sold: ticket.sold,
+          sale_start_at: ticket.saleStartAt,
+          sale_end_at: ticket.saleEndAt,
+        })),
+      }),
+    }).then((res) => (res.data ? toManagedEvent(res.data) : { id })),
+  deleteEvent: (id) =>
+    apiRequest(`/events/${id}`, {
+      method: "DELETE",
+    }).then((res) => res.data ?? res),
   getMyTickets: () =>
     apiRequest("/ticket").then((res) => (res.data ?? []).map(toMyPaidTicketFromApi)),
   getMyTicket: (id) =>

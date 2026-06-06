@@ -11,6 +11,7 @@ import BuatEventPage from './pages/BuatEventPage'
 import CheckoutPage from './pages/CheckoutPage'
 import ContactPage from './pages/ContactPage'
 import DashboardPage from './pages/DashboardPage'
+import EditEventPage from './pages/EditEventPage'
 import EventDetailPage from './pages/EventDetailPage'
 import EventKamuDetailPage from './pages/EventKamuDetailPage'
 import EventKamuPage from './pages/EventKamuPage'
@@ -134,6 +135,14 @@ function App() {
         element={
           <ProtectedRoute>
             <EventKamuPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/event-kamu/:eventId/edit"
+        element={
+          <ProtectedRoute>
+            <EditEventPage />
           </ProtectedRoute>
         }
       />
