@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { FaTimes } from "react-icons/fa";
 import { api } from "../lib/api";
 import { formatIDR } from "../lib/format";
 
@@ -174,9 +175,10 @@ function PaymentModal({ open, transaction, onClose }) {
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg border border-gray-200 px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50"
+            aria-label="Tutup"
+            className="rounded-lg border border-gray-200 p-2 text-gray-600 hover:bg-gray-50"
           >
-            Tutup
+            <FaTimes className="h-4 w-4" />
           </button>
         </div>
 
@@ -225,13 +227,6 @@ function PaymentModal({ open, transaction, onClose }) {
               Kalau sudah bayar, tutup modal ini dan tunggu update status
               transaksi.
             </p>
-            <button
-              type="button"
-              onClick={onClose}
-              className="rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium hover:bg-gray-50"
-            >
-              Tutup modal
-            </button>
           </div>
         </div>
       </div>
