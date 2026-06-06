@@ -1,13 +1,14 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import AuthLayout from "../components/AuthLayout";
+import GoogleAuthButton from "../components/GoogleAuthButton";
 import { useAuth } from "../context/authContext";
 
 const inputClass =
   "mt-2 h-10 w-full rounded-xl border border-[#f0f0f0] bg-[#f5f5f5] px-4 text-sm text-[#333333] outline-none placeholder:text-[#9d9d9d] focus:border-emerald-300 md:h-11 md:text-base";
 
 function RegisterPage() {
-  const { isLoading, register } = useAuth();
+  const { isLoading, register, googleAuth } = useAuth();
   const navigate = useNavigate();
   const [form, setForm] = useState({
     name: "",
@@ -58,7 +59,7 @@ function RegisterPage() {
       });
 
       if (accessToken) {
-        navigate(user?.role === "admin" ? "/dashboard" : "/home", {
+        navigate(user?.role === "admin" ? "/dashboard" : "/", {
           replace: true,
         });
         return;
@@ -70,12 +71,40 @@ function RegisterPage() {
     }
   }
 
+  const handleGoogleCredential = useCallback(
+    async (credential) => {
+      setError("");
+      try {
+        const { user } = await googleAuth({ credential });
+        navigate(user?.role === "admin" ? "/dashboard" : "/", {
+          replace: true,
+        });
+      } catch (err) {
+        setError(err || "Registrasi Google gagal.");
+      }
+    },
+    [googleAuth, navigate],
+  );
+
   return (
     <AuthLayout
       title="Buat Akun Baru"
       subtitle="Mulai petualangan event kamu bersama Ramein"
     >
       <form className="space-y-4" onSubmit={handleSubmit}>
+        <GoogleAuthButton
+          disabled={isLoading}
+          enableOneTap
+          context="signup"
+          onCredential={handleGoogleCredential}
+        />
+
+        <div className="flex items-center gap-3 text-xs font-semibold uppercase tracking-wider text-[#9d9d9d]">
+          <span className="h-px flex-1 bg-[#eeeeee]" />
+          atau
+          <span className="h-px flex-1 bg-[#eeeeee]" />
+        </div>
+
         <label className="block text-lg font-semibold text-[#2b2b2b] md:text-[16px]">
           Nama Lengkap
           <input

@@ -10,6 +10,15 @@ const initialState = {
   hasCheckedSession: !getAccessToken(),
 }
 
+function normalizeAuthResponse(response) {
+  const data = response?.data ?? response ?? {}
+  const accessToken = data.accessToken ?? data.access_token ?? data.token ?? null
+  const refreshToken = data.refreshToken ?? data.refresh_token ?? null
+  const user = data.user ?? data.profile ?? null
+
+  return { user, accessToken, refreshToken }
+}
+
 export const loginUser = createAsyncThunk(
   'auth/login',
   async ({ email, password }, { rejectWithValue }) => {
@@ -43,6 +52,30 @@ export const registerUser = createAsyncThunk(
       if (accessToken) saveTokens({ accessToken, refreshToken })
 
       return { user, accessToken: accessToken ?? null }
+    } catch (error) {
+      clearTokens()
+      return rejectWithValue(error.message)
+    }
+  },
+)
+
+export const googleAuthUser = createAsyncThunk(
+  'auth/google',
+  async ({ credential }, { rejectWithValue }) => {
+    try {
+      const response = await apiRequest('/auth/google', {
+        method: 'POST',
+        body: JSON.stringify({ credential }),
+      })
+
+      const { user, accessToken, refreshToken } = normalizeAuthResponse(response)
+      if (!user || !accessToken) {
+        throw new Error('Response Google auth tidak lengkap.')
+      }
+
+      saveTokens({ accessToken, refreshToken })
+
+      return { user, accessToken }
     } catch (error) {
       clearTokens()
       return rejectWithValue(error.message)
@@ -111,6 +144,24 @@ const authSlice = createSlice({
         state.accessToken = null
         state.status = 'failed'
         state.error = action.payload || 'Registrasi gagal.'
+        state.hasCheckedSession = true
+      })
+      .addCase(googleAuthUser.pending, (state) => {
+        state.status = 'loading'
+        state.error = null
+      })
+      .addCase(googleAuthUser.fulfilled, (state, action) => {
+        state.user = action.payload.user
+        state.accessToken = action.payload.accessToken
+        state.status = 'authenticated'
+        state.error = null
+        state.hasCheckedSession = true
+      })
+      .addCase(googleAuthUser.rejected, (state, action) => {
+        state.user = null
+        state.accessToken = null
+        state.status = 'failed'
+        state.error = action.payload || 'Login Google gagal.'
         state.hasCheckedSession = true
       })
       .addCase(fetchCurrentUser.pending, (state) => {

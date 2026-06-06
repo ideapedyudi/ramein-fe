@@ -1025,9 +1025,10 @@ export const api = {
     }).then((res) => (res.data ? toAdminUserFromApi(res.data) : toAdminUserFromApi(res))),
   getCategories: () => delay(apiCategories),
   getRegions: () => delay(apiRegions),
-  searchEvents: ({ category, wilayah, kota, date }) => {
+  searchEvents: ({ search, category, wilayah, kota, date }) => {
     const params = new URLSearchParams()
 
+    if (search) params.set("search", search)
     if (category) params.set("category", category)
     if (wilayah) params.set("wilayah", wilayah)
     if (kota) params.set("kota", kota)

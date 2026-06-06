@@ -38,9 +38,8 @@ function UntukKamuPage() {
         if (cancelled) return
         const available = res.map((category) => category.name).filter(Boolean)
         const stored = getStoredInterests().filter((item) => available.includes(item))
-
         setCategories(res)
-        setSelectedCategories(stored.length > 0 ? stored : res[0]?.name ? [res[0].name] : [])
+        setSelectedCategories(stored.length > 0 ? stored : available.includes('Music') ? ['Music'] : [])
       })
       .catch((err) => {
         if (!cancelled) setError(err.message || 'Gagal memuat kategori minat.')
@@ -64,13 +63,15 @@ function UntukKamuPage() {
     if (loadingCategories) return
 
     let cancelled = false
-    setLoadingEvents(true)
-    setError('')
 
-    api
-      .getEventsByInterest(selectedCategories)
+    Promise.resolve().then(() => {
+      if (cancelled) return null
+      setLoadingEvents(true)
+      setError('')
+      return api.getEventsByInterest(selectedCategories)
+    })
       .then((res) => {
-        if (!cancelled) setEvents(res)
+        if (!cancelled && res) setEvents(res)
       })
       .catch((err) => {
         if (!cancelled) {
@@ -138,9 +139,8 @@ function UntukKamuPage() {
                 className="inline-flex items-center gap-1.5 rounded-full bg-brand-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-gray-300"
               >
                 <FaPlus
-                  className={`text-xs transition-transform duration-300 ${
-                    addInterestOpen ? 'rotate-45' : ''
-                  }`}
+                  className={`text-xs transition-transform duration-300 ${addInterestOpen ? 'rotate-45' : ''
+                    }`}
                 />
                 Tambah Minat
               </button>
@@ -174,11 +174,10 @@ function UntukKamuPage() {
           </div>
 
           <div
-            className={`grid transition-all duration-300 ease-out ${
-              addInterestOpen
-                ? 'mt-4 grid-rows-[1fr] opacity-100'
-                : 'grid-rows-[0fr] opacity-0'
-            }`}
+            className={`grid transition-all duration-300 ease-out ${addInterestOpen
+              ? 'mt-4 grid-rows-[1fr] opacity-100'
+              : 'grid-rows-[0fr] opacity-0'
+              }`}
           >
             <div className="overflow-hidden">
               <div className="rounded-xl border border-brand-100 bg-brand-50/50 p-3">
@@ -229,11 +228,11 @@ function UntukKamuPage() {
           <div className="mt-4 grid grid-cols-2 items-start gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4">
             {loadingEvents
               ? Array.from({ length: 8 }).map((_, i) => (
-                  <EventCardSkeleton key={i} />
-                ))
+                <EventCardSkeleton key={i} />
+              ))
               : visible.map((event) => (
-                  <EventListCard key={event.id} event={event} />
-                ))}
+                <EventListCard key={event.id} event={event} />
+              ))}
           </div>
 
           {/* Infinite-scroll sentinel: reveals the next batch on scroll. */}

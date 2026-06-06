@@ -29,7 +29,7 @@ function AuthLayout({ title, subtitle, children }) {
         </section>
         <div className="mt-6 text-center text-sm font-medium text-[#6e6e6e] md:text-base">
           <Link
-            to="/home"
+            to="/"
             className="inline-flex items-center gap-2 hover:text-[#2ea387]"
           >
             <span aria-hidden="true">&lt;-</span>

@@ -5,11 +5,13 @@ Disallow: /login
 Disallow: /register
 Disallow: /checkout
 Disallow: /order/success
+Disallow: /admin
 Disallow: /dashboard
 Disallow: /tiket-saya
 Disallow: /transaksi
+Disallow: /withdraw
 Disallow: /pengaturan
 Disallow: /buat-event
 Disallow: /event-kamu
 
-Sitemap: https://www.ramein.fun/sitemap.xml
+Sitemap: https://ramein.fun/sitemap.xml

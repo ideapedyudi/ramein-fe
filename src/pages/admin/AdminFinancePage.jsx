@@ -102,18 +102,20 @@ function AdminFinancePage() {
 
   useEffect(() => {
     if (!organizerId) {
-      setFinanceRows([])
+      Promise.resolve().then(() => setFinanceRows([]))
       return
     }
 
     let cancelled = false
-    setLoadingFinance(true)
-    setError('')
 
-    api
-      .getAdminFinance(organizerId)
+    Promise.resolve().then(() => {
+      if (cancelled) return null
+      setLoadingFinance(true)
+      setError('')
+      return api.getAdminFinance(organizerId)
+    })
       .then((res) => {
-        if (!cancelled) setFinanceRows(res)
+        if (!cancelled && res) setFinanceRows(res)
       })
       .catch((err) => {
         if (!cancelled) setError(err.message || 'Gagal memuat finance.')
@@ -201,7 +203,7 @@ function AdminFinancePage() {
 
       <section className="mt-6 rounded-2xl border border-[#eee] bg-white">
         <div className="flex flex-col gap-3 border-b border-[#eee] p-4 lg:flex-row lg:items-center lg:justify-between lg:p-5">
-          <div className="grid gap-2 sm:grid-cols-[260px_1fr]">
+          <div className="grid gap-2 sm:grid-cols-[260px_260px]">
             <select
               value={organizerId}
               onChange={(event) => setOrganizerId(event.target.value)}
@@ -215,6 +217,16 @@ function AdminFinancePage() {
                 </option>
               ))}
             </select>
+            <label className="relative">
+              <FaSearch className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-xs text-[#9a9a9a]" />
+              <input
+                type="search"
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder="Cari transaksi..."
+                className="w-full rounded-lg border border-[#e2e2e2] bg-white py-2 pl-8 pr-3 text-xs outline-none focus:border-brand-500"
+              />
+            </label>
           </div>
           <div className="flex flex-wrap gap-2">
             <button

@@ -15,7 +15,7 @@ function GuestRoute({ children }) {
   }
 
   if (isAuthenticated) {
-    const fallback = isAdmin ? '/dashboard' : '/home'
+    const fallback = isAdmin ? '/dashboard' : '/'
     return <Navigate to={location.state?.from ?? fallback} replace />
   }
 

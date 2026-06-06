@@ -41,11 +41,10 @@ function App() {
       <TopProgressBar />
       <RouteSeo />
       <Routes>
-        <Route path="/" element={<Navigate to="/home" replace />} />
-
         {/* Public site — Navbar stays mounted across these routes */}
         <Route element={<PublicLayout />}>
-          <Route path="/home" element={<HomePage />} />
+          <Route path="/" element={<HomePage />} />
+          <Route path="/home" element={<Navigate to="/" replace />} />
 
           <Route path="/jelajah" element={<Navigate to="/jelajahi" replace />} />
           <Route path="/jelajahi" element={<JelajahiPage />} />
@@ -220,7 +219,7 @@ function App() {
           </GuestRoute>
         }
       />
-      <Route path="*" element={<Navigate to="/home" replace />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </>
   )

@@ -38,7 +38,13 @@ function AdminKotaPage() {
   }, [])
 
   useEffect(() => {
-    loadItems()
+    let cancelled = false
+    Promise.resolve().then(() => {
+      if (!cancelled) loadItems()
+    })
+    return () => {
+      cancelled = true
+    }
   }, [loadItems])
 
   function resetForm() {

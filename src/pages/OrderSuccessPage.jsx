@@ -177,31 +177,39 @@ function OrderSuccessPage() {
   })
 
   useEffect(() => {
-    if (eventId) return
-    if (!orderId || typeof window === 'undefined') {
-      setError('Missing event')
-      return
-    }
+    let cancelled = false
 
-    try {
-      const rawMeta = window.localStorage.getItem(`checkout_meta_${orderId}`)
-      if (!rawMeta) {
+    Promise.resolve().then(() => {
+      if (cancelled || eventId) return
+      if (!orderId || typeof window === 'undefined') {
         setError('Missing event')
         return
       }
 
-      const meta = JSON.parse(rawMeta)
-      if (!meta?.eventId) {
-        setError('Missing event')
-        return
-      }
+      try {
+        const rawMeta = window.localStorage.getItem(`checkout_meta_${orderId}`)
+        if (!rawMeta) {
+          setError('Missing event')
+          return
+        }
 
-      setEventId(String(meta.eventId))
-      if (!params.get('total') && Number.isFinite(Number(meta.total))) {
-        setTotal(Number(meta.total))
+        const meta = JSON.parse(rawMeta)
+        if (!meta?.eventId) {
+          setError('Missing event')
+          return
+        }
+
+        setEventId(String(meta.eventId))
+        if (!params.get('total') && Number.isFinite(Number(meta.total))) {
+          setTotal(Number(meta.total))
+        }
+      } catch {
+        setError('Missing event')
       }
-    } catch {
-      setError('Missing event')
+    })
+
+    return () => {
+      cancelled = true
     }
   }, [eventId, orderId, params])
 
@@ -209,14 +217,17 @@ function OrderSuccessPage() {
     let cancelled = false
     if (!eventId) return undefined
 
-    setError('')
-    api.getEvent(eventId).then((res) => {
+    Promise.resolve().then(() => {
       if (cancelled) return
-      if (!res) {
-        setError('Event not found')
-        return
-      }
-      setEvent(res)
+      setError('')
+      return api.getEvent(eventId).then((res) => {
+        if (cancelled) return
+        if (!res) {
+          setError('Event not found')
+          return
+        }
+        setEvent(res)
+      })
     })
 
     return () => {
@@ -227,11 +238,13 @@ function OrderSuccessPage() {
   useEffect(() => {
     if (!event || !orderId) return
 
-    setFeedback({
-      rating: ratingOptions[0].value,
-      review: '',
+    Promise.resolve().then(() => {
+      setFeedback({
+        rating: ratingOptions[0].value,
+        review: '',
+      })
+      setFeedbackOpen(true)
     })
-    setFeedbackOpen(true)
   }, [event, orderId])
 
   useEffect(() => {
@@ -292,7 +305,7 @@ function OrderSuccessPage() {
     return (
       <div className="mx-auto max-w-[920px] px-4 py-20 text-center">
         <h1 className="text-2xl font-bold text-gray-900">{error}</h1>
-        <Link to="/home" className="mt-4 inline-block text-brand-600 hover:underline">
+        <Link to="/" className="mt-4 inline-block text-brand-600 hover:underline">
           &larr; Kembali ke Beranda
         </Link>
       </div>
@@ -309,7 +322,7 @@ function OrderSuccessPage() {
     <div className="min-h-screen bg-[var(--color-page)]">
       <div className="border-b border-black/5 bg-white">
         <div className="mx-auto max-w-[920px] px-4 py-4 sm:px-6 lg:px-8">
-          <Link to="/home" className="text-sm text-gray-600 hover:text-brand-600">
+          <Link to="/" className="text-sm text-gray-600 hover:text-brand-600">
             &larr; Beranda
           </Link>
         </div>

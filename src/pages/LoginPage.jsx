@@ -1,13 +1,14 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import AuthLayout from "../components/AuthLayout";
+import GoogleAuthButton from "../components/GoogleAuthButton";
 import { SAMPLE_CREDENTIALS, useAuth } from "../context/authContext";
 
 const inputClass =
   "mt-2 h-10 w-full rounded-xl border border-[#f0f0f0] bg-[#f5f5f5] px-4 text-sm text-[#333333] outline-none placeholder:text-[#9d9d9d] focus:border-emerald-300 md:h-11 md:text-base";
 
 function LoginPage() {
-  const { isLoading, login } = useAuth();
+  const { isLoading, login, googleAuth } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const requestedPath = location.state?.from ?? null;
@@ -15,6 +16,21 @@ function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+
+  const navigateAfterAuth = useCallback(
+    (user) => {
+      const adminOnly =
+        requestedPath?.startsWith("/admin") || requestedPath === "/dashboard";
+      const fallback = user.role === "admin" ? "/dashboard" : "/";
+      const destination =
+        requestedPath && !(adminOnly && user.role !== "admin")
+          ? requestedPath
+          : fallback;
+
+      navigate(destination, { replace: true });
+    },
+    [navigate, requestedPath],
+  );
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -26,19 +42,24 @@ function LoginPage() {
 
     try {
       const { user } = await login({ email, password });
-      const adminOnly =
-        requestedPath?.startsWith("/admin") || requestedPath === "/dashboard";
-      const fallback = user.role === "admin" ? "/dashboard" : "/home";
-      const destination =
-        requestedPath && !(adminOnly && user.role !== "admin")
-          ? requestedPath
-          : fallback;
-
-      navigate(destination, { replace: true });
+      navigateAfterAuth(user);
     } catch (err) {
       setError(err || "Login gagal. Periksa email dan password.");
     }
   }
+
+  const handleGoogleCredential = useCallback(
+    async (credential) => {
+      setError("");
+      try {
+        const { user } = await googleAuth({ credential });
+        navigateAfterAuth(user);
+      } catch (err) {
+        setError(err || "Login Google gagal.");
+      }
+    },
+    [googleAuth, navigateAfterAuth],
+  );
 
   function fillWith(creds) {
     setEmail(creds.email);
@@ -51,6 +72,19 @@ function LoginPage() {
       subtitle="Masuk ke akun Ramein kamu"
     >
       <form className="space-y-5" onSubmit={handleSubmit}>
+        <GoogleAuthButton
+          disabled={isLoading}
+          enableOneTap
+          context="signin"
+          onCredential={handleGoogleCredential}
+        />
+
+        <div className="flex items-center gap-3 text-xs font-semibold uppercase tracking-wider text-[#9d9d9d]">
+          <span className="h-px flex-1 bg-[#eeeeee]" />
+          atau
+          <span className="h-px flex-1 bg-[#eeeeee]" />
+        </div>
+
         <label className="block text-lg font-semibold text-[#2b2b2b] md:text-[16px]">
           Email
           <input

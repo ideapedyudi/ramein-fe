@@ -4,7 +4,7 @@ Frontend aplikasi **Ramein**, platform pemesanan tiket event untuk membantu user
 
 ## Fitur Saat Ini
 
-- Halaman beranda event (`/home`) dengan:
+- Halaman beranda event (`/`) dengan:
 - Hero slideshow banner
 - Section **Trending Events**
 - Section **Browse by Category**
@@ -80,16 +80,16 @@ npm run lint
 
 Contoh:
 ```bash
-VITE_SITE_URL=https://www.ramein.fun
+VITE_SITE_URL=https://ramein.fun
 ```
 
 Catatan:
-- `public/sitemap.xml` dan `public/robots.txt` saat ini memakai domain `https://www.ramein.fun`; sesuaikan jika domain production berbeda.
+- `public/sitemap.xml`, `public/robots.txt`, dan `.env.production` saat ini memakai domain `https://ramein.fun`; sesuaikan jika domain production berbeda.
 
 ## Routing
 
-- `/` -> redirect ke `/home`
-- `/home` -> halaman utama
+- `/` -> halaman utama
+- `/home` -> redirect ke `/`
 - `/jelajah` -> redirect ke `/jelajahi`
 - `/jelajahi` -> halaman jelajah event + filter
 - `/untuk-kamu` -> rekomendasi personal

@@ -157,12 +157,17 @@ function BuatEventFestivalPage() {
 
   useEffect(() => {
     let cancelled = false
-    setLoadingMaster(true)
-    setError('')
 
-    Promise.all([api.getMasterCategories(), api.getMasterOrganizers(), api.getMasterCities()])
-      .then(([categoryRes, organizerRes, cityRes]) => {
-        if (cancelled) return
+    Promise.resolve().then(() => {
+      if (cancelled) return null
+      setLoadingMaster(true)
+      setError('')
+
+      return Promise.all([api.getMasterCategories(), api.getMasterOrganizers(), api.getMasterCities()])
+    })
+      .then((result) => {
+        if (cancelled || !result) return
+        const [categoryRes, organizerRes, cityRes] = result
         setCategories(categoryRes)
         setOrganizers(organizerRes)
         setCities(cityRes)

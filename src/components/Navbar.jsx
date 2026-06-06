@@ -28,7 +28,7 @@ function Navbar() {
 
   function handleLogout() {
     logout();
-    navigate("/home");
+    navigate("/");
   }
 
   // Slide the active-link highlight to the current route. We mutate the
@@ -99,7 +99,7 @@ function Navbar() {
       </div>
       <div className="bg-[rgb(50,160,140)]">
         <div className="mx-auto flex w-full max-w-370 flex-row items-center justify-between gap-3 px-2 py-3 md:h-16 md:px-3 md:py-0">
-          <Link to="/home" className="flex items-center gap-2">
+          <Link to="/" className="flex items-center gap-2">
             <img src={brandLogo} alt="brand logo" className="w-10" />
             <span className="text-4xl font-extrabold leading-none text-white">
               Ramein
@@ -119,6 +119,7 @@ function Navbar() {
               <NavLink
                 key={menu.to}
                 to={menu.to}
+                end={menu.to === "/"}
                 ref={(el) => {
                   linkRefs.current[i] = el;
                 }}
@@ -196,6 +197,7 @@ function Navbar() {
                   <NavLink
                     key={menu.to}
                     to={menu.to}
+                    end={menu.to === "/"}
                     onClick={closeMobile}
                     style={{ animationDelay: `${i * 45}ms` }}
                     className={({ isActive }) =>

@@ -57,8 +57,8 @@ function AboutPage() {
           </h2>
           <div className="mt-3 grid gap-x-10 gap-y-3 text-gray-700 leading-relaxed md:grid-cols-2">
             <p>
-              Banyak acara — konser, seminar, esports, workshop, festival,
-              sampai acara komunitas — masih mengalami kesulitan dalam penjualan
+              Banyak acara konser, seminar, esports, workshop, festival,
+              sampai acara komunitas masih mengalami kesulitan dalam penjualan
               tiket dan pengelolaan peserta. Sebagian besar penyelenggara masih
               menggunakan sistem manual yang kurang efisien dan sulit dipantau
               secara real-time.
@@ -92,7 +92,7 @@ function AboutPage() {
               },
               {
                 title: "Biaya yang adil",
-                desc: "Transparan dan terjangkau — kamu hanya bayar saat tiket terjual.",
+                desc: "Transparan dan terjangkau kamu hanya bayar saat tiket terjual.",
               },
             ].map((m) => (
               <li
@@ -206,7 +206,7 @@ function AboutPage() {
           className="rounded-3xl bg-gradient-to-br from-brand-500 to-brand-700 p-6 text-white sm:p-10"
         >
           <h2 className="text-xl font-bold sm:text-2xl">
-            Siap meramein-kan harimu?
+            Siap Ramein harimu?
           </h2>
           <p className="mt-2 max-w-2xl text-white/90">
             Jelajahi ribuan event di seluruh Indonesia, atau buat event sendiri

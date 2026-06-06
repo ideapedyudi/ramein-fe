@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { clearTokens, getAccessToken } from '../lib/authStorage'
 import {
   fetchCurrentUser,
+  googleAuthUser,
   loginUser,
   logout as logoutAction,
   registerUser,
@@ -30,6 +31,7 @@ export function AuthProvider({ children }) {
       hasCheckedSession,
       login: (credentials) => dispatch(loginUser(credentials)).unwrap(),
       register: (payload) => dispatch(registerUser(payload)).unwrap(),
+      googleAuth: (payload) => dispatch(googleAuthUser(payload)).unwrap(),
       logout: () => {
         clearTokens()
         dispatch(logoutAction())
