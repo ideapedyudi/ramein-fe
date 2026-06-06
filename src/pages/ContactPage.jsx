@@ -43,7 +43,7 @@ function ContactPage() {
             <p className="mt-3 max-w-md text-white/90">
               Punya <strong>saran</strong> untuk Ramein atau ada{" "}
               <strong>pertanyaan</strong> seputar event, tiket, atau kerja sama?
-              Langsung chat tim kami lewat WhatsApp — kami balas secepatnya di
+              Langsung chat tim kami lewat WhatsApp kami balas secepatnya di
               jam operasional.
             </p>
             <p className="mt-4 text-lg font-semibold">{WHATSAPP_DISPLAY}</p>

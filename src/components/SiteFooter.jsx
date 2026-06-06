@@ -61,7 +61,7 @@ function SiteFooter() {
         <FooterColumn title="Support" items={supportItems} />
       </div>
       <div className="border-t border-[#efefef] py-4 text-center text-xs text-[#888] md:py-6 md:text-lg">
-        (c) 2026 Ramein. All rights reserved.
+        © 2026 Ramein. All rights reserved.
       </div>
     </footer>
   );

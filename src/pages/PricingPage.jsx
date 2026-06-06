@@ -19,7 +19,7 @@ const perks = [
   {
     icon: "📲",
     title: "Semua Fitur Termasuk",
-    desc: "QR Code, validasi tiket, halaman event, dan laporan penjualan — semua sudah termasuk.",
+    desc: "QR Code, validasi tiket, halaman event, dan laporan penjualan semua sudah termasuk.",
   },
 ];
 
@@ -181,7 +181,7 @@ function PricingPage() {
                 Berapa biaya publikasinya?
               </h3>
               <p className="mt-1 text-sm text-gray-600">
-                Biaya publikasi bersifat <strong>khusus per event</strong> —
+                Biaya publikasi bersifat <strong>khusus per event </strong> 
                 kami diskusikan dulu bersama kamu menyesuaikan skala dan
                 kebutuhan acara. Hubungi tim kami untuk penawaran.
               </p>
