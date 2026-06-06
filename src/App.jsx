@@ -32,6 +32,7 @@ import AdminFinancePage from './pages/admin/AdminFinancePage'
 import AdminKategoriPage from './pages/admin/AdminKategoriPage'
 import AdminKotaPage from './pages/admin/AdminKotaPage'
 import AdminOrganizerPage from './pages/admin/AdminOrganizerPage'
+import AdminUsersPage from './pages/admin/AdminUsersPage'
 
 function App() {
   return (
@@ -167,6 +168,14 @@ function App() {
         element={
           <ProtectedRoute requireAdmin>
             <AdminOrganizerPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/users"
+        element={
+          <ProtectedRoute requireAdmin>
+            <AdminUsersPage />
           </ProtectedRoute>
         }
       />

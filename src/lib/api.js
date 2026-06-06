@@ -861,6 +861,25 @@ const getFeedbackCollection = (payload) => {
   return []
 }
 
+const toAdminUserFromApi = (entry) => ({
+  id: entry.id,
+  name: entry.name ?? "-",
+  email: entry.email ?? "-",
+  phone: entry.phone ?? "-",
+  role: entry.role ?? "-",
+  isActive: Boolean(entry.isActive ?? entry.is_active),
+  createdAt: entry.createdAt ?? entry.created_at ?? null,
+  updatedAt: entry.updatedAt ?? entry.updated_at ?? null,
+})
+
+const getAdminUserCollection = (payload, key) => {
+  if (Array.isArray(payload)) return payload
+  if (Array.isArray(payload?.data)) return payload.data
+  if (Array.isArray(payload?.data?.[key])) return payload.data[key]
+  if (Array.isArray(payload?.[key])) return payload[key]
+  return []
+}
+
 const publicCatalog = () =>
   eventCatalog.filter((e) => e.visibility === "public");
 
@@ -991,6 +1010,19 @@ export const api = {
     }).then((res) => res.data ?? res),
   getFeedbacks: () =>
     apiRequest("/feedback").then((res) => getFeedbackCollection(res).map(toFeedbackFromApi)),
+  getAdminUsers: () =>
+    apiRequest("/users/admin/users").then((res) =>
+      getAdminUserCollection(res, "users").map(toAdminUserFromApi),
+    ),
+  getAdminAdmins: () =>
+    apiRequest("/users/admin/admins").then((res) =>
+      getAdminUserCollection(res, "admins").map(toAdminUserFromApi),
+    ),
+  createAdminUser: ({ name, email, password, phone }) =>
+    apiRequest("/users/admin/admins", {
+      method: "POST",
+      body: JSON.stringify({ name, email, password, phone }),
+    }).then((res) => (res.data ? toAdminUserFromApi(res.data) : toAdminUserFromApi(res))),
   getCategories: () => delay(apiCategories),
   getRegions: () => delay(apiRegions),
   searchEvents: ({ category, wilayah, kota, date }) => {
