@@ -74,6 +74,8 @@ function LoginPage() {
       <form className="space-y-5" onSubmit={handleSubmit}>
         <GoogleAuthButton
           disabled={isLoading}
+          enableOneTap
+          context="signin"
           onCredential={handleGoogleCredential}
         />
 

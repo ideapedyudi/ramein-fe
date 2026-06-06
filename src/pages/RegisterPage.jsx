@@ -94,6 +94,8 @@ function RegisterPage() {
       <form className="space-y-4" onSubmit={handleSubmit}>
         <GoogleAuthButton
           disabled={isLoading}
+          enableOneTap
+          context="signup"
           onCredential={handleGoogleCredential}
         />
 

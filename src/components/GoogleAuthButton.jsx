@@ -26,7 +26,7 @@ function loadGoogleScript() {
   })
 }
 
-function GoogleAuthButton({ onCredential, disabled }) {
+function GoogleAuthButton({ onCredential, disabled, enableOneTap = false, context = 'signin' }) {
   const buttonRef = useRef(null)
   const [error, setError] = useState('')
   const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID
@@ -44,6 +44,7 @@ function GoogleAuthButton({ onCredential, disabled }) {
 
         window.google.accounts.id.initialize({
           client_id: clientId,
+          context,
           callback: (response) => {
             if (response?.credential) onCredential(response.credential)
           },
@@ -55,6 +56,10 @@ function GoogleAuthButton({ onCredential, disabled }) {
           text: 'continue_with',
           shape: 'rectangular',
         })
+
+        if (enableOneTap) {
+          window.google.accounts.id.prompt()
+        }
       })
       .catch(() => {
         if (!cancelled) setError('Gagal memuat Google Login.')
@@ -62,8 +67,11 @@ function GoogleAuthButton({ onCredential, disabled }) {
 
     return () => {
       cancelled = true
+      if (enableOneTap && window.google?.accounts?.id) {
+        window.google.accounts.id.cancel()
+      }
     }
-  }, [clientId, onCredential])
+  }, [clientId, context, enableOneTap, onCredential])
 
   const message = clientId ? error : 'Google Client ID belum dikonfigurasi.'
 
