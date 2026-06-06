@@ -142,12 +142,12 @@ function PaymentModal({ open, transaction, onClose }) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4 py-6"
+      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/60 px-4 py-6"
       onClick={onClose}
       role="presentation"
     >
       <div
-        className="flex max-h-[90vh] w-full max-w-5xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl"
+        className="my-auto flex w-full max-w-5xl flex-col rounded-2xl bg-white shadow-2xl"
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
@@ -180,7 +180,7 @@ function PaymentModal({ open, transaction, onClose }) {
           </button>
         </div>
 
-        <div className="grid flex-1 gap-4 overflow-y-auto p-4 sm:p-5 lg:grid-cols-[1fr_280px]">
+        <div className="grid gap-4 p-4 sm:p-5 lg:grid-cols-[1fr_280px]">
           <div className="overflow-hidden rounded-xl border border-gray-200 bg-gray-50">
             <iframe
               src={transaction.redirectUrl}
