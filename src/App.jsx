@@ -11,6 +11,7 @@ import BuatEventPage from './pages/BuatEventPage'
 import CheckoutPage from './pages/CheckoutPage'
 import ContactPage from './pages/ContactPage'
 import DashboardPage from './pages/DashboardPage'
+import EditEventPage from './pages/EditEventPage'
 import EventDetailPage from './pages/EventDetailPage'
 import EventKamuDetailPage from './pages/EventKamuDetailPage'
 import EventKamuPage from './pages/EventKamuPage'
@@ -32,6 +33,7 @@ import AdminFinancePage from './pages/admin/AdminFinancePage'
 import AdminKategoriPage from './pages/admin/AdminKategoriPage'
 import AdminKotaPage from './pages/admin/AdminKotaPage'
 import AdminOrganizerPage from './pages/admin/AdminOrganizerPage'
+import AdminUsersPage from './pages/admin/AdminUsersPage'
 
 function App() {
   return (
@@ -137,6 +139,14 @@ function App() {
         }
       />
       <Route
+        path="/event-kamu/:eventId/edit"
+        element={
+          <ProtectedRoute>
+            <EditEventPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
         path="/event-kamu/:eventId"
         element={
           <ProtectedRoute>
@@ -167,6 +177,14 @@ function App() {
         element={
           <ProtectedRoute requireAdmin>
             <AdminOrganizerPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/users"
+        element={
+          <ProtectedRoute requireAdmin>
+            <AdminUsersPage />
           </ProtectedRoute>
         }
       />

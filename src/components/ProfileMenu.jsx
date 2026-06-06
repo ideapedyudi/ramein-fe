@@ -10,6 +10,7 @@ import {
   FaSignOutAlt,
   FaTachometerAlt,
   FaTicketAlt,
+  FaUsers,
 } from "react-icons/fa";
 
 function initialsOf(name = "") {
@@ -43,6 +44,7 @@ function ProfileMenu({ user, isAdmin, onLogout, variant = "desktop" }) {
         { label: "Kategori", to: "/admin/kategori", icon: FaReceipt },
         { label: "Kota", to: "/admin/kota", icon: FaReceipt },
         { label: "Organizer", to: "/admin/organizer", icon: FaCalendarAlt },
+        { label: "User", to: "/admin/users", icon: FaUsers },
         { label: "Finance", to: "/admin/finance", icon: FaChartLine },
         { label: "Feedback", to: "/admin/feedback", icon: FaComments },
         { label: "Event Dikelola", to: "/event-kamu", icon: FaCalendarAlt },

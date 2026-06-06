@@ -16,6 +16,7 @@ import {
   FaSignOutAlt,
   FaTachometerAlt,
   FaTicketAlt,
+  FaUsers,
   FaUserShield,
 } from "react-icons/fa";
 import { useAuth } from "../context/authContext";
@@ -42,6 +43,7 @@ const adminNav = [
   { to: "/admin/kategori", label: "Kategori", icon: FaListUl },
   { to: "/admin/kota", label: "Kota", icon: FaCity },
   { to: "/admin/organizer", label: "Organizer", icon: FaBuilding },
+  { to: "/admin/users", label: "User", icon: FaUsers },
   { to: "/admin/finance", label: "Finance", icon: FaChartLine },
   { to: "/admin/feedback", label: "Feedback", icon: FaComments },
   { to: "/event-kamu", label: "Event Dikelola", icon: FaCalendarAlt },
