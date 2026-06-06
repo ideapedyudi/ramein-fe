@@ -44,7 +44,6 @@ const adminNav = [
   { to: "/admin/finance", label: "Finance", icon: FaChartLine },
   { to: "/event-kamu", label: "Event Dikelola", icon: FaCalendarAlt },
   { to: "/buat-event", label: "Buat Event", icon: FaPlusCircle },
-  { to: "/admin/withdraw", label: "Withdraw", icon: FaMoneyBillWave },
 ];
 
 const footerNav = [{ to: "/pengaturan", label: "Pengaturan", icon: FaCog }];

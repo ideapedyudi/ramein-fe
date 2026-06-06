@@ -31,7 +31,6 @@ import AdminFinancePage from './pages/admin/AdminFinancePage'
 import AdminKategoriPage from './pages/admin/AdminKategoriPage'
 import AdminKotaPage from './pages/admin/AdminKotaPage'
 import AdminOrganizerPage from './pages/admin/AdminOrganizerPage'
-import AdminWithdrawPage from './pages/admin/AdminWithdrawPage'
 
 function App() {
   return (
@@ -88,7 +87,7 @@ function App() {
       <Route
         path="/withdraw"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute userOnly>
             <WithdrawPage />
           </ProtectedRoute>
         }
@@ -178,15 +177,6 @@ function App() {
           </ProtectedRoute>
         }
       />
-      <Route
-        path="/admin/withdraw"
-        element={
-          <ProtectedRoute requireAdmin>
-            <AdminWithdrawPage />
-          </ProtectedRoute>
-        }
-      />
-
       <Route
         path="/login"
         element={

@@ -45,7 +45,6 @@ function ProfileMenu({ user, isAdmin, onLogout, variant = "desktop" }) {
         { label: "Finance", to: "/admin/finance", icon: FaChartLine },
         { label: "Event Dikelola", to: "/event-kamu", icon: FaCalendarAlt },
         { label: "Buat Event", to: "/buat-event", icon: FaTicketAlt },
-        { label: "Withdraw", to: "/admin/withdraw", icon: FaMoneyBillWave },
         { label: "Pengaturan", to: "/pengaturan", icon: FaCog },
       ]
     : [
