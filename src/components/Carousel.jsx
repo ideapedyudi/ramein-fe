@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { flushSync } from 'react-dom'
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi'
 
 function resolveResponsive(value, viewportWidth) {
@@ -30,6 +31,7 @@ function Carousel({
 }) {
   const itemCount = items?.length ?? 0
   const viewportRef = useRef(null)
+  const trackRef = useRef(null)
   const [viewportWidth, setViewportWidth] = useState(0)
   const [isTransitionEnabled, setIsTransitionEnabled] = useState(true)
   const [isHovered, setIsHovered] = useState(false)
@@ -76,25 +78,51 @@ function Carousel({
     ? (((currentIndex - cloneCount) % itemCount) + itemCount) % itemCount
     : displayIndex
 
-  const goNext = useCallback(() => {
+  // Map an extended-track index to its equivalent in the real (home) range.
+  const homeIndexOf = (i) =>
+    cloneCount + ((((i - cloneCount) % itemCount) + itemCount) % itemCount)
+
+  // If we're sitting on a clone, jump (without animation) to the identical real
+  // slide and force a synchronous reflow. This makes the next animated step move
+  // exactly one slide instead of letting a fast tap run the index off the end of
+  // the cloned buffer into empty space (the white-screen bug). Returns true if it
+  // snapped, so callers know the index has already been advanced to home.
+  const rebaseOffClone = () => {
+    if (!canLoop) return false
+    if (currentIndex >= cloneCount && currentIndex < cloneCount + itemCount) {
+      return false
+    }
+    flushSync(() => {
+      setIsTransitionEnabled(false)
+      setCurrentIndex(homeIndexOf(currentIndex))
+    })
+    // Touch layout so the browser commits the snapped transform as the baseline.
+    void trackRef.current?.offsetWidth
+    return true
+  }
+
+  const goNext = () => {
+    rebaseOffClone()
     setIsTransitionEnabled(true)
     if (canLoop) {
       setCurrentIndex((i) => i + 1)
     } else {
       setCurrentIndex((i) => Math.min(maxIndex, i + 1))
     }
-  }, [canLoop, maxIndex])
+  }
 
-  const goPrev = useCallback(() => {
+  const goPrev = () => {
+    rebaseOffClone()
     setIsTransitionEnabled(true)
     if (canLoop) {
       setCurrentIndex((i) => i - 1)
     } else {
       setCurrentIndex((i) => Math.max(0, i - 1))
     }
-  }, [canLoop])
+  }
 
   const goToDot = (dotIndex) => {
+    rebaseOffClone()
     setIsTransitionEnabled(true)
     if (canLoop) setCurrentIndex(dotIndex + cloneCount)
     else setCurrentIndex(Math.min(Math.max(dotIndex, 0), maxIndex))
@@ -105,13 +133,20 @@ function Carousel({
     const timer = window.setInterval(() => {
       setIsTransitionEnabled(true)
       setCurrentIndex((i) => {
-        if (canLoop) return i + 1
+        if (canLoop) {
+          // Always advance from the real (home) copy. If reduced-motion is on,
+          // no transitionend fires to reset us off a clone, so normalize here to
+          // keep autoplay from walking off the end of the cloned buffer.
+          const home =
+            cloneCount + ((((i - cloneCount) % itemCount) + itemCount) % itemCount)
+          return home + 1
+        }
         if (i >= maxIndex) return 0
         return i + 1
       })
     }, autoPlayInterval)
     return () => window.clearInterval(timer)
-  }, [autoPlay, autoPlayInterval, canLoop, isHovered, isDragging, itemCount, maxIndex])
+  }, [autoPlay, autoPlayInterval, canLoop, cloneCount, isHovered, isDragging, itemCount, maxIndex])
 
   useEffect(() => {
     if (isTransitionEnabled) return undefined
@@ -166,6 +201,15 @@ function Carousel({
       dragMovedRef.current = true
       setIsDragging(true)
       setIsTransitionEnabled(false)
+      // Rebase off any clone before dragging (seamless — clone and real slide
+      // are pixel-identical) so repeated fast swipes can never drift the index
+      // past the cloned buffer.
+      if (
+        canLoop &&
+        (currentIndex < cloneCount || currentIndex >= cloneCount + itemCount)
+      ) {
+        setCurrentIndex(homeIndexOf(currentIndex))
+      }
       try {
         start.target.setPointerCapture?.(start.pointerId)
       } catch {
@@ -243,6 +287,7 @@ function Carousel({
         onClickCapture={onClickCapture}
       >
         <div
+          ref={trackRef}
           className={`flex items-start ${
             isTransitionEnabled
               ? 'motion-safe:transition-transform motion-safe:duration-500 motion-safe:ease-[cubic-bezier(0.22,1,0.36,1)]'
