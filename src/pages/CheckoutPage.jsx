@@ -181,11 +181,11 @@ function PaymentModal({ open, transaction, onClose }) {
         </div>
 
         <div className="grid flex-1 gap-4 overflow-y-auto p-4 sm:p-5 lg:grid-cols-[1fr_280px]">
-          <div className="min-h-[60vh] overflow-hidden rounded-xl border border-gray-200 bg-gray-50">
+          <div className="overflow-hidden rounded-xl border border-gray-200 bg-gray-50">
             <iframe
               src={transaction.redirectUrl}
               title="Midtrans payment"
-              className="h-full min-h-[70vh] w-full"
+              className="h-205 max-h-none w-full"
               referrerPolicy="no-referrer"
             />
           </div>
