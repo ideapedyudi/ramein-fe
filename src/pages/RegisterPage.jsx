@@ -59,7 +59,7 @@ function RegisterPage() {
       });
 
       if (accessToken) {
-        navigate(user?.role === "admin" ? "/dashboard" : "/home", {
+        navigate(user?.role === "admin" ? "/dashboard" : "/", {
           replace: true,
         });
         return;
@@ -76,7 +76,7 @@ function RegisterPage() {
       setError("");
       try {
         const { user } = await googleAuth({ credential });
-        navigate(user?.role === "admin" ? "/dashboard" : "/home", {
+        navigate(user?.role === "admin" ? "/dashboard" : "/", {
           replace: true,
         });
       } catch (err) {

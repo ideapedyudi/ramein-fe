@@ -13,7 +13,7 @@ function ProtectedRoute({ children, requireAdmin = false, userOnly = false }) {
     return <Navigate to="/login" state={{ from: location.pathname }} replace />
   }
   if (requireAdmin && !isAdmin) {
-    return <Navigate to="/home" replace />
+    return <Navigate to="/" replace />
   }
   if (userOnly && isAdmin) {
     return <Navigate to="/dashboard" replace />

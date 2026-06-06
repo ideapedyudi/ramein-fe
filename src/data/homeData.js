@@ -6,7 +6,7 @@ import banner4 from "../assets/banner4.webp";
 import { apiCategories, apiRegions, eventCatalog } from "../lib/api";
 
 export const navMenus = [
-  { label: "Beranda", to: "/home" },
+  { label: "Beranda", to: "/" },
   { label: "Jelajah", to: "/jelajahi" },
   { label: "Untuk Kamu", to: "/untuk-kamu" },
   { label: "Tentang", to: "/about" },

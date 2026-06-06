@@ -82,7 +82,7 @@ function SidebarContent({ user, isAdmin, onLogout, onNavigate }) {
   return (
     <div className="flex h-full flex-col">
       <Link
-        to="/home"
+        to="/"
         onClick={onNavigate}
         className="flex items-center gap-2 border-b border-[#eee] px-5 py-4"
       >
@@ -123,7 +123,7 @@ function SidebarContent({ user, isAdmin, onLogout, onNavigate }) {
           </div>
         </div>
         <Link
-          to="/home"
+          to="/"
           onClick={onNavigate}
           className="mt-2 flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium text-[#6d6d6d] transition hover:bg-[#f4f4f4] hover:text-[#1f1f1f]"
         >
@@ -159,7 +159,7 @@ function AdminLayout({ title, subtitle, actions, children }) {
 
   function handleLogout() {
     logout();
-    navigate("/home");
+    navigate("/");
   }
 
   return (

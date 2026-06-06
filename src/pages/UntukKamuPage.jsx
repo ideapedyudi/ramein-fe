@@ -39,7 +39,7 @@ function UntukKamuPage() {
         const available = res.map((category) => category.name).filter(Boolean)
         const stored = getStoredInterests().filter((item) => available.includes(item))
         setCategories(res)
-        setSelectedCategories(stored.length > 0 ? stored : "Music" ? "Music" : [])
+        setSelectedCategories(stored.length > 0 ? stored : available.includes('Music') ? ['Music'] : [])
       })
       .catch((err) => {
         if (!cancelled) setError(err.message || 'Gagal memuat kategori minat.')
@@ -63,13 +63,15 @@ function UntukKamuPage() {
     if (loadingCategories) return
 
     let cancelled = false
-    setLoadingEvents(true)
-    setError('')
 
-    api
-      .getEventsByInterest(selectedCategories)
+    Promise.resolve().then(() => {
+      if (cancelled) return null
+      setLoadingEvents(true)
+      setError('')
+      return api.getEventsByInterest(selectedCategories)
+    })
       .then((res) => {
-        if (!cancelled) setEvents(res)
+        if (!cancelled && res) setEvents(res)
       })
       .catch((err) => {
         if (!cancelled) {

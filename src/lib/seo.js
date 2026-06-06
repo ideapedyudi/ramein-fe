@@ -1,9 +1,9 @@
 import { useEffect } from 'react'
 
 const SITE_NAME = 'Ramein'
-const DEFAULT_TITLE = 'Ramein - Platform Tiket Event Indonesia'
+const DEFAULT_TITLE = 'Ramein - Beli Tiket Event, Konser, Festival & Workshop'
 const DEFAULT_DESCRIPTION =
-  'Ramein adalah platform tiket event Indonesia untuk menemukan, menjelajahi, dan membeli tiket event dengan cepat dan aman.'
+  'Ramein adalah platform tiket event Indonesia untuk menemukan konser, festival, seminar, workshop, esports, dan membeli tiket event online dengan cepat dan aman.'
 const DEFAULT_IMAGE_PATH = '/favicon.svg'
 
 function trimTrailingSlash(value) {
@@ -16,7 +16,7 @@ export function getSiteUrl() {
   if (typeof window !== 'undefined' && window.location?.origin) {
     return trimTrailingSlash(window.location.origin)
   }
-  return 'https://www.ramein.fun'
+  return 'https://ramein.fun'
 }
 
 export function toAbsoluteUrl(path = '/') {
@@ -74,7 +74,11 @@ export function usePageSeo({
   jsonLdId = 'ramein-seo-jsonld',
 }) {
   useEffect(() => {
-    const finalTitle = title ? `${title} | ${SITE_NAME}` : DEFAULT_TITLE
+    const finalTitle = title
+      ? title.toLowerCase().includes(SITE_NAME.toLowerCase())
+        ? title
+        : `${title} | ${SITE_NAME}`
+      : DEFAULT_TITLE
     const finalDescription = description ?? DEFAULT_DESCRIPTION
     const canonicalUrl = toAbsoluteUrl(canonicalPath)
     const ogImage = toAbsoluteUrl(image)
@@ -121,4 +125,3 @@ export function usePageSeo({
     type,
   ])
 }
-

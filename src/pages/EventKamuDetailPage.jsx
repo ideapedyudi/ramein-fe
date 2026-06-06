@@ -163,7 +163,7 @@ function ScanAttendanceModal({ open, onClose, onScanSuccess }) {
         onDecodeResult() { },
         onError() { },
       },
-    [cameraRetry, mode, open, scanLocked, submitQrCode, submitting],
+    [mode, open, scanLocked, submitQrCode, submitting],
   )
   const { ref } = useZxing(scannerOptions)
 

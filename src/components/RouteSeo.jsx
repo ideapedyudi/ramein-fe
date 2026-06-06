@@ -1,17 +1,23 @@
 import { useMemo } from 'react'
 import { useLocation } from 'react-router-dom'
+import { navMenus } from '../data/homeData'
 import { getSiteUrl, usePageSeo } from '../lib/seo'
 
 const routeSeo = {
-  '/home': {
-    title: 'Ramein - Platform Tiket Event Indonesia',
+  '/': {
+    title: 'Ramein - Beli Tiket Event, Konser, Festival & Workshop',
     description:
-      'Temukan dan beli tiket event konser, seminar, workshop, dan festival di seluruh Indonesia dengan cepat dan aman.',
+      'Temukan dan beli tiket event konser, festival, seminar, workshop, esports, dan acara komunitas di seluruh Indonesia dengan cepat dan aman.',
+  },
+  '/home': {
+    title: 'Ramein - Beli Tiket Event, Konser, Festival & Workshop',
+    description:
+      'Temukan dan beli tiket event konser, festival, seminar, workshop, esports, dan acara komunitas di seluruh Indonesia dengan cepat dan aman.',
   },
   '/jelajahi': {
-    title: 'Jelajahi Event Terbaru',
+    title: 'Jelajahi Event Terbaru di Indonesia',
     description:
-      'Cari event berdasarkan kategori dan wilayah, lalu temukan acara yang paling cocok untuk kamu.',
+      'Cari event terbaru berdasarkan kategori, kota, wilayah, dan tanggal, lalu beli tiket event yang paling cocok untuk kamu.',
   },
   '/untuk-kamu': {
     title: 'Rekomendasi Event Untuk Kamu',
@@ -46,6 +52,7 @@ const routeSeo = {
 }
 
 const noIndexPrefixes = [
+  '/admin',
   '/login',
   '/register',
   '/checkout',
@@ -53,6 +60,7 @@ const noIndexPrefixes = [
   '/dashboard',
   '/tiket-saya',
   '/transaksi',
+  '/withdraw',
   '/pengaturan',
   '/buat-event',
   '/event-kamu',
@@ -71,9 +79,9 @@ function RouteSeo() {
 
     return (
       routeSeo[pathname] ?? {
-        title: 'Ramein - Platform Tiket Event Indonesia',
+        title: 'Ramein - Beli Tiket Event, Konser, Festival & Workshop',
         description:
-          'Platform tiket event Indonesia untuk menemukan, menjelajahi, dan membeli tiket event online.',
+          'Platform tiket event Indonesia untuk menemukan, menjelajahi, dan membeli tiket event online dengan cepat dan aman.',
       }
     )
   }, [pathname])
@@ -82,26 +90,49 @@ function RouteSeo() {
     (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
   )
 
+  const siteUrl = getSiteUrl()
+  const canonicalPath = pathname === '/home' ? '/' : pathname
+
   const homeJsonLd =
-    pathname === '/home' || pathname === '/'
+    canonicalPath === '/'
       ? {
           '@context': 'https://schema.org',
           '@graph': [
             {
               '@type': 'Organization',
               name: 'Ramein',
-              url: getSiteUrl(),
-              logo: `${getSiteUrl()}/favicon.svg`,
+              url: siteUrl,
+              logo: `${siteUrl}/favicon.svg`,
+              email: 'halo@ramein.fun',
+              contactPoint: {
+                '@type': 'ContactPoint',
+                contactType: 'customer support',
+                email: 'halo@ramein.fun',
+                availableLanguage: ['Indonesian'],
+              },
             },
             {
               '@type': 'WebSite',
               name: 'Ramein',
-              url: getSiteUrl(),
+              url: siteUrl,
               potentialAction: {
                 '@type': 'SearchAction',
-                target: `${getSiteUrl()}/jelajahi?search={search_term_string}`,
+                target: `${siteUrl}/jelajahi?search={search_term_string}`,
                 'query-input': 'required name=search_term_string',
               },
+            },
+            {
+              '@type': 'ItemList',
+              name: 'Menu utama Ramein',
+              itemListElement: navMenus.map((menu, index) => ({
+                '@type': 'ListItem',
+                position: index + 1,
+                item: {
+                  '@type': 'SiteNavigationElement',
+                  name: menu.label,
+                  url: `${siteUrl}${menu.to}`,
+                },
+              })),
             },
           ],
         }
@@ -110,7 +141,7 @@ function RouteSeo() {
   usePageSeo({
     title: config.title,
     description: config.description,
-    canonicalPath: pathname,
+    canonicalPath,
     noIndex,
     jsonLd: homeJsonLd,
     jsonLdId: 'ramein-home-jsonld',
@@ -120,4 +151,3 @@ function RouteSeo() {
 }
 
 export default RouteSeo
-

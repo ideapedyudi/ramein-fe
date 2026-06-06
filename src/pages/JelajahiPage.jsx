@@ -37,6 +37,7 @@ function JelajahiPage() {
   const [error, setError] = useState('')
 
   const filters = {
+    search: params.get('search') ?? params.get('q') ?? undefined,
     category: params.get('category') ?? params.get('kategori') ?? undefined,
     wilayah: params.get('wilayah') ?? params.get('region') ?? undefined,
     kota: params.get('kota') ?? params.get('city') ?? undefined,
@@ -45,6 +46,7 @@ function JelajahiPage() {
 
   useEffect(() => {
     const aliases = [
+      ['q', 'search'],
       ['kategori', 'category'],
       ['region', 'wilayah'],
       ['city', 'kota'],
@@ -72,10 +74,14 @@ function JelajahiPage() {
   useEffect(() => {
     let cancelled = false
 
-    setMasterLoading(true)
-    Promise.all([api.getMasterCategories(), api.getMasterCities()])
-      .then(([categoryRes, cityRes]) => {
-        if (cancelled) return
+    Promise.resolve().then(() => {
+      if (cancelled) return null
+      setMasterLoading(true)
+      return Promise.all([api.getMasterCategories(), api.getMasterCities()])
+    })
+      .then((result) => {
+        if (cancelled || !result) return
+        const [categoryRes, cityRes] = result
         setCategories(categoryRes)
         setCities(cityRes)
       })
@@ -93,18 +99,22 @@ function JelajahiPage() {
 
   useEffect(() => {
     let cancelled = false
-    setLoading(true)
-    setError('')
 
-    api
-      .searchEvents({
+    Promise.resolve().then(() => {
+      if (cancelled) return null
+      setLoading(true)
+      setError('')
+
+      return api.searchEvents({
+        search: filters.search,
         category: filters.category,
         wilayah: filters.wilayah,
         kota: filters.kota,
         date: filters.date,
       })
+    })
       .then((res) => {
-        if (!cancelled) setEvents(res)
+        if (!cancelled && res) setEvents(res)
       })
       .catch((err) => {
         if (!cancelled) {
@@ -118,7 +128,7 @@ function JelajahiPage() {
     return () => {
       cancelled = true
     }
-  }, [filters.category, filters.wilayah, filters.kota, filters.date])
+  }, [filters.search, filters.category, filters.wilayah, filters.kota, filters.date])
 
   const cityOptions = useMemo(() => {
     return cities
@@ -146,7 +156,7 @@ function JelajahiPage() {
         <Container>
           <h1 className="text-3xl font-bold sm:text-4xl">Jelajahi Event</h1>
           <p className="mt-1 text-sm text-white/90 sm:text-base">
-            Temukan ribuan event menarik di seluruh Indonesia
+            Temukan event menarik di seluruh Indonesia berdasarkan nama, kategori, kota, dan tanggal
           </p>
         </Container>
       </section>
@@ -154,7 +164,17 @@ function JelajahiPage() {
       <Container className="py-8 sm:py-10">
         <div className="rounded-2xl border border-black/5 bg-white p-4 shadow-sm sm:p-6">
           <h2 className="text-base font-semibold text-gray-900 sm:text-lg">Filter Event</h2>
-          <div className="mt-4 grid gap-4 sm:grid-cols-2 md:grid-cols-4">
+          <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+            <div>
+              <label className="mb-1.5 block text-sm font-medium text-gray-700">Cari Event</label>
+              <input
+                type="search"
+                value={filters.search ?? ''}
+                onChange={(event) => update('search', event.target.value)}
+                placeholder="Konser, seminar, workshop..."
+                className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
+              />
+            </div>
             <Select
               label="Kategori"
               value={filters.category ?? ''}
@@ -204,7 +224,7 @@ function JelajahiPage() {
           <p className="text-sm text-gray-600">
             {loading ? 'Memuat event...' : `Menampilkan ${events.length} event`}
           </p>
-          {(filters.category || filters.wilayah || filters.kota || filters.date) && (
+          {(filters.search || filters.category || filters.wilayah || filters.kota || filters.date) && (
             <Link to="/jelajahi" className="text-sm font-medium text-brand-600 hover:underline">
               Hapus filter
             </Link>

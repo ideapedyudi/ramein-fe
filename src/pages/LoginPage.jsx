@@ -21,7 +21,7 @@ function LoginPage() {
     (user) => {
       const adminOnly =
         requestedPath?.startsWith("/admin") || requestedPath === "/dashboard";
-      const fallback = user.role === "admin" ? "/dashboard" : "/home";
+      const fallback = user.role === "admin" ? "/dashboard" : "/";
       const destination =
         requestedPath && !(adminOnly && user.role !== "admin")
           ? requestedPath

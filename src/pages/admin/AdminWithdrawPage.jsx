@@ -46,7 +46,13 @@ function AdminWithdrawPage() {
   }, [])
 
   useEffect(() => {
-    loadWithdraws()
+    let cancelled = false
+    Promise.resolve().then(() => {
+      if (!cancelled) loadWithdraws()
+    })
+    return () => {
+      cancelled = true
+    }
   }, [loadWithdraws])
 
   const filtered = useMemo(() => {

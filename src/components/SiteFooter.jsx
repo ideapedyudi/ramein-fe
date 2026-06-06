@@ -48,7 +48,7 @@ function SiteFooter() {
     <footer className="mt-10 border-t border-[#e8e8e8] bg-white md:mt-16">
       <div className="mx-auto grid w-full max-w-370 gap-6 px-4 py-8 md:grid-cols-4 md:gap-10 md:px-3 md:py-12">
         <div className="flex flex-col items-center text-center md:items-start md:text-left">
-          <Link to="/home" className="flex items-center gap-2">
+          <Link to="/" className="flex items-center gap-2">
             <img src={brandLogo} alt="Ramein Logo" className="w-8 md:w-10" />
             <span className="text-3xl font-bold text-[#2ea387] md:text-4xl">Ramein</span>
           </Link>

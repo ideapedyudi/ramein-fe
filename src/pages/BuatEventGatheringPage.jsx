@@ -176,12 +176,17 @@ function BuatEventGatheringPage() {
 
   useEffect(() => {
     let cancelled = false
-    setLoadingMaster(true)
-    setError('')
 
-    Promise.all([api.getMasterCategories(), api.getMasterOrganizers(), api.getMasterCities()])
-      .then(([categoryRes, organizerRes, cityRes]) => {
-        if (cancelled) return
+    Promise.resolve().then(() => {
+      if (cancelled) return null
+      setLoadingMaster(true)
+      setError('')
+
+      return Promise.all([api.getMasterCategories(), api.getMasterOrganizers(), api.getMasterCities()])
+    })
+      .then((result) => {
+        if (cancelled || !result) return
+        const [categoryRes, organizerRes, cityRes] = result
         setCategories(categoryRes)
         setOrganizers(organizerRes)
         setCities(cityRes)
@@ -207,14 +212,15 @@ function BuatEventGatheringPage() {
   const resolvedTicketPrice = paymentType === 'free' ? 0 : Number(ticketPrice) || 0
   const previewPrice = paymentType === 'free' ? 0 : ticketPrice === '' ? undefined : Number(ticketPrice)
 
-  useEffect(() => {
-    if (paymentType === 'free') {
+  function handlePaymentTypeChange(nextType) {
+    setPaymentType(nextType)
+    if (nextType === 'free') {
       setTicketName((current) => current || 'Free Pass')
       setTicketPrice('')
     } else {
       setTicketName((current) => (current === 'Free Pass' ? 'Regular' : current || 'Regular'))
     }
-  }, [paymentType])
+  }
 
   async function handleBannerChange(file) {
     if (!file) return
@@ -380,8 +386,8 @@ function BuatEventGatheringPage() {
             <div className="rounded-2xl border border-black/5 bg-white p-5 shadow-sm">
               <p className="mb-3 text-sm font-semibold text-gray-900">Pembayaran & Tiket</p>
               <div className="grid gap-2 sm:grid-cols-2">
-                <PriceMode title="Gratis" desc="payment free" selected={paymentType === 'free'} onClick={() => setPaymentType('free')} />
-                <PriceMode title="Berbayar" desc="payment paid" selected={paymentType === 'paid'} onClick={() => setPaymentType('paid')} />
+                <PriceMode title="Gratis" desc="payment free" selected={paymentType === 'free'} onClick={() => handlePaymentTypeChange('free')} />
+                <PriceMode title="Berbayar" desc="payment paid" selected={paymentType === 'paid'} onClick={() => handlePaymentTypeChange('paid')} />
               </div>
 
               <div className="mt-4 grid gap-3 sm:grid-cols-3">
