@@ -20,7 +20,7 @@ import {
   FaUserShield,
 } from "react-icons/fa";
 import { useAuth } from "../context/authContext";
-import brandLogo from "../assets/logobrand2.png";
+import brandLogo from "../assets/logobrand2.webp";
 
 function initialsOf(name = "") {
   const parts = name.trim().split(/\s+/).slice(0, 2);
