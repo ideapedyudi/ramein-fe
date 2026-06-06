@@ -3,6 +3,7 @@ import GuestRoute from './components/GuestRoute'
 import ProtectedRoute from './components/ProtectedRoute'
 import PublicLayout from './components/PublicLayout'
 import RouteSeo from './components/RouteSeo'
+import ScrollToTop from './components/ScrollToTop'
 import TopProgressBar from './components/TopProgressBar'
 import AboutPage from './pages/AboutPage'
 import BuatEventFestivalPage from './pages/BuatEventFestivalPage'
@@ -38,6 +39,7 @@ import AdminUsersPage from './pages/admin/AdminUsersPage'
 function App() {
   return (
     <>
+      <ScrollToTop />
       <TopProgressBar />
       <RouteSeo />
       <Routes>
