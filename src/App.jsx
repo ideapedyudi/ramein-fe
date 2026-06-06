@@ -27,11 +27,11 @@ import TiketSayaPage from './pages/TiketSayaPage'
 import TransaksiPage from './pages/TransaksiPage'
 import UntukKamuPage from './pages/UntukKamuPage'
 import WithdrawPage from './pages/WithdrawPage'
+import AdminFeedbackPage from './pages/admin/AdminFeedbackPage'
 import AdminFinancePage from './pages/admin/AdminFinancePage'
 import AdminKategoriPage from './pages/admin/AdminKategoriPage'
 import AdminKotaPage from './pages/admin/AdminKotaPage'
 import AdminOrganizerPage from './pages/admin/AdminOrganizerPage'
-import AdminWithdrawPage from './pages/admin/AdminWithdrawPage'
 
 function App() {
   return (
@@ -88,7 +88,7 @@ function App() {
       <Route
         path="/withdraw"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute userOnly>
             <WithdrawPage />
           </ProtectedRoute>
         }
@@ -179,14 +179,13 @@ function App() {
         }
       />
       <Route
-        path="/admin/withdraw"
+        path="/admin/feedback"
         element={
           <ProtectedRoute requireAdmin>
-            <AdminWithdrawPage />
+            <AdminFeedbackPage />
           </ProtectedRoute>
         }
       />
-
       <Route
         path="/login"
         element={
