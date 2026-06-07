@@ -76,19 +76,7 @@ function TicketIcon({ className }) {
 }
 
 const paymentMethods = [
-  {
-    value: "ewallet",
-    title: "E-Wallet",
-    desc: "GoPay, OVO, Dana, ShopeePay",
-    Icon: WalletIcon,
-  },
   { value: "qris", title: "QRIS", desc: "Scan to pay", Icon: QrIcon },
-  {
-    value: "bank",
-    title: "Bank Transfer",
-    desc: "BCA, Mandiri, BNI, BRI",
-    Icon: BankIcon,
-  },
 ];
 
 function Card({ children }) {
@@ -250,7 +238,7 @@ function CheckoutPage() {
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
   const [transaction, setTransaction] = useState(null);
 
-  const [payment, setPayment] = useState("ewallet");
+  const [payment, setPayment] = useState("qris");
   const [contact, setContact] = useState({
     email: "",
     firstName: "",
@@ -487,6 +475,27 @@ function CheckoutPage() {
               <h2 className="mb-5 text-lg font-semibold text-gray-900">
                 Order Summary
               </h2>
+              <div
+                className={`mb-4 w-full overflow-hidden rounded-lg bg-gradient-to-br ${
+                  event.bannerHue ?? "from-brand-400 to-brand-600"
+                } ${event.imageUrl ? "" : "aspect-video"}`}
+              >
+                {event.imageUrl ? (
+                  <img
+                    src={event.imageUrl}
+                    alt={event.name}
+                    loading="eager"
+                    decoding="async"
+                    className="block h-auto w-full"
+                  />
+                ) : (
+                  <div className="flex h-full items-end p-4">
+                    <p className="line-clamp-2 text-sm font-semibold text-white">
+                      {event.name}
+                    </p>
+                  </div>
+                )}
+              </div>
               <p className="font-semibold text-gray-900">{event.name}</p>
               <p className="mt-0.5 text-sm text-gray-600">
                 {tier.name} Ticket × {qty}
