@@ -16,6 +16,7 @@ const CONFETTI_DURATION_MS = 2400
 const CONFETTI_SETTLE_DELAY_MS = 1800
 const FEEDBACK_AFTER_CONFETTI_DELAY_MS = CONFETTI_DURATION_MS + CONFETTI_SETTLE_DELAY_MS
 const RSVP_FEEDBACK_DELAY_MS = 1400
+const CONFETTI_COLORS = ['#0a7c6e', '#2fa084', '#46b994', '#ffc94d', '#ffd770']
 
 function fireRealisticConfetti() {
   if (typeof window === 'undefined') return undefined
@@ -26,6 +27,7 @@ function fireRealisticConfetti() {
   const duration = CONFETTI_DURATION_MS
   const animationEnd = Date.now() + duration
   const defaults = {
+    colors: CONFETTI_COLORS,
     disableForReducedMotion: true,
     origin: { y: 0.7 },
     zIndex: 70,
