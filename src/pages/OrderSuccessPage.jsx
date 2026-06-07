@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react'
+import confetti from 'canvas-confetti'
+import { useEffect, useRef, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { api } from '../lib/api'
 import { formatIDR } from '../lib/format'
@@ -10,6 +11,81 @@ const ratingOptions = [
   { value: 'Tidak Puas', emoji: '🙁' },
   { value: 'Sangat Tidak Puas', emoji: '😠' },
 ]
+
+function fireRealisticConfetti() {
+  if (typeof window === 'undefined') return undefined
+
+  const prefersReducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+  if (prefersReducedMotion) return undefined
+
+  const duration = 2400
+  const animationEnd = Date.now() + duration
+  const defaults = {
+    disableForReducedMotion: true,
+    origin: { y: 0.7 },
+    zIndex: 70,
+  }
+
+  const fire = (particleRatio, opts) => {
+    confetti({
+      ...defaults,
+      ...opts,
+      particleCount: Math.floor(220 * particleRatio),
+    })
+  }
+
+  fire(0.25, {
+    spread: 26,
+    startVelocity: 55,
+  })
+  fire(0.2, {
+    spread: 60,
+  })
+  fire(0.35, {
+    decay: 0.91,
+    scalar: 0.8,
+    spread: 100,
+  })
+  fire(0.1, {
+    decay: 0.92,
+    scalar: 1.2,
+    spread: 120,
+    startVelocity: 25,
+  })
+  fire(0.1, {
+    spread: 120,
+    startVelocity: 45,
+  })
+
+  const intervalId = window.setInterval(() => {
+    const timeLeft = animationEnd - Date.now()
+
+    if (timeLeft <= 0) {
+      window.clearInterval(intervalId)
+      return
+    }
+
+    const particleCount = 40 * (timeLeft / duration)
+    confetti({
+      ...defaults,
+      angle: 60,
+      origin: { x: 0, y: 0.72 },
+      particleCount,
+      spread: 55,
+      startVelocity: 38,
+    })
+    confetti({
+      ...defaults,
+      angle: 120,
+      origin: { x: 1, y: 0.72 },
+      particleCount,
+      spread: 55,
+      startVelocity: 38,
+    })
+  }, 250)
+
+  return () => window.clearInterval(intervalId)
+}
 
 function CopyButton({ value }) {
   return (
@@ -175,6 +251,7 @@ function OrderSuccessPage() {
     rating: ratingOptions[0].value,
     review: '',
   })
+  const hasCelebratedRef = useRef(false)
 
   useEffect(() => {
     let cancelled = false
@@ -238,14 +315,23 @@ function OrderSuccessPage() {
   useEffect(() => {
     if (!event || !orderId) return
 
-    Promise.resolve().then(() => {
+    const timeoutId = window.setTimeout(() => {
       setFeedback({
         rating: ratingOptions[0].value,
         review: '',
       })
       setFeedbackOpen(true)
-    })
+    }, 1400)
+
+    return () => window.clearTimeout(timeoutId)
   }, [event, orderId])
+
+  useEffect(() => {
+    if (!event || !orderId || total <= 0 || hasCelebratedRef.current) return
+
+    hasCelebratedRef.current = true
+    return fireRealisticConfetti()
+  }, [event, orderId, total])
 
   useEffect(() => {
     if (!feedbackNotice) return undefined

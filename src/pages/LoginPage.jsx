@@ -114,7 +114,7 @@ function LoginPage() {
 
         <div className="space-y-2 rounded-lg border border-dashed border-emerald-300 bg-emerald-50/60 px-3 py-2.5 text-xs text-[#2b2b2b]">
           <p className="font-semibold uppercase tracking-wider text-emerald-700">
-            Backend sample
+            User Test
           </p>
           <div className="flex items-center justify-between gap-2">
             <span>
