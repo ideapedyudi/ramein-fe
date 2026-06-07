@@ -12,13 +12,17 @@ const ratingOptions = [
   { value: 'Sangat Tidak Puas', emoji: '😠' },
 ]
 
+const CONFETTI_DURATION_MS = 2400
+const FEEDBACK_AFTER_CONFETTI_DELAY_MS = CONFETTI_DURATION_MS + 300
+const RSVP_FEEDBACK_DELAY_MS = 1400
+
 function fireRealisticConfetti() {
   if (typeof window === 'undefined') return undefined
 
   const prefersReducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
   if (prefersReducedMotion) return undefined
 
-  const duration = 2400
+  const duration = CONFETTI_DURATION_MS
   const animationEnd = Date.now() + duration
   const defaults = {
     disableForReducedMotion: true,
@@ -315,16 +319,17 @@ function OrderSuccessPage() {
   useEffect(() => {
     if (!event || !orderId) return
 
+    const feedbackDelay = total > 0 ? FEEDBACK_AFTER_CONFETTI_DELAY_MS : RSVP_FEEDBACK_DELAY_MS
     const timeoutId = window.setTimeout(() => {
       setFeedback({
         rating: ratingOptions[0].value,
         review: '',
       })
       setFeedbackOpen(true)
-    }, 1400)
+    }, feedbackDelay)
 
     return () => window.clearTimeout(timeoutId)
-  }, [event, orderId])
+  }, [event, orderId, total])
 
   useEffect(() => {
     if (!event || !orderId || total <= 0 || hasCelebratedRef.current) return
@@ -420,7 +425,7 @@ function OrderSuccessPage() {
             &#10003;
           </div>
           <h1 className="mt-4 text-2xl font-bold text-gray-900 sm:text-3xl">
-            {isRsvp ? 'RSVP Berhasil!' : 'Pembayaran Berhasil!'}
+            {isRsvp ? 'Hore!!! RSVP Berhasil!' : 'Hore!!! Pembayaran Berhasil!'}
           </h1>
           <p className="mt-2 text-gray-600">
             {isRsvp
