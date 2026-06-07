@@ -33,6 +33,10 @@ function getPublicEventUrl(eventId) {
   return `${window.location.origin}/event/${eventId}`
 }
 
+function getDiscountDisplayPrice(price) {
+  return Math.round((price ?? 0) * 1.2)
+}
+
 async function copyText(value) {
   if (navigator.clipboard?.writeText) {
     await navigator.clipboard.writeText(value)
@@ -261,32 +265,46 @@ function EventDetailPage() {
             <Card>
               <CardHeader title="Select Ticket Tier" />
               <div className="space-y-3">
-                {event.tiers.map((t) => (
-                  <button
-                    key={t.id}
-                    onClick={() => setSelectedTier(t.id)}
-                    className={`w-full rounded-xl border p-4 text-left transition ${
-                      selectedTier === t.id
-                        ? 'border-brand-500 bg-brand-50/40 ring-2 ring-brand-200'
-                        : 'border-gray-200 hover:border-brand-300'
-                    }`}
-                  >
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <h3 className="font-semibold text-gray-900">{t.name}</h3>
-                        <p className="text-xs text-gray-500">{t.quotaAvailable} tickets available</p>
+                {event.tiers.map((t) => {
+                  const discountDisplayPrice = getDiscountDisplayPrice(t.price)
+
+                  return (
+                    <button
+                      key={t.id}
+                      onClick={() => setSelectedTier(t.id)}
+                      className={`w-full rounded-xl border p-4 text-left transition ${
+                        selectedTier === t.id
+                          ? 'border-brand-500 bg-brand-50/40 ring-2 ring-brand-200'
+                          : 'border-gray-200 hover:border-brand-300'
+                      }`}
+                    >
+                      <div className="flex items-start justify-between gap-4">
+                        <div>
+                          <h3 className="font-semibold text-gray-900">{t.name}</h3>
+                          <p className="text-xs text-gray-500">{t.quotaAvailable} tickets available</p>
+                        </div>
+                        <div className="shrink-0 text-right">
+                          <div className="flex flex-wrap items-center justify-end gap-2">
+                            <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold text-emerald-700">
+                              Diskon 20%
+                            </span>
+                            <span className="text-xs font-medium text-gray-400 line-through">
+                              {formatIDR(discountDisplayPrice)}
+                            </span>
+                          </div>
+                          <p className="mt-1 font-bold text-brand-600">{formatIDR(t.price)}</p>
+                        </div>
                       </div>
-                      <span className="font-bold text-brand-600">{formatIDR(t.price)}</span>
-                    </div>
-                    <ul className="mt-2 space-y-1 text-xs text-gray-600">
-                      {t.perks.map((p) => (
-                        <li key={p} className="flex items-center gap-1">
-                          <span className="text-brand-500">●</span> {p}
-                        </li>
-                      ))}
-                    </ul>
-                  </button>
-                ))}
+                      <ul className="mt-2 space-y-1 text-xs text-gray-600">
+                        {t.perks.map((p) => (
+                          <li key={p} className="flex items-center gap-1">
+                            <span className="text-brand-500">●</span> {p}
+                          </li>
+                        ))}
+                      </ul>
+                    </button>
+                  )
+                })}
               </div>
             </Card>
 
