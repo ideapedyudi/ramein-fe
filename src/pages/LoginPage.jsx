@@ -1,3 +1,4 @@
+import confetti from "canvas-confetti";
 import { useCallback, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import AuthLayout from "../components/AuthLayout";
@@ -6,6 +7,83 @@ import { SAMPLE_CREDENTIALS, useAuth } from "../context/authContext";
 
 const inputClass =
   "mt-2 h-10 w-full rounded-xl border border-[#f0f0f0] bg-[#f5f5f5] px-4 text-sm text-[#333333] outline-none placeholder:text-[#9d9d9d] focus:border-emerald-300 md:h-11 md:text-base";
+
+const loginConfettiColors = ["#0a7c6e", "#2fa084", "#46b994", "#ffc94d", "#ffd770"];
+const loginConfettiDurationMs = 1400;
+
+function fireLoginConfetti() {
+  if (typeof window === "undefined") return;
+
+  const prefersReducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+  if (prefersReducedMotion) return;
+
+  const defaults = {
+    colors: loginConfettiColors,
+    disableForReducedMotion: true,
+    shapes: ["square", "circle", "star"],
+    ticks: 240,
+    zIndex: 90,
+  };
+
+  const fireSideCannon = (originX, angle, drift) => {
+    confetti({
+      ...defaults,
+      angle,
+      decay: 0.91,
+      drift,
+      origin: { x: originX, y: 0.82 },
+      particleCount: 28,
+      scalar: 0.85,
+      spread: 54,
+      startVelocity: 44,
+    });
+  };
+
+  fireSideCannon(0, 58, 0.35);
+  fireSideCannon(1, 122, -0.35);
+
+  const animationEnd = Date.now() + loginConfettiDurationMs;
+  const intervalId = window.setInterval(() => {
+    const timeLeft = animationEnd - Date.now();
+
+    if (timeLeft <= 0) {
+      window.clearInterval(intervalId);
+      return;
+    }
+
+    const progress = timeLeft / loginConfettiDurationMs;
+    const particleCount = Math.round(16 * progress);
+
+    fireSideCannon(0, 60, 0.45);
+    fireSideCannon(1, 120, -0.45);
+    if (particleCount > 0) {
+      confetti({
+        ...defaults,
+        angle: 62,
+        decay: 0.93,
+        drift: 0.25,
+        origin: { x: 0, y: 0.64 },
+        particleCount,
+        scalar: 0.68,
+        spread: 44,
+        startVelocity: 22,
+      });
+      confetti({
+        ...defaults,
+        angle: 118,
+        decay: 0.93,
+        drift: -0.25,
+        origin: { x: 1, y: 0.64 },
+        particleCount,
+        scalar: 0.68,
+        spread: 44,
+        startVelocity: 22,
+      });
+    }
+  }, 420);
+
+  window.setTimeout(() => window.clearInterval(intervalId), loginConfettiDurationMs + 100);
+}
 
 function LoginPage() {
   const { isLoading, login, googleAuth } = useAuth();
@@ -42,6 +120,7 @@ function LoginPage() {
 
     try {
       const { user } = await login({ email, password });
+      fireLoginConfetti();
       navigateAfterAuth(user);
     } catch (err) {
       setError(err || "Login gagal. Periksa email dan password.");
@@ -53,6 +132,7 @@ function LoginPage() {
       setError("");
       try {
         const { user } = await googleAuth({ credential });
+        fireLoginConfetti();
         navigateAfterAuth(user);
       } catch (err) {
         setError(err || "Login Google gagal.");
