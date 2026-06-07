@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { FaCheckCircle, FaExclamationTriangle, FaLaptop, FaMapMarkerAlt } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import Carousel from "../components/Carousel";
 import CategoryCard from "../components/CategoryCard";
@@ -18,6 +19,27 @@ import {
 import { api } from "../lib/api";
 
 const eventItemsPerView = { base: 2, sm: 2, md: 3, lg: 4, xl: 4 };
+
+const eventWarnings = [
+  "Pastikan nama event, tanggal, jam, lokasi, dan penyelenggara sudah sesuai sebelum membeli tiket.",
+  "Jangan bagikan QR code, kode booking, atau link akses online ke orang lain.",
+  "Baca ketentuan refund, batas check-in, dan aturan usia atau identitas jika tersedia.",
+  "Waspadai ajakan pembayaran di luar platform atau kontak yang tidak resmi.",
+];
+
+const offlinePreparations = [
+  "Bawa e-ticket atau QR code yang bisa diakses tanpa internet.",
+  "Siapkan identitas sesuai nama pada tiket jika diminta di venue.",
+  "Datang lebih awal untuk antrean check-in, parkir, dan pemeriksaan keamanan.",
+  "Cek rute, cuaca, dress code, dan barang yang tidak boleh dibawa.",
+];
+
+const onlinePreparations = [
+  "Pastikan link akses, email tiket, dan jadwal sudah tersimpan.",
+  "Gunakan koneksi internet stabil dan perangkat yang baterainya cukup.",
+  "Tes kamera, mikrofon, speaker, dan aplikasi meeting sebelum event dimulai.",
+  "Masuk beberapa menit lebih awal agar tidak tertinggal sesi pembuka.",
+];
 
 function HomePage() {
   const [trendingState, setTrendingState] = useState({
@@ -140,6 +162,86 @@ function HomePage() {
               subtitle="Berdasarkan minat favorit kamu"
             />
             {renderEventSection(recommendedState)}
+          </section>
+        </Container>
+
+        <Container className="mt-12">
+          <section className="rounded-2xl border border-black/5 bg-white p-4 shadow-sm sm:p-6">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wide text-brand-600">
+                  Panduan sebelum ikut event
+                </p>
+                <h2 className="mt-1 text-xl font-bold text-gray-900 sm:text-2xl">
+                  Perhatikan ini sebelum berangkat atau join online
+                </h2>
+              </div>
+              <p className="max-w-md text-sm leading-relaxed text-gray-500">
+                Checklist singkat supaya pengalaman event lebih aman, lancar, dan tidak ada detail penting yang terlewat.
+              </p>
+            </div>
+
+            <div className="mt-5 grid gap-4 lg:grid-cols-3">
+              <div className="rounded-xl border border-amber-100 bg-amber-50/70 p-4">
+                <div className="flex items-center gap-3">
+                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-amber-100 text-amber-700">
+                    <FaExclamationTriangle />
+                  </span>
+                  <div>
+                    <h3 className="font-semibold text-gray-900">Warning untuk user</h3>
+                    <p className="text-xs text-gray-600">Cek ulang sebelum transaksi dan hadir.</p>
+                  </div>
+                </div>
+                <ul className="mt-4 space-y-3 text-sm leading-relaxed text-gray-700">
+                  {eventWarnings.map((item) => (
+                    <li key={item} className="flex gap-2">
+                      <FaCheckCircle className="mt-1 shrink-0 text-amber-600" />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="rounded-xl border border-brand-100 bg-brand-50/70 p-4">
+                <div className="flex items-center gap-3">
+                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-brand-100 text-brand-700">
+                    <FaMapMarkerAlt />
+                  </span>
+                  <div>
+                    <h3 className="font-semibold text-gray-900">Persiapan event offline</h3>
+                    <p className="text-xs text-gray-600">Untuk event di venue atau lokasi fisik.</p>
+                  </div>
+                </div>
+                <ul className="mt-4 space-y-3 text-sm leading-relaxed text-gray-700">
+                  {offlinePreparations.map((item) => (
+                    <li key={item} className="flex gap-2">
+                      <FaCheckCircle className="mt-1 shrink-0 text-brand-600" />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="rounded-xl border border-sky-100 bg-sky-50/70 p-4">
+                <div className="flex items-center gap-3">
+                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-sky-100 text-sky-700">
+                    <FaLaptop />
+                  </span>
+                  <div>
+                    <h3 className="font-semibold text-gray-900">Persiapan event online</h3>
+                    <p className="text-xs text-gray-600">Untuk webinar, kelas, atau live session.</p>
+                  </div>
+                </div>
+                <ul className="mt-4 space-y-3 text-sm leading-relaxed text-gray-700">
+                  {onlinePreparations.map((item) => (
+                    <li key={item} className="flex gap-2">
+                      <FaCheckCircle className="mt-1 shrink-0 text-sky-600" />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
           </section>
         </Container>
 
