@@ -110,7 +110,7 @@ function PaymentModal({ open, transaction, onClose }) {
         <div className="flex shrink-0 items-start justify-between gap-4 border-b border-gray-100 p-4 sm:p-5">
           <div>
             <p className="text-xs font-semibold uppercase tracking-wide text-brand-600">
-              Pembayaran Midtrans
+              Pembayaran Event
             </p>
             <h2
               id="midtrans-payment-title"
@@ -151,7 +151,7 @@ function PaymentModal({ open, transaction, onClose }) {
                 Kalau halaman tidak muncul
               </p>
               <p className="mt-1 text-sm text-gray-600">
-                Browser atau Midtrans bisa memblokir embed. Buka link pembayaran
+                Browser bisa memblokir embed. Buka link pembayaran
                 di tab baru.
               </p>
               <a
@@ -167,7 +167,7 @@ function PaymentModal({ open, transaction, onClose }) {
             <div className="rounded-xl border border-brand-100 bg-brand-50 p-4 text-sm text-brand-700">
               <p className="font-semibold">Langkah berikutnya</p>
               <p className="mt-1">
-                Selesaikan pembayaran di Midtrans. Setelah status transaksi
+                Selesaikan pembayaran. Setelah status transaksi
                 berubah, kamu bisa lanjut ke halaman sukses / riwayat transaksi.
               </p>
             </div>
@@ -398,18 +398,16 @@ function CheckoutPage() {
                       type="button"
                       onClick={() => setPayment(p.value)}
                       aria-pressed={selected}
-                      className={`flex w-full cursor-pointer items-center gap-4 rounded-xl border p-4 text-left transition duration-200 ${
-                        selected
-                          ? "border-brand-500 bg-brand-50/50 ring-2 ring-brand-200"
-                          : "border-gray-200 hover:border-brand-300 hover:bg-gray-50/40"
-                      }`}
+                      className={`flex w-full cursor-pointer items-center gap-4 rounded-xl border p-4 text-left transition duration-200 ${selected
+                        ? "border-brand-500 bg-brand-50/50 ring-2 ring-brand-200"
+                        : "border-gray-200 hover:border-brand-300 hover:bg-gray-50/40"
+                        }`}
                     >
                       <div
-                        className={`grid h-11 w-11 shrink-0 place-items-center rounded-lg transition ${
-                          selected
-                            ? "bg-brand-100 text-brand-700"
-                            : "bg-gray-100 text-gray-500"
-                        }`}
+                        className={`grid h-11 w-11 shrink-0 place-items-center rounded-lg transition ${selected
+                          ? "bg-brand-100 text-brand-700"
+                          : "bg-gray-100 text-gray-500"
+                          }`}
                       >
                         <p.Icon className="h-5 w-5" />
                       </div>
@@ -418,11 +416,10 @@ function CheckoutPage() {
                         <p className="mt-0.5 text-xs text-gray-500">{p.desc}</p>
                       </div>
                       <div
-                        className={`grid h-5 w-5 shrink-0 place-items-center rounded-full border-2 transition ${
-                          selected
-                            ? "border-brand-600 bg-brand-600"
-                            : "border-gray-300"
-                        }`}
+                        className={`grid h-5 w-5 shrink-0 place-items-center rounded-full border-2 transition ${selected
+                          ? "border-brand-600 bg-brand-600"
+                          : "border-gray-300"
+                          }`}
                       >
                         {selected && (
                           <span className="h-1.5 w-1.5 rounded-full bg-white" />
@@ -441,9 +438,8 @@ function CheckoutPage() {
                 Order Summary
               </h2>
               <div
-                className={`mb-4 w-full overflow-hidden rounded-lg bg-gradient-to-br ${
-                  event.bannerHue ?? "from-brand-400 to-brand-600"
-                } ${event.imageUrl ? "" : "aspect-video"}`}
+                className={`mb-4 w-full overflow-hidden rounded-lg bg-gradient-to-br ${event.bannerHue ?? "from-brand-400 to-brand-600"
+                  } ${event.imageUrl ? "" : "aspect-video"}`}
               >
                 {event.imageUrl ? (
                   <img

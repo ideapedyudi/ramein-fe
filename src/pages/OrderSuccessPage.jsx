@@ -419,7 +419,7 @@ function OrderSuccessPage() {
 
   if (error) {
     return (
-      <div className="mx-auto max-w-[920px] px-4 py-20 text-center">
+      <div className="mx-auto max-w-[1120px] px-4 py-20 text-center">
         <h1 className="text-2xl font-bold text-gray-900">{error}</h1>
         <Link to="/" className="mt-4 inline-block text-brand-600 hover:underline">
           &larr; Kembali ke Beranda
@@ -429,7 +429,7 @@ function OrderSuccessPage() {
   }
 
   if (!event) {
-    return <div className="mx-auto max-w-[920px] px-4 py-20 text-center text-gray-500">Memuat...</div>
+    return <div className="mx-auto max-w-[1120px] px-4 py-20 text-center text-gray-500">Memuat...</div>
   }
 
   const isRsvp = total === 0
@@ -437,14 +437,14 @@ function OrderSuccessPage() {
   return (
     <div className="min-h-screen bg-[var(--color-page)]">
       <div className="border-b border-black/5 bg-white">
-        <div className="mx-auto max-w-[920px] px-4 py-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-[1120px] px-4 py-4 sm:px-6 lg:px-8">
           <Link to="/" className="text-sm text-gray-600 hover:text-brand-600">
             &larr; Beranda
           </Link>
         </div>
       </div>
 
-      <div className="mx-auto max-w-[920px] px-4 py-10 sm:px-6 sm:py-12 lg:px-8">
+      <div className="mx-auto max-w-[1120px] px-4 py-10 sm:px-6 sm:py-12 lg:px-8">
         <div className="rounded-2xl border border-black/5 bg-white p-5 shadow-sm sm:p-8">
           <div className="grid h-14 w-14 place-items-center rounded-full bg-brand-100 text-3xl">
             &#10003;
