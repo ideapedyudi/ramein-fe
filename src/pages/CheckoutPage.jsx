@@ -4,24 +4,6 @@ import { FaTimes } from "react-icons/fa";
 import { api } from "../lib/api";
 import { formatIDR } from "../lib/format";
 
-function WalletIcon({ className }) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4" />
-      <path d="M4 6v12c0 1.1.9 2 2 2h14v-4" />
-      <path d="M18 12a2 2 0 0 0-2 2c0 1.1.9 2 2 2h4v-4h-4z" />
-    </svg>
-  );
-}
-
 function QrIcon({ className }) {
   return (
     <svg
@@ -37,23 +19,6 @@ function QrIcon({ className }) {
       <rect x="14" y="3" width="7" height="7" rx="1" />
       <rect x="3" y="14" width="7" height="7" rx="1" />
       <path d="M14 14h3v3h-3zM20 14v3M14 20h3M20 20h1" />
-    </svg>
-  );
-}
-
-function BankIcon({ className }) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="m3 10 9-7 9 7" />
-      <path d="M5 10v9M19 10v9M9 10v9M15 10v9M3 21h18" />
     </svg>
   );
 }
