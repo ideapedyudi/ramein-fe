@@ -29,10 +29,31 @@ function loadGoogleScript() {
 function GoogleAuthButton({ onCredential, disabled, enableOneTap = false, context = 'signin' }) {
   const buttonRef = useRef(null)
   const [error, setError] = useState('')
+  const [width, setWidth] = useState(0)
   const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID
 
   useEffect(() => {
-    if (!clientId) {
+    if (!buttonRef.current) return undefined
+
+    const updateWidth = () => {
+      setWidth(buttonRef.current?.offsetWidth || 0)
+    }
+
+    updateWidth()
+
+    if (typeof ResizeObserver === 'undefined') {
+      window.addEventListener('resize', updateWidth)
+      return () => window.removeEventListener('resize', updateWidth)
+    }
+
+    const observer = new ResizeObserver(updateWidth)
+    observer.observe(buttonRef.current)
+
+    return () => observer.disconnect()
+  }, [])
+
+  useEffect(() => {
+    if (!clientId || !width) {
       return undefined
     }
 
@@ -49,10 +70,11 @@ function GoogleAuthButton({ onCredential, disabled, enableOneTap = false, contex
             if (response?.credential) onCredential(response.credential)
           },
         })
+        buttonRef.current.innerHTML = ''
         window.google.accounts.id.renderButton(buttonRef.current, {
           theme: 'outline',
           size: 'large',
-          width: buttonRef.current.offsetWidth || 360,
+          width,
           text: 'continue_with',
           shape: 'rectangular',
         })
@@ -71,7 +93,7 @@ function GoogleAuthButton({ onCredential, disabled, enableOneTap = false, contex
         window.google.accounts.id.cancel()
       }
     }
-  }, [clientId, context, enableOneTap, onCredential])
+  }, [clientId, context, enableOneTap, onCredential, width])
 
   const message = clientId ? error : 'Google Client ID belum dikonfigurasi.'
 
@@ -85,10 +107,10 @@ function GoogleAuthButton({ onCredential, disabled, enableOneTap = false, contex
 
   return (
     <div
-      className={disabled ? 'pointer-events-none opacity-60' : ''}
+      className={`${disabled ? 'pointer-events-none opacity-60' : ''} flex justify-center`}
       aria-disabled={disabled}
     >
-      <div ref={buttonRef} className="min-h-11 w-full" />
+      <div ref={buttonRef} className="min-h-11 w-full max-w-[360px]" />
     </div>
   )
 }
