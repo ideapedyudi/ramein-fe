@@ -126,7 +126,7 @@ function HomePage() {
         <Container className="mt-12">
           <section>
             <SectionTitle
-              title="Browse by Category"
+              title="Kategori"
               subtitle="Temukan event sesuai minatmu"
             />
             <div className="grid grid-cols-4 gap-4 sm:grid-cols-6 md:grid-cols-9 lg:grid-cols-12">
