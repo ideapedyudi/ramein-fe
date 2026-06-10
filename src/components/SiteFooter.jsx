@@ -27,6 +27,39 @@ function FooterColumn({ title, items }) {
   );
 }
 
+function PseBadge() {
+  // Lencana dummy "Terdaftar PSE Kominfo" (Penyelenggara Sistem Elektronik).
+  return (
+    <div
+      className="mt-4 inline-flex items-center gap-2 rounded-lg border border-[#e0e0e0] bg-[#f7faf9] px-3 py-2"
+      title="Terdaftar sebagai Penyelenggara Sistem Elektronik (PSE) Kominfo"
+    >
+      <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[#2ea387]/10 text-[#2ea387]">
+        <svg
+          viewBox="0 0 24 24"
+          className="h-5 w-5"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M12 2 4 5v6c0 5 3.4 8.5 8 11 4.6-2.5 8-6 8-11V5l-8-3Z" />
+          <path d="m9 12 2 2 4-4" />
+        </svg>
+      </span>
+      <span className="text-left leading-tight">
+        <span className="block text-[11px] font-semibold text-[#202020]">
+          Terdaftar PSE Kominfo
+        </span>
+        <span className="block text-[10px] text-[#9a9a9a]">
+          No. 00000123/DJAI.PSE/06/2026
+        </span>
+      </span>
+    </div>
+  );
+}
+
 const productItems = [
   { label: "Jelajahi Event", to: "/jelajahi" },
   { label: "Buat Event", to: "/buat-event" },
@@ -55,6 +88,7 @@ function SiteFooter() {
           <p className="mt-2 max-w-xs text-sm leading-relaxed text-[#6b6b6b] md:mt-4 md:text-lg">
             Platform tiket event terpercaya untuk semua momen seru kamu.
           </p>
+          <PseBadge />
         </div>
         <FooterColumn title="Produk" items={productItems} />
         <FooterColumn title="Perusahaan" items={companyItems} />
