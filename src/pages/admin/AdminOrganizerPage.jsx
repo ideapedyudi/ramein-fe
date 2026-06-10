@@ -39,7 +39,7 @@ function AdminOrganizerPage() {
       const res = await api.getMasterOrganizers()
       setItems(res)
     } catch (err) {
-      setError(err.message || 'Gagal memuat organizer.')
+      setError(err.message || 'Gagal memuat penyelenggara.')
     } finally {
       setLoading(false)
     }
@@ -94,7 +94,7 @@ function AdminOrganizerPage() {
       }
       resetForm()
     } catch (err) {
-      setError(err.message || `Gagal ${editingId ? 'mengupdate' : 'menambah'} organizer.`)
+      setError(err.message || `Gagal ${editingId ? 'mengubah' : 'menambah'} penyelenggara.`)
     } finally {
       setBusy(false)
     }
@@ -102,15 +102,15 @@ function AdminOrganizerPage() {
 
   return (
     <AdminLayout
-      title="Organizer"
+      title="Penyelenggara"
       subtitle="Daftar partner resmi yang menyelenggarakan event"
     >
       <section className="rounded-2xl border border-[#eee] bg-white p-5">
         <h2 className="text-sm font-semibold text-[#1f1f1f]">
-          {editingId ? 'Update Organizer' : 'Tambah Organizer'}
+          {editingId ? 'Ubah Penyelenggara' : 'Tambah Penyelenggara'}
         </h2>
         <form onSubmit={handleSubmit} className="mt-3 grid gap-3 sm:grid-cols-2">
-          <Field label="Nama Organizer">
+          <Field label="Nama Penyelenggara">
             <input
               className={inputClass}
               value={form.name}
@@ -123,7 +123,7 @@ function AdminOrganizerPage() {
               className={inputClass}
               value={form.description}
               onChange={(e) => update('description', e.target.value)}
-              placeholder="Organizer resmi konser"
+              placeholder="Penyelenggara resmi konser"
             />
           </Field>
           <Field label="Kontak (Nama)">
@@ -158,7 +158,7 @@ function AdminOrganizerPage() {
               className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-700 disabled:opacity-50 sm:w-auto"
             >
               {editingId ? <FaEdit className="text-xs" /> : <FaPlus className="text-xs" />}
-              {editingId ? 'Simpan Update' : 'Tambah Organizer'}
+              {editingId ? 'Simpan Perubahan' : 'Tambah Penyelenggara'}
             </button>
             {editingId && (
               <button
@@ -179,7 +179,7 @@ function AdminOrganizerPage() {
 
       <section className="mt-5 rounded-2xl border border-[#eee] bg-white">
         <div className="flex items-center justify-between border-b border-[#eee] px-5 py-3">
-          <h2 className="text-sm font-semibold text-[#1f1f1f]">Daftar Organizer</h2>
+          <h2 className="text-sm font-semibold text-[#1f1f1f]">Daftar Penyelenggara</h2>
           <div className="flex items-center gap-3">
             <span className="text-xs text-[#6d6d6d]">{items.length} item</span>
             <button
@@ -189,7 +189,7 @@ function AdminOrganizerPage() {
               className="inline-flex items-center gap-1.5 rounded-md border border-[#e2e2e2] px-2 py-1 text-xs font-medium text-[#4a4a4a] hover:bg-[#f7f7f7] disabled:opacity-50"
             >
               <FaSyncAlt className="text-[10px]" />
-              Refresh
+              Muat Ulang
             </button>
           </div>
         </div>
@@ -197,7 +197,7 @@ function AdminOrganizerPage() {
           <table className="w-full min-w-[720px] text-left text-sm">
             <thead className="bg-[#fafafa] text-xs uppercase text-[#9a9a9a]">
               <tr>
-                <th className="px-5 py-3 font-medium">Organizer</th>
+                <th className="px-5 py-3 font-medium">Penyelenggara</th>
                 <th className="px-5 py-3 font-medium">Kontak</th>
                 <th className="px-5 py-3 font-medium">Dibuat</th>
                 <th className="px-5 py-3 text-right font-medium">Aksi</th>
@@ -207,7 +207,7 @@ function AdminOrganizerPage() {
               {loading && (
                 <tr>
                   <td colSpan={4} className="px-5 py-10 text-center text-sm text-[#6d6d6d]">
-                    Memuat organizer...
+                    Memuat penyelenggara...
                   </td>
                 </tr>
               )}
@@ -243,7 +243,7 @@ function AdminOrganizerPage() {
                       className="inline-flex items-center gap-1.5 rounded-md border border-[#e2e2e2] px-2 py-1 text-xs font-medium text-brand-700 hover:bg-brand-50"
                     >
                       <FaEdit className="text-[10px]" />
-                      Update
+                      Ubah
                     </button>
                   </td>
                 </tr>
@@ -251,7 +251,7 @@ function AdminOrganizerPage() {
               {!loading && items.length === 0 && (
                 <tr>
                   <td colSpan={4} className="px-5 py-10 text-center text-sm text-[#6d6d6d]">
-                    Belum ada organizer.
+                    Belum ada penyelenggara.
                   </td>
                 </tr>
               )}

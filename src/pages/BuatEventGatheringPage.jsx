@@ -312,7 +312,7 @@ function BuatEventGatheringPage() {
             </div>
 
             <div className="rounded-2xl border border-black/5 bg-white p-5 shadow-sm">
-              <p className="mb-3 text-sm font-semibold text-gray-900">Master Data</p>
+              <p className="mb-3 text-sm font-semibold text-gray-900">Data Master</p>
               <div className="grid gap-3 sm:grid-cols-3">
                 <SmallSelect label="Kategori" name="categoryId" required value={categoryId} onChange={setCategoryId}>
                   {loadingMaster && <option value="">Memuat...</option>}
@@ -323,9 +323,9 @@ function BuatEventGatheringPage() {
                     </option>
                   ))}
                 </SmallSelect>
-                <SmallSelect label="Organizer" name="organizerId" required value={organizerId} onChange={setOrganizerId}>
+                <SmallSelect label="Penyelenggara" name="organizerId" required value={organizerId} onChange={setOrganizerId}>
                   {loadingMaster && <option value="">Memuat...</option>}
-                  {!loadingMaster && organizers.length === 0 && <option value="">Belum ada organizer</option>}
+                  {!loadingMaster && organizers.length === 0 && <option value="">Belum ada penyelenggara</option>}
                   {organizers.map((organizer) => (
                     <option key={organizer.id} value={organizer.id}>
                       {organizer.name}
@@ -386,8 +386,8 @@ function BuatEventGatheringPage() {
             <div className="rounded-2xl border border-black/5 bg-white p-5 shadow-sm">
               <p className="mb-3 text-sm font-semibold text-gray-900">Pembayaran & Tiket</p>
               <div className="grid gap-2 sm:grid-cols-2">
-                <PriceMode title="Gratis" desc="payment free" selected={paymentType === 'free'} onClick={() => handlePaymentTypeChange('free')} />
-                <PriceMode title="Berbayar" desc="payment paid" selected={paymentType === 'paid'} onClick={() => handlePaymentTypeChange('paid')} />
+                <PriceMode title="Gratis" desc="tanpa biaya" selected={paymentType === 'free'} onClick={() => handlePaymentTypeChange('free')} />
+                <PriceMode title="Berbayar" desc="dengan biaya" selected={paymentType === 'paid'} onClick={() => handlePaymentTypeChange('paid')} />
               </div>
 
               <div className="mt-4 grid gap-3 sm:grid-cols-3">
@@ -424,8 +424,8 @@ function BuatEventGatheringPage() {
           <aside className="md:sticky md:top-6 md:self-start">
             <div className="rounded-2xl border border-black/5 bg-white p-5 shadow-sm">
               <div className="mb-4 flex items-center justify-between">
-                <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-500">Preview</h2>
-                <span className="text-[10px] font-medium uppercase tracking-wide text-gray-400">Live</span>
+                <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-500">Pratinjau</h2>
+                <span className="text-[10px] font-medium uppercase tracking-wide text-gray-400">Langsung</span>
               </div>
               <EventCardPreview
                 name={title}

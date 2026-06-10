@@ -39,7 +39,7 @@ function WithdrawPage() {
         if (!cancelled) setWithdraws(res)
       })
       .catch((err) => {
-        if (!cancelled) setError(err.message || 'Gagal memuat data withdraw.')
+        if (!cancelled) setError(err.message || 'Gagal memuat data tarik dana.')
       })
       .finally(() => {
         if (!cancelled) setLoading(false)
@@ -78,11 +78,11 @@ function WithdrawPage() {
   )
 
   return (
-    <AdminLayout title="Withdraw" subtitle="Riwayat pengajuan pencairan revenue event">
+    <AdminLayout title="Tarik Dana" subtitle="Riwayat pengajuan pencairan pendapatan event">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <div className="rounded-2xl border border-[#eee] bg-white p-5">
           <p className="text-xs font-semibold uppercase tracking-wider text-[#9a9a9a]">
-            Total Withdraw
+            Total Tarik Dana
           </p>
           <p className="mt-2 text-2xl font-bold text-[#1f1f1f]">{formatIDR(totals.amount)}</p>
           <p className="mt-1 text-xs text-[#6d6d6d]">{totals.count} pengajuan</p>
@@ -96,7 +96,7 @@ function WithdrawPage() {
         </div>
         <div className="rounded-2xl border border-[#eee] bg-white p-5">
           <p className="text-xs font-semibold uppercase tracking-wider text-[#9a9a9a]">
-            Event Withdraw
+            Event Tarik Dana
           </p>
           <p className="mt-2 text-2xl font-bold text-[#1f1f1f]">{totals.events}</p>
           <p className="mt-1 text-xs text-[#6d6d6d]">Event dengan pencairan</p>
@@ -184,12 +184,12 @@ function WithdrawPage() {
           </table>
         </div>
 
-        {loading && <div className="p-10 text-center text-sm text-[#6d6d6d]">Memuat withdraw...</div>}
+        {loading && <div className="p-10 text-center text-sm text-[#6d6d6d]">Memuat data tarik dana...</div>}
 
         {!loading && filtered.length === 0 && (
           <div className="p-10 text-center">
             <FaMoneyBillWave className="mx-auto text-3xl text-[#c5c5c5]" />
-            <p className="mt-3 text-sm font-medium text-[#4a4a4a]">Belum ada data withdraw.</p>
+            <p className="mt-3 text-sm font-medium text-[#4a4a4a]">Belum ada data tarik dana.</p>
           </div>
         )}
       </section>

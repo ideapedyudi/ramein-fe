@@ -33,19 +33,19 @@ const userNav = [
   { to: "/transaksi", label: "Transaksi", icon: FaReceipt },
   { to: "/event-kamu", label: "Event Saya", icon: FaCalendarAlt },
   { to: "/buat-event", label: "Buat Event", icon: FaPlusCircle },
-  { to: "/withdraw", label: "Withdraw", icon: FaMoneyBillWave },
+  { to: "/withdraw", label: "Tarik Dana", icon: FaMoneyBillWave },
 ];
 
 // Internal staff (admin) — manages master data and can create events
 // on behalf of registered organizers.
 const adminNav = [
-  { to: "/dashboard", label: "Dashboard", icon: FaTachometerAlt, exact: true },
+  { to: "/dashboard", label: "Dasbor", icon: FaTachometerAlt, exact: true },
   { to: "/admin/kategori", label: "Kategori", icon: FaListUl },
   { to: "/admin/kota", label: "Kota", icon: FaCity },
-  { to: "/admin/organizer", label: "Organizer", icon: FaBuilding },
-  { to: "/admin/users", label: "User", icon: FaUsers },
-  { to: "/admin/finance", label: "Finance", icon: FaChartLine },
-  { to: "/admin/feedback", label: "Feedback", icon: FaComments },
+  { to: "/admin/organizer", label: "Penyelenggara", icon: FaBuilding },
+  { to: "/admin/users", label: "Pengguna", icon: FaUsers },
+  { to: "/admin/finance", label: "Keuangan", icon: FaChartLine },
+  { to: "/admin/feedback", label: "Masukan", icon: FaComments },
   { to: "/event-kamu", label: "Event Dikelola", icon: FaCalendarAlt },
   { to: "/buat-event", label: "Buat Event", icon: FaPlusCircle },
 ];
@@ -92,7 +92,7 @@ function SidebarContent({ user, isAdmin, onLogout, onNavigate }) {
             Ramein
           </span>
           <span className="text-[10px] font-semibold uppercase tracking-wider text-[#2ea387]">
-            {isAdmin ? "Admin · Master Data" : "My Account"}
+            {isAdmin ? "Admin · Data Master" : "Akun Saya"}
           </span>
         </div>
       </Link>

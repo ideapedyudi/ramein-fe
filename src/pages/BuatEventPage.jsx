@@ -106,7 +106,7 @@ function FestivalCard() {
           </span>
         </div>
         <h2 className="mt-5 text-2xl font-bold tracking-tight text-gray-900">
-          Festival & Ticketing
+          Festival & Tiket
         </h2>
         <p className="mt-1 text-sm text-gray-600">
           Untuk konser, festival, dan seminar berbayar dengan tiket berjenjang.
@@ -115,7 +115,7 @@ function FestivalCard() {
 
       <div className="flex-1 p-6">
         <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">
-          Tier tiket
+          Kategori tiket
         </p>
         <ul className="mt-3 space-y-2">
           {tiers.map((t) => (
@@ -132,7 +132,7 @@ function FestivalCard() {
                     {t.name}
                   </p>
                   <p className="text-[11px] text-gray-500">
-                    {t.available} tickets available
+                    {t.available} tiket tersedia
                   </p>
                 </div>
               </div>
@@ -211,7 +211,7 @@ function GatheringCard() {
                 19:00 · Online via Zoom
               </p>
               <div className="mt-2 inline-flex items-center gap-1.5 rounded-md bg-brand-50 px-2 py-1 text-[11px] font-medium text-brand-700">
-                <BroadcastIcon className="h-3 w-3" /> Online · Free RSVP
+                <BroadcastIcon className="h-3 w-3" /> Online · RSVP Gratis
               </div>
             </div>
           </div>
@@ -221,7 +221,7 @@ function GatheringCard() {
               tabIndex={-1}
               className="w-full cursor-default rounded-lg bg-brand-600 py-2 text-xs font-semibold text-white"
             >
-              RSVP — Free
+              RSVP — Gratis
             </button>
           </div>
         </div>
@@ -255,7 +255,7 @@ function BuatEventPage() {
       subtitle={
         isAdmin
           ? "Pilih tipe event yang ingin kamu buat"
-          : "Buat meetup, gathering, atau private event RSVP"
+          : "Buat meetup, gathering, atau event RSVP privat"
       }
       actions={
         <Link
@@ -268,8 +268,8 @@ function BuatEventPage() {
     >
       {!isAdmin && (
         <div className="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs text-amber-800 sm:text-sm">
-          Sebagai user kamu bisa membuat <span className="font-semibold">event RSVP / private</span>. Untuk event
-          publik berbayar dengan tiket berjenjang (Festival & Ticketing), silakan hubungi admin Ramein.
+          Sebagai user kamu bisa membuat <span className="font-semibold">event RSVP / privat</span>. Untuk event
+          publik berbayar dengan tiket berjenjang (Festival & Tiket), silakan hubungi admin Ramein.
         </div>
       )}
       <div

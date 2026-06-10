@@ -109,11 +109,11 @@ function ScanAttendanceModal({ open, onClose, onScanSuccess }) {
 
       try {
         const result = await api.scanTicketQrCode(qrCode)
-        setSubmitMessage(result?.message ?? 'Scan kehadiran berhasil diproses.')
+        setSubmitMessage(result?.message ?? 'Pindai kehadiran berhasil diproses.')
         setManualQr(qrCode)
         onScanSuccess?.()
       } catch (err) {
-        setSubmitError(err.message || 'Gagal memproses scan QR.')
+        setSubmitError(err.message || 'Gagal memproses pindai QR.')
       } finally {
         setSubmitting(false)
         setTimeout(() => setScanLocked(false), 1200)
@@ -185,8 +185,8 @@ function ScanAttendanceModal({ open, onClose, onScanSuccess }) {
       <div className="w-full max-w-2xl rounded-2xl bg-white shadow-xl">
         <div className="flex items-start justify-between border-b border-gray-100 p-5">
           <div>
-            <h3 className="text-lg font-semibold text-gray-900">Scan Kehadiran</h3>
-            <p className="text-sm text-gray-500">Scan QR peserta atau masukkan kode QR secara manual.</p>
+            <h3 className="text-lg font-semibold text-gray-900">Pindai Kehadiran</h3>
+            <p className="text-sm text-gray-500">Pindai QR peserta atau masukkan kode QR secara manual.</p>
           </div>
           <button
             type="button"
@@ -218,7 +218,7 @@ function ScanAttendanceModal({ open, onClose, onScanSuccess }) {
                 : 'border border-[#e2e2e2] bg-white text-[#4a4a4a]'
                 }`}
             >
-              <FaKeyboard /> Input Manual
+              <FaKeyboard /> Masukkan Manual
             </button>
           </div>
 
@@ -251,7 +251,7 @@ function ScanAttendanceModal({ open, onClose, onScanSuccess }) {
                 </div>
               )}
               <p className="mt-3 text-xs text-gray-500">
-                Arahkan kamera ke QR peserta. Scan akan langsung diproses.
+                Arahkan kamera ke QR peserta. Pindaian akan langsung diproses.
               </p>
             </div>
           ) : (
@@ -280,7 +280,7 @@ function ScanAttendanceModal({ open, onClose, onScanSuccess }) {
                 disabled={submitting || !manualQr.trim()}
                 className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-gray-300"
               >
-                {submitting ? 'Memproses...' : 'Submit Scan'}
+                {submitting ? 'Memproses...' : 'Pindai Sekarang'}
               </button>
             </form>
           )}
@@ -333,7 +333,7 @@ function WithdrawModal({ open, eventId, totalAmount, onClose, onSuccess }) {
       })
       onSuccess?.()
     } catch (err) {
-      setError(err.message || 'Gagal mengajukan withdraw.')
+      setError(err.message || 'Gagal mengajukan tarik dana.')
     } finally {
       setSubmitting(false)
     }
@@ -344,7 +344,7 @@ function WithdrawModal({ open, eventId, totalAmount, onClose, onSuccess }) {
       <div className="w-full max-w-lg rounded-2xl bg-white shadow-xl">
         <div className="flex items-start justify-between border-b border-gray-100 p-5">
           <div>
-            <h3 className="text-lg font-semibold text-gray-900">Withdraw Revenue</h3>
+            <h3 className="text-lg font-semibold text-gray-900">Tarik Pendapatan</h3>
             <p className="text-sm text-gray-500">Ajukan pencairan dana untuk event ini.</p>
           </div>
           <button
@@ -407,7 +407,7 @@ function WithdrawModal({ open, eventId, totalAmount, onClose, onSuccess }) {
 
           <div>
             <label htmlFor="total-amount" className="mb-1 block text-xs font-medium text-gray-600">
-              Total Withdraw
+              Total Tarik Dana
             </label>
             <input
               id="total-amount"
@@ -416,7 +416,7 @@ function WithdrawModal({ open, eventId, totalAmount, onClose, onSuccess }) {
               value={formatIDR(totalAmount)}
               className="w-full rounded-xl border border-[#e2e2e2] bg-gray-50 px-3 py-2 text-sm text-gray-700 outline-none"
             />
-            <p className="mt-1 text-xs text-gray-500">Jumlah withdraw mengikuti seluruh revenue event.</p>
+            <p className="mt-1 text-xs text-gray-500">Jumlah tarik dana mengikuti seluruh pendapatan event.</p>
           </div>
 
           {error && (
@@ -438,7 +438,7 @@ function WithdrawModal({ open, eventId, totalAmount, onClose, onSuccess }) {
               disabled={submitting}
               className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-gray-300"
             >
-              {submitting ? 'Menyimpan...' : 'Ajukan Withdraw'}
+              {submitting ? 'Menyimpan...' : 'Ajukan Tarik Dana'}
             </button>
           </div>
         </form>
@@ -534,7 +534,7 @@ function AttendeeSection({ eventId, onScanSuccess }) {
             onClick={() => setScanModalOpen(true)}
             className="inline-flex items-center gap-2 rounded-full bg-gray-900 px-3 py-1.5 text-xs font-semibold text-white hover:bg-black"
           >
-            <FaCamera /> Scan Kehadiran
+            <FaCamera /> Pindai Kehadiran
           </button>
         </div>
       </div>
@@ -559,7 +559,7 @@ function AttendeeSection({ eventId, onScanSuccess }) {
             <thead className="bg-gray-50 text-[11px] uppercase tracking-wide text-gray-500">
               <tr>
                 <th className="px-4 py-3 font-semibold">Peserta</th>
-                <th className="px-4 py-3 font-semibold">Order ID</th>
+                <th className="px-4 py-3 font-semibold">ID Pesanan</th>
                 <th className="px-4 py-3 font-semibold">Status</th>
                 <th className="px-4 py-3 font-semibold">Waktu</th>
               </tr>
@@ -687,7 +687,7 @@ function EventKamuDetailPage() {
         <div className="rounded-2xl border border-dashed border-gray-300 bg-white p-12 text-center">
           <h2 className="text-xl font-bold text-gray-900">{error || 'Event tidak ditemukan.'}</h2>
           <Link to="/event-kamu" className="mt-4 inline-block text-brand-600 hover:underline">
-            Kembali ke Event Saya
+            Kembali ke Event Kamu
           </Link>
         </div>
       </AdminLayout>
@@ -715,7 +715,7 @@ function EventKamuDetailPage() {
             onClick={handleShareLink}
             className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs font-medium hover:bg-gray-50 sm:text-sm"
           >
-            Share Link
+            Bagikan Link
           </button>
           {shareMessage && (
             <p className="mt-2 max-w-[240px] break-words text-xs text-emerald-600">{shareMessage}</p>
@@ -724,7 +724,7 @@ function EventKamuDetailPage() {
       }
     >
       <Link to="/event-kamu" className="mb-4 inline-block text-sm text-gray-600 hover:text-brand-600">
-        Kembali ke Event Saya
+        Kembali ke Event Kamu
       </Link>
 
       <div>
@@ -768,13 +768,13 @@ function EventKamuDetailPage() {
                   <Info label="Kota" value={event.city} />
                   <Info label="Alamat" value={event.addressDetail} />
                   <Info label="Kategori" value={event.category} />
-                  <Info label="Organizer" value={event.organizer?.name} />
+                  <Info label="Penyelenggara" value={event.organizer?.name} />
                   <Info label="Status">
                     <span className="inline-flex rounded-full bg-amber-50 px-2 py-0.5 text-xs font-semibold uppercase text-amber-700">
                       {event.status ?? '-'}
                     </span>
                   </Info>
-                  <Info label="Published" value={event.isPublished ? 'Ya' : 'Belum'} />
+                  <Info label="Dipublikasikan" value={event.isPublished ? 'Ya' : 'Belum'} />
                 </div>
               </div>
               <div className="mt-5 border-t border-gray-100 pt-4">
@@ -835,7 +835,7 @@ function EventKamuDetailPage() {
                       disabled={isWithdrawDisabled}
                       className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-gray-300"
                     >
-                      {isWithdraw ? 'Withdraw' : 'Withdraw'}
+                      {isWithdraw ? 'Tarik Dana' : 'Tarik Dana'}
                     </button>
                   </div>
                 )}
@@ -867,7 +867,7 @@ function EventKamuDetailPage() {
                   accent="text-amber-600"
                 />
                 <BigStat
-                  label="Revenue"
+                  label="Pendapatan"
                   value={formatIDR(stats.revenue)}
                   accent="text-rose-600"
                 />
@@ -882,7 +882,7 @@ function EventKamuDetailPage() {
                   onClose={() => setWithdrawModalOpen(false)}
                   onSuccess={() => {
                     setWithdrawModalOpen(false)
-                    setWithdrawMessage('Pengajuan withdraw berhasil disimpan.')
+                    setWithdrawMessage('Pengajuan tarik dana berhasil disimpan.')
                     setEvent((current) =>
                       current ? { ...current, isWithdraw: true, is_withdraw: true } : current,
                     )

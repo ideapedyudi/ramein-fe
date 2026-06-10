@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import EventImage from '../components/EventImage'
+import LoginPromptModal from '../components/LoginPromptModal'
 import SiteFooter from '../components/SiteFooter'
 import SiteLayout from '../components/SiteLayout'
+import { useAuth } from '../context/authContext'
 import { api } from '../lib/api'
 import { formatIDR, formatNumber } from '../lib/format'
 import { toAbsoluteUrl, usePageSeo } from '../lib/seo'
@@ -57,12 +59,31 @@ async function copyText(value) {
 function EventDetailPage() {
   const { eventId } = useParams()
   const navigate = useNavigate()
+  const { isAuthenticated } = useAuth()
   const [event, setEvent] = useState(null)
   const [selectedTier, setSelectedTier] = useState('')
   const [quantity, setQuantity] = useState(1)
   const [notFound, setNotFound] = useState(false)
   const [shareMessage, setShareMessage] = useState('')
+  const [loginPromptOpen, setLoginPromptOpen] = useState(false)
   const canonicalPath = `/event/${eventId}`
+
+  function buildCheckoutPath() {
+    const search = new URLSearchParams({
+      eventId: event.id,
+      tierId: selectedTier,
+      qty: String(quantity),
+    })
+    return `/checkout?${search.toString()}`
+  }
+
+  function handleCheckout() {
+    if (!isAuthenticated) {
+      setLoginPromptOpen(true)
+      return
+    }
+    navigate(buildCheckoutPath())
+  }
 
   async function handleShareLink() {
     const publicUrl = getPublicEventUrl(eventId)
@@ -177,7 +198,7 @@ function EventDetailPage() {
       <div className="border-b border-black/5 bg-white">
         <div className="mx-auto max-w-[1280px] px-4 py-4 sm:px-6 lg:px-8">
           <Link to="/jelajahi" className="text-sm text-gray-600 hover:text-brand-600">
-            ← Back to Events
+            ← Kembali ke Daftar Event
           </Link>
         </div>
       </div>
@@ -192,20 +213,20 @@ function EventDetailPage() {
             </div>
 
             <Card>
-              <CardHeader title="Event Information" />
+              <CardHeader title="Informasi Event" />
               <div className="space-y-4">
-                <Info icon="📅" label="Date & Time" value={event.timeLabel} />
-                <Info icon="📍" label="Location" value={event.location} />
+                <Info icon="📅" label="Tanggal & Waktu" value={event.timeLabel} />
+                <Info icon="📍" label="Lokasi" value={event.location} />
                 <Info
                   icon="👥"
-                  label="Attendees"
-                  value={`${formatNumber(event.attendees)}+ interested`}
+                  label="Peserta"
+                  value={`${formatNumber(event.attendees)}+ tertarik`}
                 />
               </div>
             </Card>
 
             <Card>
-              <CardHeader title="About This Event" />
+              <CardHeader title="Tentang Event Ini" />
               <p className="text-sm leading-relaxed text-gray-700">{event.description}</p>
             </Card>
           </div>
@@ -215,7 +236,7 @@ function EventDetailPage() {
               <div className="mb-2 flex flex-wrap gap-2">
                 {event.visibility === 'private' && (
                   <span className="inline-flex items-center gap-1 rounded-full bg-gray-900 px-2.5 py-0.5 text-xs font-semibold uppercase text-white">
-                    🔒 Private Event
+                    🔒 Event Privat
                   </span>
                 )}
                 {event.isOnline && (
@@ -232,7 +253,7 @@ function EventDetailPage() {
                     onClick={handleShareLink}
                     className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50 sm:text-sm"
                   >
-                    Share Link
+                    Bagikan Tautan
                   </button>
                   {shareMessage && (
                     <p className="mt-2 max-w-[240px] break-words text-xs text-emerald-600">{shareMessage}</p>
@@ -263,7 +284,7 @@ function EventDetailPage() {
             </div>
 
             <Card>
-              <CardHeader title="Select Ticket Tier" />
+              <CardHeader title="Pilih Kategori Tiket" />
               <div className="space-y-3">
                 {event.tiers.map((t) => {
                   const discountDisplayPrice = getDiscountDisplayPrice(t.price)
@@ -281,7 +302,7 @@ function EventDetailPage() {
                       <div className="flex items-start justify-between gap-4">
                         <div>
                           <h3 className="font-semibold text-gray-900">{t.name}</h3>
-                          <p className="text-xs text-gray-500">{t.quotaAvailable} tickets available</p>
+                          <p className="text-xs text-gray-500">{t.quotaAvailable} tiket tersedia</p>
                         </div>
                         <div className="shrink-0 text-right">
                           <div className="flex flex-wrap items-center justify-end gap-2">
@@ -309,7 +330,7 @@ function EventDetailPage() {
             </Card>
 
             <Card>
-              <CardHeader title="Ticket Quantity" />
+              <CardHeader title="Jumlah Tiket" />
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <button
@@ -340,23 +361,24 @@ function EventDetailPage() {
                   <p className="text-2xl font-bold text-brand-600">{formatIDR(total)}</p>
                 </div>
                 <button
-                  onClick={() => {
-                    const search = new URLSearchParams({
-                      eventId: event.id,
-                      tierId: selectedTier,
-                      qty: String(quantity),
-                    })
-                    navigate(`/checkout?${search.toString()}`)
-                  }}
+                  onClick={handleCheckout}
                   className="w-full rounded-lg bg-brand-600 px-6 py-3 text-sm font-semibold text-white shadow-sm hover:bg-brand-700"
                 >
-                  Proceed to Checkout
+                  Lanjut ke Pembayaran
                 </button>
               </div>
             </div>
           </div>
         </div>
       </div>
+
+      <LoginPromptModal
+        open={loginPromptOpen}
+        onClose={() => setLoginPromptOpen(false)}
+        message="Kamu perlu masuk ke akun terlebih dahulu sebelum melanjutkan pembelian tiket."
+        redirectTo={buildCheckoutPath()}
+      />
+
       <SiteFooter />
     </SiteLayout>
   )

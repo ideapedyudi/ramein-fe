@@ -111,7 +111,7 @@ function TicketQrModal({ open, ticket, onClose }) {
 
         <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
           <div className="rounded-xl border border-[#efefef] p-3">
-            <p className="text-[10px] uppercase text-[#9a9a9a]">Order ID</p>
+            <p className="text-[10px] uppercase text-[#9a9a9a]">ID Pesanan</p>
             <p className="mt-1 font-mono text-xs text-[#1f1f1f]">{ticket.orderId}</p>
           </div>
           <div className="rounded-xl border border-[#efefef] p-3">
@@ -125,7 +125,7 @@ function TicketQrModal({ open, ticket, onClose }) {
             <p className="mt-1 font-semibold text-[#1f1f1f]">{ticket.dateLabel}</p>
           </div>
           <div className="rounded-xl border border-[#efefef] p-3">
-            <p className="text-[10px] uppercase text-[#9a9a9a]">Check-in</p>
+            <p className="text-[10px] uppercase text-[#9a9a9a]">Kehadiran</p>
             <p className="mt-1 font-semibold text-[#1f1f1f]">
               {activeTicket.attendedAt ? formatDateTime(activeTicket.attendedAt) : 'Belum hadir'}
             </p>
@@ -189,7 +189,7 @@ function TicketCard({
 
         <div className="grid grid-cols-3 gap-3 border-t border-[#f0f0f0] pt-3">
           <div>
-            <p className="text-[10px] uppercase text-[#9a9a9a]">Tier</p>
+            <p className="text-[10px] uppercase text-[#9a9a9a]">Jenis</p>
             <p className="mt-0.5 text-sm font-semibold text-[#1f1f1f]">{ticket.tier}</p>
           </div>
           <div>

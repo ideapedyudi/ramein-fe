@@ -74,7 +74,7 @@ function DashboardPage() {
         />
         <StatCard
           icon={FaBuilding}
-          label="Organizer"
+          label="Penyelenggara"
           value={counts.organizers}
           accent="bg-amber-50 text-amber-700"
           hint="Partner resmi"
@@ -107,7 +107,7 @@ function DashboardPage() {
 
         <section className="rounded-2xl border border-[#eee] bg-white p-5">
           <div className="flex items-center justify-between">
-            <h2 className="text-base font-semibold text-[#1f1f1f]">Organizer Terbaru</h2>
+            <h2 className="text-base font-semibold text-[#1f1f1f]">Penyelenggara Terbaru</h2>
             <Link
               to="/admin/organizer"
               className="inline-flex items-center gap-1 text-xs font-semibold text-brand-600 hover:underline"
@@ -123,7 +123,7 @@ function DashboardPage() {
               </li>
             ))}
             {recent.organizers.length === 0 && (
-              <li className="py-6 text-center text-xs text-[#6d6d6d]">Belum ada organizer.</li>
+              <li className="py-6 text-center text-xs text-[#6d6d6d]">Belum ada penyelenggara.</li>
             )}
           </ul>
         </section>

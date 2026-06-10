@@ -86,7 +86,7 @@ function AdminKotaPage() {
       }
       resetForm()
     } catch (err) {
-      setError(err.message || `Gagal ${editingId ? 'mengupdate' : 'menambah'} kota.`)
+      setError(err.message || `Gagal ${editingId ? 'mengubah' : 'menambah'} kota.`)
     } finally {
       setBusy(false)
     }
@@ -96,7 +96,7 @@ function AdminKotaPage() {
     <AdminLayout title="Kota" subtitle="Master data kota tempat event berlangsung">
       <section className="rounded-2xl border border-[#eee] bg-white p-5">
         <h2 className="text-sm font-semibold text-[#1f1f1f]">
-          {editingId ? 'Update Kota' : 'Tambah Kota'}
+          {editingId ? 'Ubah Kota' : 'Tambah Kota'}
         </h2>
         <form onSubmit={handleSubmit} className="mt-3 grid gap-3 lg:grid-cols-[1fr_220px_auto]">
           <input
@@ -123,7 +123,7 @@ function AdminKotaPage() {
             className="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-700 disabled:opacity-50"
           >
             {editingId ? <FaEdit className="text-xs" /> : <FaPlus className="text-xs" />}
-            {editingId ? 'Simpan Update' : 'Tambah'}
+            {editingId ? 'Simpan Perubahan' : 'Tambah'}
           </button>
           {editingId && (
             <button
@@ -153,7 +153,7 @@ function AdminKotaPage() {
               className="inline-flex items-center gap-1.5 rounded-md border border-[#e2e2e2] px-2 py-1 text-xs font-medium text-[#4a4a4a] hover:bg-[#f7f7f7] disabled:opacity-50"
             >
               <FaSyncAlt className="text-[10px]" />
-              Refresh
+              Muat Ulang
             </button>
           </div>
         </div>
@@ -191,7 +191,7 @@ function AdminKotaPage() {
                       className="inline-flex items-center gap-1.5 rounded-md border border-[#e2e2e2] px-2 py-1 text-xs font-medium text-brand-700 hover:bg-brand-50"
                     >
                       <FaEdit className="text-[10px]" />
-                      Update
+                      Ubah
                     </button>
                   </td>
                 </tr>

@@ -69,7 +69,7 @@ function EventKamuPage() {
 
   return (
     <AdminLayout
-      title="Event Saya"
+      title="Event Kamu"
       subtitle={`${events.length} event yang kamu kelola`}
       actions={
         <Link
@@ -115,8 +115,8 @@ function EventKamuPage() {
                 <Stat label="Terjual" value={formatNumber(event.registered)} accent="text-brand-600" />
                 <Stat label="Kuota" value={formatNumber(event.totalQuota)} accent="text-emerald-600" />
                 <Stat
-                  label="Visibility"
-                  value={event.visibility ?? (event.isPublished ? 'Published' : 'Draft')}
+                  label="Visibilitas"
+                  value={event.visibility ?? (event.isPublished ? 'Tampil' : 'Draf')}
                   accent="text-emerald-600"
                 />
               </div>
@@ -135,7 +135,7 @@ function EventKamuPage() {
                   className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-red-100 px-3 py-2 text-xs font-semibold text-red-600 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   <FaTrashAlt className="text-[11px]" />
-                  {deletingId === event.id ? 'Menghapus...' : 'Delete'}
+                  {deletingId === event.id ? 'Menghapus...' : 'Hapus'}
                 </button>
               </div>
             </div>

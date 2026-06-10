@@ -152,7 +152,7 @@ function LoginPage() {
     e.preventDefault();
     setError("");
     if (!email || !password) {
-      setError("Email dan password wajib diisi.");
+      setError("Email dan kata sandi wajib diisi.");
       return;
     }
 
@@ -161,7 +161,7 @@ function LoginPage() {
       fireLoginConfetti();
       navigateAfterAuth(user);
     } catch (err) {
-      setError(err || "Login gagal. Periksa email dan password.");
+      setError(err || "Masuk gagal. Periksa email dan kata sandi.");
     }
   }
 
@@ -173,7 +173,7 @@ function LoginPage() {
         fireLoginConfetti();
         navigateAfterAuth(user);
       } catch (err) {
-        setError(err || "Login Google gagal.");
+        setError(err || "Masuk dengan Google gagal.");
       }
     },
     [googleAuth, navigateAfterAuth],
@@ -255,12 +255,12 @@ function LoginPage() {
                 />
               </label>
               <label className="block text-lg font-semibold text-[#2b2b2b] md:text-[16px]">
-                Password
+                Kata Sandi
                 <input
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Masukkan password"
+                  placeholder="Masukkan kata sandi"
                   className={inputClass}
                 />
               </label>
@@ -273,11 +273,11 @@ function LoginPage() {
 
               <div className="space-y-2 rounded-lg border border-dashed border-emerald-300 bg-emerald-50/60 px-3 py-2.5 text-xs text-[#2b2b2b]">
                 <p className="font-semibold uppercase tracking-wider text-emerald-700">
-                  User Test
+                  Akun Uji Coba
                 </p>
                 <div className="flex items-center justify-between gap-2">
                   <span>
-                    <span className="font-semibold">User</span> ·{" "}
+                    <span className="font-semibold">Pengguna</span> ·{" "}
                     {SAMPLE_CREDENTIALS.user.email} /{" "}
                     {SAMPLE_CREDENTIALS.user.password}
                   </span>
@@ -300,7 +300,7 @@ function LoginPage() {
                   Ingat saya
                 </label>
                 <a href="#" className="text-[#2ea387] hover:underline">
-                  Lupa password?
+                  Lupa kata sandi?
                 </a>
               </div>
               <button

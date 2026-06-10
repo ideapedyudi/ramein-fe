@@ -121,14 +121,14 @@ function PengaturanPage() {
                 e.preventDefault()
               }}
             >
-              <h2 className="text-base font-semibold text-[#1f1f1f]">Ganti Password</h2>
-              <Field label="Password Lama">
+              <h2 className="text-base font-semibold text-[#1f1f1f]">Ganti Kata Sandi</h2>
+              <Field label="Kata Sandi Lama">
                 <input type="password" className={inputClass} placeholder="••••••••" />
               </Field>
-              <Field label="Password Baru">
+              <Field label="Kata Sandi Baru">
                 <input type="password" className={inputClass} placeholder="••••••••" />
               </Field>
-              <Field label="Konfirmasi Password Baru">
+              <Field label="Konfirmasi Kata Sandi Baru">
                 <input type="password" className={inputClass} placeholder="••••••••" />
               </Field>
               <div className="flex justify-end">
@@ -136,7 +136,7 @@ function PengaturanPage() {
                   type="submit"
                   className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-700"
                 >
-                  Update Password
+                  Perbarui Kata Sandi
                 </button>
               </div>
             </form>

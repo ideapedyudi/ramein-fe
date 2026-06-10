@@ -21,20 +21,20 @@ const CONFETTI_COLORS = ['#0a7c6e', '#2fa084', '#46b994', '#ffc94d', '#ffd770']
 
 const eventWarnings = [
   'Pastikan nama event, tanggal, jam, lokasi, dan penyelenggara sudah sesuai.',
-  'Jangan bagikan QR code, kode booking, atau link akses online ke orang lain.',
+  'Jangan bagikan QR Code, kode pemesanan, atau tautan akses online ke orang lain.',
   'Baca ketentuan refund, batas check-in, dan aturan usia atau identitas jika tersedia.',
   'Waspadai ajakan pembayaran tambahan atau kontak yang tidak resmi.',
 ]
 
 const offlinePreparations = [
-  'Bawa e-ticket atau QR code yang bisa diakses tanpa internet.',
+  'Bawa e-tiket atau QR Code yang bisa diakses tanpa internet.',
   'Siapkan identitas sesuai nama pada tiket jika diminta di venue.',
   'Datang lebih awal untuk antrean check-in, parkir, dan pemeriksaan keamanan.',
   'Cek rute, cuaca, dress code, dan barang yang tidak boleh dibawa.',
 ]
 
 const onlinePreparations = [
-  'Pastikan link akses, email tiket, dan jadwal sudah tersimpan.',
+  'Pastikan tautan akses, email tiket, dan jadwal sudah tersimpan.',
   'Gunakan koneksi internet stabil dan perangkat yang baterainya cukup.',
   'Tes kamera, mikrofon, speaker, dan aplikasi meeting sebelum event dimulai.',
   'Masuk beberapa menit lebih awal agar tidak tertinggal sesi pembuka.',
@@ -127,7 +127,7 @@ function CopyButton({ value }) {
       }}
       className="rounded-lg bg-brand-600 px-3 py-2 text-xs font-semibold text-white hover:bg-brand-700"
     >
-      Copy Link
+      Salin Tautan
     </button>
   )
 }
@@ -176,13 +176,13 @@ function FeedbackModal({
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-brand-600">
-              Feedback Transaksi
+              Masukan Transaksi
             </p>
             <h2 id="feedback-modal-title" className="mt-2 text-2xl font-bold text-gray-900">
               Gimana pengalaman transaksi kamu?
             </h2>
             <p className="mt-2 text-sm text-gray-600">
-              Contoh feedback: rating <strong>Sangat Puas</strong>, review{' '}
+              Contoh masukan: rating <strong>Sangat Puas</strong>, ulasan{' '}
               <strong>Proses transaksi mudah dan cepat</strong>.
             </p>
           </div>
@@ -224,7 +224,7 @@ function FeedbackModal({
 
           <label className="mt-5 block">
             <span className="text-sm font-semibold text-gray-900">
-              Review <span className="font-normal text-gray-500">(opsional)</span>
+              Ulasan <span className="font-normal text-gray-500">(opsional)</span>
             </span>
             <textarea
               value={feedback.review}
@@ -254,7 +254,7 @@ function FeedbackModal({
               disabled={submitting}
               className="rounded-xl bg-brand-600 px-5 py-3 text-sm font-semibold text-white hover:bg-brand-700 disabled:opacity-60"
             >
-              {submitting ? 'Mengirim...' : 'Kirim feedback'}
+              {submitting ? 'Mengirim...' : 'Kirim masukan'}
             </button>
           </div>
         </form>
@@ -288,20 +288,20 @@ function OrderSuccessPage() {
     Promise.resolve().then(() => {
       if (cancelled || eventId) return
       if (!orderId || typeof window === 'undefined') {
-        setError('Missing event')
+        setError('Event tidak ditemukan')
         return
       }
 
       try {
         const rawMeta = window.localStorage.getItem(`checkout_meta_${orderId}`)
         if (!rawMeta) {
-          setError('Missing event')
+          setError('Event tidak ditemukan')
           return
         }
 
         const meta = JSON.parse(rawMeta)
         if (!meta?.eventId) {
-          setError('Missing event')
+          setError('Event tidak ditemukan')
           return
         }
 
@@ -310,7 +310,7 @@ function OrderSuccessPage() {
           setTotal(Number(meta.total))
         }
       } catch {
-        setError('Missing event')
+        setError('Event tidak ditemukan')
       }
     })
 
@@ -329,7 +329,7 @@ function OrderSuccessPage() {
       return api.getEvent(eventId).then((res) => {
         if (cancelled) return
         if (!res) {
-          setError('Event not found')
+          setError('Event tidak ditemukan')
           return
         }
         setEvent(res)
@@ -407,11 +407,11 @@ function OrderSuccessPage() {
         review: trimmedReview,
         submittedAt: new Date().toISOString(),
       }
-      setFeedbackNotice('Feedback berhasil dikirim. Terima kasih.')
+      setFeedbackNotice('Masukan berhasil dikirim. Terima kasih.')
       setFeedbackOpen(false)
       setFeedback(nextFeedback)
     } catch (submitError) {
-      setFeedbackError(submitError.message || 'Feedback belum berhasil dikirim. Coba lagi.')
+      setFeedbackError(submitError.message || 'Masukan belum berhasil dikirim. Coba lagi.')
     } finally {
       setFeedbackSubmitting(false)
     }
@@ -450,12 +450,12 @@ function OrderSuccessPage() {
             &#10003;
           </div>
           <h1 className="mt-4 text-2xl font-bold text-gray-900 sm:text-3xl">
-            {isRsvp ? 'Hore!!! RSVP Berhasil!' : 'Hore!!! Pembayaran Berhasil!'}
+            {isRsvp ? 'Hore!!! Pendaftaran Berhasil!' : 'Hore!!! Pembayaran Berhasil!'}
           </h1>
           <p className="mt-2 text-gray-600">
             {isRsvp
               ? 'Kamu sudah terdaftar di event ini. Detail akses sudah kami siapkan di bawah.'
-              : 'E-ticket sudah dikirim ke email kamu. Tunjukkan QR code di lokasi untuk validasi.'}
+              : 'E-tiket sudah dikirim ke email kamu. Tunjukkan QR Code di lokasi untuk validasi.'}
           </p>
 
           {feedbackNotice && (
@@ -465,7 +465,7 @@ function OrderSuccessPage() {
           )}
 
           <div className="mt-6 rounded-xl border border-gray-100 bg-gray-50/40 p-5">
-            <p className="text-xs font-medium uppercase text-gray-500">Order ID</p>
+            <p className="text-xs font-medium uppercase text-gray-500">ID Pesanan</p>
             <p className="mt-0.5 font-mono text-sm text-gray-900">{orderId || '-'}</p>
             <div className="mt-4 border-t border-gray-100 pt-4">
               <p className="font-semibold text-gray-900">{event.name}</p>
@@ -487,7 +487,7 @@ function OrderSuccessPage() {
                 Akses: {event.attachmentLabel ?? 'Akses Event'}
               </p>
               <p className="mt-1 text-xs text-brand-700/80">
-                Berikut link akses yang disiapkan organizer untuk peserta:
+                Berikut tautan akses yang disiapkan penyelenggara untuk peserta:
               </p>
               <div className="mt-3 flex flex-wrap items-center gap-2">
                 <a
@@ -501,7 +501,7 @@ function OrderSuccessPage() {
                 <CopyButton value={event.attachmentUrl} />
               </div>
               <p className="mt-3 text-xs text-brand-700/70">
-                Simpan link ini. Link juga sudah dikirim ke email kamu.
+                Simpan tautan ini. Tautan juga sudah dikirim ke email kamu.
               </p>
             </div>
           ) : (
@@ -516,13 +516,13 @@ function OrderSuccessPage() {
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.24em] text-amber-600">
-                  Feedback
+                  Masukan
                 </p>
                 <h2 className="mt-2 text-lg font-semibold text-gray-900">
                   Bantu kami nilai pengalaman transaksi kamu
                 </h2>
                 <p className="mt-1 text-sm text-gray-600">
-                  Rating wajib dipilih, review boleh dikosongkan.
+                  Rating wajib dipilih, ulasan boleh dikosongkan.
                 </p>
               </div>
               <button
@@ -530,7 +530,7 @@ function OrderSuccessPage() {
                 onClick={openFeedbackModal}
                 className="rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-semibold text-white hover:bg-gray-800"
               >
-                Beri feedback
+                Beri masukan
               </button>
             </div>
           </div>
@@ -573,7 +573,7 @@ function OrderSuccessPage() {
                   <FaExclamationTriangle />
                 </span>
                 <div>
-                  <h3 className="font-semibold text-gray-900">Warning untuk user</h3>
+                  <h3 className="font-semibold text-gray-900">Peringatan untuk kamu</h3>
                   <p className="text-xs text-gray-600">Cek ulang sebelum hadir.</p>
                 </div>
               </div>

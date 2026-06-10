@@ -10,7 +10,7 @@ const sections = [
   },
   {
     title: '2. Akun Pengguna',
-    body: 'Kamu bertanggung jawab menjaga kerahasiaan akun dan password. Aktivitas yang terjadi di bawah akun kamu menjadi tanggung jawab kamu sepenuhnya. Beritahu kami segera jika kamu mencurigai adanya akses tidak sah.',
+    body: 'Kamu bertanggung jawab menjaga kerahasiaan akun dan kata sandi. Aktivitas yang terjadi di bawah akun kamu menjadi tanggung jawab kamu sepenuhnya. Beritahu kami segera jika kamu mencurigai adanya akses tidak sah.',
   },
   {
     title: '3. Pembelian Tiket',
@@ -22,7 +22,7 @@ const sections = [
   },
   {
     title: '5. Pembayaran & Biaya',
-    body: 'Ramein mengenakan biaya layanan dan biaya platform yang ditampilkan secara transparan pada halaman checkout. Pembayaran diproses melalui payment gateway terpercaya (E-Wallet, QRIS, Bank Transfer).',
+    body: 'Ramein mengenakan biaya layanan dan biaya platform yang ditampilkan secara transparan pada halaman pembayaran. Pembayaran diproses melalui gerbang pembayaran terpercaya (E-Wallet, QRIS, Transfer Bank).',
   },
   {
     title: '6. Hak Kekayaan Intelektual',

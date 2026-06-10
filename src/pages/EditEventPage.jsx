@@ -204,7 +204,7 @@ function EditEventPage() {
       })
       navigate(`/event-kamu/${eventId}`)
     } catch (err) {
-      setError(err.message || 'Gagal mengupdate event.')
+      setError(err.message || 'Gagal memperbarui event.')
     } finally {
       setSubmitting(false)
     }
@@ -212,8 +212,8 @@ function EditEventPage() {
 
   return (
     <AdminLayout
-      title="Edit Event"
-      subtitle="Update data lengkap event"
+      title="Ubah Event"
+      subtitle="Perbarui data lengkap event"
       actions={
         <Link
           to="/event-kamu"
@@ -237,7 +237,7 @@ function EditEventPage() {
                   value={form.title}
                   onChange={(value) => updateForm('title', value)}
                   required
-                  placeholder="Konser Akhir Tahun Updated"
+                  placeholder="Konser Akhir Tahun Terbaru"
                 />
               </div>
 
@@ -255,12 +255,12 @@ function EditEventPage() {
                 ))}
               </Select>
               <Select
-                label="Organizer"
+                label="Penyelenggara"
                 value={form.organizerId}
                 onChange={(value) => updateForm('organizerId', value)}
                 required
               >
-                <option value="">Pilih organizer</option>
+                <option value="">Pilih penyelenggara</option>
                 {organizers.map((organizer) => (
                   <option key={organizer.id} value={organizer.id}>
                     {organizer.name}
@@ -320,13 +320,13 @@ function EditEventPage() {
                 <option value="online">Online</option>
               </Select>
               <Select
-                label="Payment"
+                label="Pembayaran"
                 value={form.paymentType}
                 onChange={(value) => updateForm('paymentType', value)}
                 required
               >
-                <option value="paid">Paid</option>
-                <option value="free">Free</option>
+                <option value="paid">Berbayar</option>
+                <option value="free">Gratis</option>
               </Select>
               <Select
                 label="Status"
@@ -334,12 +334,12 @@ function EditEventPage() {
                 onChange={(value) => updateForm('status', value)}
                 required
               >
-                <option value="published">Published</option>
-                <option value="draft">Draft</option>
-                <option value="pending">Pending</option>
+                <option value="published">Terbit</option>
+                <option value="draft">Draf</option>
+                <option value="pending">Menunggu</option>
               </Select>
               <Select
-                label="Published"
+                label="Terbit"
                 value={form.isPublished ? 'true' : 'false'}
                 onChange={(value) => updateForm('isPublished', value === 'true')}
                 required
@@ -385,7 +385,7 @@ function EditEventPage() {
 
             <div className="rounded-2xl border border-gray-100 p-4">
               <div className="flex items-center justify-between gap-3">
-                <h2 className="text-sm font-semibold text-gray-900">Ticket Types</h2>
+                <h2 className="text-sm font-semibold text-gray-900">Kategori Tiket</h2>
                 <button
                   type="button"
                   onClick={addTicket}
@@ -414,27 +414,27 @@ function EditEventPage() {
                         required
                       />
                       <Field
-                        label="Quota"
+                        label="Kuota"
                         type="number"
                         value={ticket.quota}
                         onChange={(value) => updateTicket(index, 'quota', value)}
                         required
                       />
                       <Field
-                        label="Sold"
+                        label="Terjual"
                         type="number"
                         value={ticket.sold}
                         onChange={(value) => updateTicket(index, 'sold', value)}
                         required
                       />
                       <Field
-                        label="Sale Start"
+                        label="Mulai Penjualan"
                         type="datetime-local"
                         value={ticket.saleStartAt}
                         onChange={(value) => updateTicket(index, 'saleStartAt', value)}
                       />
                       <Field
-                        label="Sale End"
+                        label="Akhir Penjualan"
                         type="datetime-local"
                         value={ticket.saleEndAt}
                         onChange={(value) => updateTicket(index, 'saleEndAt', value)}
@@ -464,7 +464,7 @@ function EditEventPage() {
                 disabled={submitting}
                 className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-gray-300"
               >
-                {submitting ? 'Menyimpan...' : 'Simpan Update'}
+                {submitting ? 'Menyimpan...' : 'Simpan Perubahan'}
               </button>
               <Link
                 to={`/event-kamu/${eventId}`}

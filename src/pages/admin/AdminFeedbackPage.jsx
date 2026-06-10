@@ -16,7 +16,7 @@ function AdminFeedbackPage() {
       const res = await api.getFeedbacks()
       setFeedbacks(res)
     } catch (err) {
-      setError(err.message || 'Gagal memuat feedback.')
+      setError(err.message || 'Gagal memuat masukan.')
     } finally {
       setLoading(false)
     }
@@ -31,12 +31,12 @@ function AdminFeedbackPage() {
   }, [loadFeedbacks])
 
   return (
-    <AdminLayout title="Feedback" subtitle="Daftar feedback dari user">
+    <AdminLayout title="Masukan" subtitle="Daftar masukan dari pengguna">
       <section className="rounded-2xl border border-[#eee] bg-white">
         <div className="flex items-center justify-between gap-3 border-b border-[#eee] px-5 py-3">
           <div>
-            <h2 className="text-sm font-semibold text-[#1f1f1f]">Daftar Feedback</h2>
-            <p className="mt-1 text-xs text-[#6d6d6d]">{feedbacks.length} feedback</p>
+            <h2 className="text-sm font-semibold text-[#1f1f1f]">Daftar Masukan</h2>
+            <p className="mt-1 text-xs text-[#6d6d6d]">{feedbacks.length} masukan</p>
           </div>
           <button
             type="button"
@@ -45,7 +45,7 @@ function AdminFeedbackPage() {
             className="inline-flex items-center gap-1.5 rounded-md border border-[#e2e2e2] px-2 py-1 text-xs font-medium text-[#4a4a4a] hover:bg-[#f7f7f7] disabled:opacity-50"
           >
             <FaSyncAlt className="text-[10px]" />
-            Refresh
+            Muat Ulang
           </button>
         </div>
 
@@ -60,7 +60,7 @@ function AdminFeedbackPage() {
             <thead className="bg-[#fafafa] text-xs uppercase text-[#9a9a9a]">
               <tr>
                 <th className="px-5 py-3 font-medium">Rating</th>
-                <th className="px-5 py-3 font-medium">Review</th>
+                <th className="px-5 py-3 font-medium">Ulasan</th>
                 <th className="px-5 py-3 font-medium">Dibuat</th>
               </tr>
             </thead>
@@ -78,10 +78,10 @@ function AdminFeedbackPage() {
           </table>
         </div>
 
-        {loading && <div className="p-10 text-center text-sm text-[#6d6d6d]">Memuat feedback...</div>}
+        {loading && <div className="p-10 text-center text-sm text-[#6d6d6d]">Memuat masukan...</div>}
 
         {!loading && feedbacks.length === 0 && (
-          <div className="p-10 text-center text-sm text-[#6d6d6d]">Belum ada data feedback.</div>
+          <div className="p-10 text-center text-sm text-[#6d6d6d]">Belum ada data masukan.</div>
         )}
       </section>
     </AdminLayout>

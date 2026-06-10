@@ -15,14 +15,14 @@ function escapeExcelCell(value) {
 function exportFinanceToExcel(rows, organizerName) {
   const headers = [
     'ID',
-    'User',
+    'Pengguna',
     'Email',
     'Event',
-    'Organizer',
-    'Gross Amount',
-    'Admin Income',
+    'Penyelenggara',
+    'Jumlah Kotor',
+    'Pendapatan Admin',
     'Waktu Transaksi',
-    'Published By',
+    'Diterbitkan Oleh',
   ]
   const tableRows = rows.map((row) => [
     row.id,
@@ -89,7 +89,7 @@ function AdminFinancePage() {
         setOrganizerId((current) => current || res[0]?.id || '')
       })
       .catch((err) => {
-        if (!cancelled) setError(err.message || 'Gagal memuat organizer.')
+        if (!cancelled) setError(err.message || 'Gagal memuat penyelenggara.')
       })
       .finally(() => {
         if (!cancelled) setLoadingMaster(false)
@@ -118,7 +118,7 @@ function AdminFinancePage() {
         if (!cancelled && res) setFinanceRows(res)
       })
       .catch((err) => {
-        if (!cancelled) setError(err.message || 'Gagal memuat finance.')
+        if (!cancelled) setError(err.message || 'Gagal memuat keuangan.')
       })
       .finally(() => {
         if (!cancelled) setLoadingFinance(false)
@@ -167,37 +167,37 @@ function AdminFinancePage() {
     api
       .getAdminFinance(organizerId)
       .then(setFinanceRows)
-      .catch((err) => setError(err.message || 'Gagal memuat finance.'))
+      .catch((err) => setError(err.message || 'Gagal memuat keuangan.'))
       .finally(() => setLoadingFinance(false))
   }
 
   return (
-    <AdminLayout title="Finance" subtitle="Laporan pemasukan admin berdasarkan organizer">
+    <AdminLayout title="Keuangan" subtitle="Laporan pemasukan admin berdasarkan penyelenggara">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <div className="rounded-2xl border border-[#eee] bg-white p-5">
           <p className="text-xs font-semibold uppercase tracking-wider text-[#9a9a9a]">
-            Gross Amount
+            Jumlah Kotor
           </p>
           <p className="mt-2 text-2xl font-bold text-[#1f1f1f]">{formatIDR(totals.gross)}</p>
           <p className="mt-1 text-xs text-[#6d6d6d]">{totals.count} transaksi</p>
         </div>
         <div className="rounded-2xl border border-[#eee] bg-white p-5">
           <p className="text-xs font-semibold uppercase tracking-wider text-[#9a9a9a]">
-            Admin Income
+            Pendapatan Admin
           </p>
           <p className="mt-2 text-2xl font-bold text-[#1f1f1f]">
             {formatIDR(totals.adminIncome)}
           </p>
-          <p className="mt-1 text-xs text-[#6d6d6d]">Dari data terfilter</p>
+          <p className="mt-1 text-xs text-[#6d6d6d]">Dari data tersaring</p>
         </div>
         <div className="rounded-2xl border border-[#eee] bg-white p-5">
           <p className="text-xs font-semibold uppercase tracking-wider text-[#9a9a9a]">
-            Organizer
+            Penyelenggara
           </p>
           <p className="mt-2 truncate text-2xl font-bold text-[#1f1f1f]">
             {selectedOrganizer?.name ?? '-'}
           </p>
-          <p className="mt-1 text-xs text-[#6d6d6d]">Filter aktif</p>
+          <p className="mt-1 text-xs text-[#6d6d6d]">Saringan aktif</p>
         </div>
       </div>
 
@@ -210,7 +210,7 @@ function AdminFinancePage() {
               disabled={loadingMaster}
               className="rounded-lg border border-[#e2e2e2] bg-white px-3 py-2 text-xs outline-none focus:border-brand-500"
             >
-              <option value="">Pilih organizer</option>
+              <option value="">Pilih penyelenggara</option>
               {organizers.map((organizer) => (
                 <option key={organizer.id} value={organizer.id}>
                   {organizer.name}
@@ -236,7 +236,7 @@ function AdminFinancePage() {
               className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-[#e2e2e2] px-3 py-2 text-xs font-medium text-[#4a4a4a] hover:bg-[#f7f7f7] disabled:cursor-not-allowed disabled:opacity-50"
             >
               <FaSyncAlt className="text-[10px]" />
-              Refresh
+              Muat Ulang
             </button>
             <button
               type="button"
@@ -245,7 +245,7 @@ function AdminFinancePage() {
               className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-brand-600 px-3 py-2 text-xs font-semibold text-white hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-gray-300"
             >
               <FaFileExcel className="text-[10px]" />
-              Export Excel
+              Ekspor Excel
             </button>
           </div>
         </div>
@@ -261,12 +261,12 @@ function AdminFinancePage() {
             <thead className="bg-[#fafafa] text-xs uppercase text-[#9a9a9a]">
               <tr>
                 <th className="px-4 py-3 font-medium">Transaksi</th>
-                <th className="px-4 py-3 font-medium">User</th>
+                <th className="px-4 py-3 font-medium">Pengguna</th>
                 <th className="px-4 py-3 font-medium">Event</th>
-                <th className="px-4 py-3 font-medium">Organizer</th>
-                <th className="px-4 py-3 text-right font-medium">Gross</th>
-                <th className="px-4 py-3 text-right font-medium">Admin Income</th>
-                <th className="px-4 py-3 font-medium">Published</th>
+                <th className="px-4 py-3 font-medium">Penyelenggara</th>
+                <th className="px-4 py-3 text-right font-medium">Kotor</th>
+                <th className="px-4 py-3 text-right font-medium">Pendapatan Admin</th>
+                <th className="px-4 py-3 font-medium">Diterbitkan</th>
                 <th className="px-4 py-3 font-medium">Waktu</th>
               </tr>
             </thead>
@@ -306,12 +306,12 @@ function AdminFinancePage() {
         </div>
 
         {(loadingMaster || loadingFinance) && (
-          <div className="p-10 text-center text-sm text-[#6d6d6d]">Memuat finance...</div>
+          <div className="p-10 text-center text-sm text-[#6d6d6d]">Memuat keuangan...</div>
         )}
 
         {!loadingMaster && !loadingFinance && filtered.length === 0 && (
           <div className="p-10 text-center text-sm text-[#6d6d6d]">
-            Belum ada data finance untuk filter ini.
+            Belum ada data keuangan untuk saringan ini.
           </div>
         )}
       </section>

@@ -158,7 +158,7 @@ function HomePage() {
         <Container className="mt-12">
           <section>
             <SectionTitle
-              title="Recommended For You"
+              title="Rekomendasi Buat Kamu"
               subtitle="Berdasarkan minat favorit kamu"
             />
             {renderEventSection(recommendedState)}
@@ -188,7 +188,7 @@ function HomePage() {
                     <FaExclamationTriangle />
                   </span>
                   <div>
-                    <h3 className="font-semibold text-gray-900">Warning untuk user</h3>
+                    <h3 className="font-semibold text-gray-900">Peringatan untuk kamu</h3>
                     <p className="text-xs text-gray-600">Cek ulang sebelum transaksi dan hadir.</p>
                   </div>
                 </div>
@@ -248,7 +248,7 @@ function HomePage() {
         <Container className="mt-16">
           <section>
             <SectionTitle
-              title="Browse by Region"
+              title="Jelajahi per Wilayah"
               subtitle="Jelajahi event di wilayah Indonesia"
             />
             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">

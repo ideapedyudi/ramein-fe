@@ -28,8 +28,8 @@ const values = [
 ];
 
 const team = [
-  { initial: "Y", name: "Yudi", role: "Team Leader & Developer" },
-  { initial: "N", name: "Naufal", role: "Developer" },
+  { initial: "Y", name: "Yudi", role: "Ketua Tim & Pengembang" },
+  { initial: "N", name: "Naufal", role: "Pengembang" },
   { initial: "A", name: "Astry", role: "Konten & Desain" },
   { initial: "G", name: "Givary", role: "Konten & Desain" },
   { initial: "R", name: "Rafly", role: "Dokumentasi & Tester" },

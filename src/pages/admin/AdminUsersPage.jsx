@@ -93,7 +93,7 @@ function AdminUsersPage() {
     form.phone.trim()
 
   return (
-    <AdminLayout title="User" subtitle="Manajemen user dan admin">
+    <AdminLayout title="Pengguna" subtitle="Manajemen pengguna dan admin">
       <section className="rounded-2xl border border-[#eee] bg-white p-5">
         <h2 className="text-sm font-semibold text-[#1f1f1f]">Tambah Admin</h2>
         <form onSubmit={handleSubmit} className="mt-3 grid gap-3 lg:grid-cols-5">
@@ -115,7 +115,7 @@ function AdminUsersPage() {
             type="password"
             value={form.password}
             onChange={(event) => updateForm('password', event.target.value)}
-            placeholder="Password"
+            placeholder="Kata Sandi"
             className="rounded-lg border border-[#e2e2e2] bg-white px-3 py-2 text-sm outline-none focus:border-brand-500"
           />
           <input
@@ -144,15 +144,15 @@ function AdminUsersPage() {
       <section className="mt-5 rounded-2xl border border-[#eee] bg-white">
         <div className="flex flex-col gap-3 border-b border-[#eee] px-5 py-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h2 className="text-sm font-semibold text-[#1f1f1f]">Daftar User</h2>
+            <h2 className="text-sm font-semibold text-[#1f1f1f]">Daftar Pengguna</h2>
             <p className="mt-1 text-xs text-[#6d6d6d]">
-              {users.length} user · {admins.length} admin
+              {users.length} pengguna · {admins.length} admin
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
             {[
               { value: 'all', label: 'Semua' },
-              { value: 'user', label: 'User' },
+              { value: 'user', label: 'Pengguna' },
               { value: 'admin', label: 'Admin' },
             ].map((item) => (
               <button
@@ -175,7 +175,7 @@ function AdminUsersPage() {
               className="inline-flex items-center gap-1.5 rounded-md border border-[#e2e2e2] px-2 py-1.5 text-xs font-medium text-[#4a4a4a] hover:bg-[#f7f7f7] disabled:opacity-50"
             >
               <FaSyncAlt className="text-[10px]" />
-              Refresh
+              Muat Ulang
             </button>
           </div>
         </div>
@@ -192,8 +192,8 @@ function AdminUsersPage() {
               <tr>
                 <th className="px-5 py-3 font-medium">Nama</th>
                 <th className="px-5 py-3 font-medium">Email</th>
-                <th className="px-5 py-3 font-medium">Phone</th>
-                <th className="px-5 py-3 font-medium">Role</th>
+                <th className="px-5 py-3 font-medium">No. HP</th>
+                <th className="px-5 py-3 font-medium">Peran</th>
                 <th className="px-5 py-3 font-medium">Status</th>
                 <th className="px-5 py-3 font-medium">Dibuat</th>
                 <th className="px-5 py-3 font-medium">Diupdate</th>
@@ -221,7 +221,7 @@ function AdminUsersPage() {
                           : 'bg-gray-100 text-gray-600 ring-gray-200'
                       }`}
                     >
-                      {row.isActive ? 'Aktif' : 'Nonaktif'}
+                      {row.isActive ? 'Aktif' : 'Tidak Aktif'}
                     </span>
                   </td>
                   <td className="px-5 py-3 text-xs text-[#6d6d6d]">

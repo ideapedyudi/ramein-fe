@@ -246,7 +246,7 @@ function BuatEventFestivalPage() {
 
   return (
     <AdminLayout
-      title="Buat Event Festival / Ticketing"
+      title="Buat Event Festival / Tiket"
       subtitle="Cocok untuk konser, festival, dan seminar berbayar"
       actions={
         <span className="inline-flex items-center gap-2 rounded-full bg-rose-50 px-3 py-1 text-xs font-semibold text-rose-700">
@@ -274,9 +274,9 @@ function BuatEventFestivalPage() {
                   </option>
                 ))}
               </Select>
-              <Select label="Organizer" name="organizerId" required value={organizerId} onChange={setOrganizerId}>
-                {loadingMaster && <option value="">Memuat organizer...</option>}
-                {!loadingMaster && organizers.length === 0 && <option value="">Belum ada organizer</option>}
+              <Select label="Penyelenggara" name="organizerId" required value={organizerId} onChange={setOrganizerId}>
+                {loadingMaster && <option value="">Memuat penyelenggara...</option>}
+                {!loadingMaster && organizers.length === 0 && <option value="">Belum ada penyelenggara</option>}
                 {organizers.map((organizer) => (
                   <option key={organizer.id} value={organizer.id}>
                     {organizer.name}
@@ -340,7 +340,7 @@ function BuatEventFestivalPage() {
                 </p>
               </div>
               <span className="rounded-full bg-rose-50 px-2.5 py-0.5 text-xs font-semibold text-rose-700">
-                {tiers.length} tier
+                {tiers.length} kategori
               </span>
             </div>
 
@@ -348,7 +348,7 @@ function BuatEventFestivalPage() {
               {tiers.map((tier, idx) => (
                 <div key={tier.id} className="rounded-xl border border-gray-100 bg-gray-50/50 p-4">
                   <div className="mb-3 flex items-center justify-between">
-                    <span className="text-xs font-semibold uppercase text-gray-500">Tier #{idx + 1}</span>
+                    <span className="text-xs font-semibold uppercase text-gray-500">Kategori #{idx + 1}</span>
                     {tiers.length > 1 && (
                       <button
                         type="button"
@@ -389,8 +389,8 @@ function BuatEventFestivalPage() {
         <aside className="space-y-4 md:sticky md:top-6 md:self-start">
           <div className="rounded-2xl border border-black/5 bg-white p-5 shadow-sm">
             <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-500">Preview</h2>
-              <span className="text-[10px] font-medium uppercase tracking-wide text-gray-400">Live</span>
+              <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-500">Pratinjau</h2>
+              <span className="text-[10px] font-medium uppercase tracking-wide text-gray-400">Langsung</span>
             </div>
             <EventCardPreview
               name={title}
@@ -408,11 +408,11 @@ function BuatEventFestivalPage() {
           <Card>
             <CardHeader title="Ringkasan" />
             <div className="space-y-2.5 text-sm">
-              <Row label="Tipe Event" value="Festival / Ticketing" />
-              <Row label="Jumlah Tier" value={`${tiers.length}`} />
+              <Row label="Tipe Event" value="Festival / Tiket" />
+              <Row label="Jumlah Kategori" value={`${tiers.length}`} />
               <Row label="Total Kuota" value={totalQuota.toLocaleString('id-ID')} />
               <Row
-                label="Range Harga"
+                label="Rentang Harga"
                 value={
                   minPrice && maxPrice
                     ? minPrice === maxPrice

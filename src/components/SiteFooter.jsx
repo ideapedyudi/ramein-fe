@@ -28,19 +28,19 @@ function FooterColumn({ title, items }) {
 }
 
 const productItems = [
-  { label: "Explore Events", to: "/jelajahi" },
-  { label: "Create Event", to: "/buat-event" },
-  { label: "Pricing", to: "/pricing" },
+  { label: "Jelajahi Event", to: "/jelajahi" },
+  { label: "Buat Event", to: "/buat-event" },
+  { label: "Harga", to: "/pricing" },
 ];
 
 const companyItems = [
-  { label: "About Us", to: "/about" },
-  { label: "Contact", to: "/contact" },
+  { label: "Tentang Kami", to: "/about" },
+  { label: "Kontak", to: "/contact" },
 ];
 
 const supportItems = [
-  { label: "Terms of Service", to: "/terms" },
-  { label: "Privacy Policy", to: "/privacy" },
+  { label: "Syarat Layanan", to: "/terms" },
+  { label: "Kebijakan Privasi", to: "/privacy" },
 ];
 
 function SiteFooter() {
@@ -56,12 +56,12 @@ function SiteFooter() {
             Platform tiket event terpercaya untuk semua momen seru kamu.
           </p>
         </div>
-        <FooterColumn title="Product" items={productItems} />
-        <FooterColumn title="Company" items={companyItems} />
-        <FooterColumn title="Support" items={supportItems} />
+        <FooterColumn title="Produk" items={productItems} />
+        <FooterColumn title="Perusahaan" items={companyItems} />
+        <FooterColumn title="Bantuan" items={supportItems} />
       </div>
       <div className="border-t border-[#efefef] py-4 text-center text-xs text-[#888] md:py-6 md:text-lg">
-        © 2026 Ramein. All rights reserved.
+        © 2026 Ramein. Seluruh hak cipta dilindungi.
       </div>
     </footer>
   );

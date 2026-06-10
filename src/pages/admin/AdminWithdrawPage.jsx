@@ -39,7 +39,7 @@ function AdminWithdrawPage() {
       const res = await api.getAllWithdraws()
       setWithdraws(res)
     } catch (err) {
-      setError(err.message || 'Gagal memuat data withdraw.')
+      setError(err.message || 'Gagal memuat data pencairan dana.')
     } finally {
       setLoading(false)
     }
@@ -102,25 +102,25 @@ function AdminWithdrawPage() {
         ),
       )
     } catch (err) {
-      setError(err.message || 'Gagal mengupdate status withdraw.')
+      setError(err.message || 'Gagal mengubah status pencairan dana.')
     } finally {
       setUpdatingId('')
     }
   }
 
   return (
-    <AdminLayout title="Withdraw" subtitle="Approval pencairan revenue event">
+    <AdminLayout title="Tarik Dana" subtitle="Persetujuan pencairan pendapatan event">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <div className="rounded-2xl border border-[#eee] bg-white p-5">
           <p className="text-xs font-semibold uppercase tracking-wider text-[#9a9a9a]">
             Total Pengajuan
           </p>
           <p className="mt-2 text-2xl font-bold text-[#1f1f1f]">{formatIDR(totals.amount)}</p>
-          <p className="mt-1 text-xs text-[#6d6d6d]">{totals.count} withdraw</p>
+          <p className="mt-1 text-xs text-[#6d6d6d]">{totals.count} pencairan</p>
         </div>
         <div className="rounded-2xl border border-[#eee] bg-white p-5">
           <p className="text-xs font-semibold uppercase tracking-wider text-[#9a9a9a]">
-            Menunggu Approval
+            Menunggu Persetujuan
           </p>
           <p className="mt-2 text-2xl font-bold text-[#1f1f1f]">{totals.pending}</p>
           <p className="mt-1 text-xs text-[#6d6d6d]">Perlu ditinjau admin</p>
@@ -130,7 +130,7 @@ function AdminWithdrawPage() {
             Data Ditampilkan
           </p>
           <p className="mt-2 text-2xl font-bold text-[#1f1f1f]">{filtered.length}</p>
-          <p className="mt-1 text-xs text-[#6d6d6d]">Sesuai filter aktif</p>
+          <p className="mt-1 text-xs text-[#6d6d6d]">Sesuai saringan aktif</p>
         </div>
       </div>
 
@@ -157,7 +157,7 @@ function AdminWithdrawPage() {
               <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-[#9a9a9a]" />
               <input
                 type="search"
-                placeholder="Cari user / event / bank"
+                placeholder="Cari pengguna / event / bank"
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 className="w-full rounded-lg border border-[#e2e2e2] py-2 pl-9 pr-3 text-xs outline-none focus:border-brand-500 sm:w-72"
@@ -170,7 +170,7 @@ function AdminWithdrawPage() {
               className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-[#e2e2e2] px-3 py-2 text-xs font-medium text-[#4a4a4a] hover:bg-[#f7f7f7] disabled:opacity-50"
             >
               <FaSyncAlt className="text-[10px]" />
-              Refresh
+              Muat Ulang
             </button>
           </div>
         </div>
@@ -186,7 +186,7 @@ function AdminWithdrawPage() {
             <thead className="bg-[#fafafa] text-xs uppercase text-[#9a9a9a]">
               <tr>
                 <th className="px-4 py-3 font-medium">Event</th>
-                <th className="px-4 py-3 font-medium">User</th>
+                <th className="px-4 py-3 font-medium">Pengguna</th>
                 <th className="px-4 py-3 font-medium">Bank</th>
                 <th className="px-4 py-3 font-medium">Rekening</th>
                 <th className="px-4 py-3 text-right font-medium">Total</th>
@@ -239,7 +239,7 @@ function AdminWithdrawPage() {
                           className="inline-flex items-center gap-1.5 rounded-md border border-emerald-200 bg-emerald-50 px-2 py-1 text-xs font-semibold text-emerald-700 hover:bg-emerald-100 disabled:cursor-not-allowed disabled:opacity-50"
                         >
                           <FaCheck className="text-[10px]" />
-                          Approve
+                          Setujui
                         </button>
                         <button
                           type="button"
@@ -248,7 +248,7 @@ function AdminWithdrawPage() {
                           className="inline-flex items-center gap-1.5 rounded-md border border-red-200 bg-red-50 px-2 py-1 text-xs font-semibold text-red-700 hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-50"
                         >
                           <FaTimes className="text-[10px]" />
-                          Reject
+                          Tolak
                         </button>
                       </div>
                     </td>
@@ -259,12 +259,12 @@ function AdminWithdrawPage() {
           </table>
         </div>
 
-        {loading && <div className="p-10 text-center text-sm text-[#6d6d6d]">Memuat withdraw...</div>}
+        {loading && <div className="p-10 text-center text-sm text-[#6d6d6d]">Memuat pencairan dana...</div>}
 
         {!loading && filtered.length === 0 && (
           <div className="p-10 text-center">
             <FaMoneyBillWave className="mx-auto text-3xl text-[#c5c5c5]" />
-            <p className="mt-3 text-sm font-medium text-[#4a4a4a]">Belum ada data withdraw.</p>
+            <p className="mt-3 text-sm font-medium text-[#4a4a4a]">Belum ada data pencairan dana.</p>
           </div>
         )}
       </section>

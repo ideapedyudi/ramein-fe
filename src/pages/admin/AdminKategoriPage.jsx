@@ -65,7 +65,7 @@ function AdminKategoriPage() {
       }
       resetForm()
     } catch (err) {
-      setError(err.message || `Gagal ${editingId ? 'mengupdate' : 'menambah'} kategori.`)
+      setError(err.message || `Gagal ${editingId ? 'mengubah' : 'menambah'} kategori.`)
     } finally {
       setBusy(false)
     }
@@ -78,14 +78,14 @@ function AdminKategoriPage() {
     >
       <section className="rounded-2xl border border-[#eee] bg-white p-5">
         <h2 className="text-sm font-semibold text-[#1f1f1f]">
-          {editingId ? 'Update Kategori' : 'Tambah Kategori'}
+          {editingId ? 'Ubah Kategori' : 'Tambah Kategori'}
         </h2>
         <form onSubmit={handleSubmit} className="mt-3 flex flex-col gap-3 sm:flex-row">
           <input
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="cth. Music"
+            placeholder="cth. Musik"
             className="flex-1 rounded-lg border border-[#e2e2e2] bg-white px-3 py-2 text-sm outline-none focus:border-brand-500"
           />
           <button
@@ -94,7 +94,7 @@ function AdminKategoriPage() {
             className="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-700 disabled:opacity-50"
           >
             {editingId ? <FaEdit className="text-xs" /> : <FaPlus className="text-xs" />}
-            {editingId ? 'Simpan Update' : 'Tambah'}
+            {editingId ? 'Simpan Perubahan' : 'Tambah'}
           </button>
           {editingId && (
             <button
@@ -126,7 +126,7 @@ function AdminKategoriPage() {
               className="inline-flex items-center gap-1.5 rounded-md border border-[#e2e2e2] px-2 py-1 text-xs font-medium text-[#4a4a4a] hover:bg-[#f7f7f7] disabled:opacity-50"
             >
               <FaSyncAlt className="text-[10px]" />
-              Refresh
+              Muat Ulang
             </button>
           </div>
         </div>
@@ -160,7 +160,7 @@ function AdminKategoriPage() {
                       className="inline-flex items-center gap-1.5 rounded-md border border-[#e2e2e2] px-2 py-1 text-xs font-medium text-brand-700 hover:bg-brand-50"
                     >
                       <FaEdit className="text-[10px]" />
-                      Update
+                      Ubah
                     </button>
                   </td>
                 </tr>

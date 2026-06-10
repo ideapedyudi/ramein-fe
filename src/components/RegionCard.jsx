@@ -14,7 +14,7 @@ function RegionCard({ region }) {
       />
       <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-black/20" />
       <div className="absolute inset-x-4 bottom-4 text-white">
-        <p className="text-sm font-medium">Loc: {region.name}</p>
+        <p className="text-sm font-medium">Lokasi: {region.name}</p>
         <p className="text-lg">{region.count}</p>
       </div>
     </Link>

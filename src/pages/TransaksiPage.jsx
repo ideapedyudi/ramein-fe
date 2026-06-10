@@ -11,6 +11,13 @@ const statusStyle = {
   refunded: 'bg-gray-100 text-gray-600 ring-gray-200',
 }
 
+const statusLabel = {
+  paid: 'Lunas',
+  pending: 'Menunggu',
+  failed: 'Gagal',
+  refunded: 'Dikembalikan',
+}
+
 const filters = [
   { value: 'all', label: 'Semua' },
   { value: 'paid', label: 'Lunas' },
@@ -137,7 +144,7 @@ function TransaksiPage() {
           <table className="w-full min-w-[720px] text-left text-sm">
             <thead className="bg-[#fafafa] text-xs uppercase text-[#9a9a9a]">
               <tr>
-                <th className="px-4 py-3 font-medium">Order ID</th>
+                <th className="px-4 py-3 font-medium">ID Pesanan</th>
                 <th className="px-4 py-3 font-medium">Event</th>
                 <th className="px-4 py-3 font-medium">Tanggal</th>
                 <th className="px-4 py-3 font-medium">Metode</th>
@@ -174,7 +181,7 @@ function TransaksiPage() {
                         'bg-gray-100 text-gray-600 ring-gray-200'
                       }`}
                     >
-                      {transaction.status}
+                      {statusLabel[transaction.status] ?? transaction.status}
                     </span>
                   </td>
                   <td className="px-4 py-3 text-right">
@@ -193,7 +200,7 @@ function TransaksiPage() {
                         disabled
                         className="inline-flex items-center gap-1.5 rounded-md border border-[#e2e2e2] px-2 py-1 text-xs font-medium text-[#4a4a4a] disabled:cursor-not-allowed disabled:opacity-50"
                       >
-                        <FaDownload className="text-[10px]" /> Invoice
+                        <FaDownload className="text-[10px]" /> Faktur
                       </button>
                     )}
                   </td>

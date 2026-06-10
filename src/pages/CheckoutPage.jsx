@@ -41,7 +41,7 @@ function TicketIcon({ className }) {
 }
 
 const paymentMethods = [
-  { value: "qris", title: "QRIS", desc: "Scan to pay", Icon: QrIcon },
+  { value: "qris", title: "QRIS", desc: "Pindai untuk bayar", Icon: QrIcon },
 ];
 
 function Card({ children }) {
@@ -119,7 +119,7 @@ function PaymentModal({ open, transaction, onClose }) {
               Selesaikan pembayaran
             </h2>
             <p className="mt-1 text-sm text-gray-600">
-              Order ID:{" "}
+              ID Pesanan:{" "}
               <span className="font-mono text-gray-900">
                 {transaction.orderId}
               </span>
@@ -193,7 +193,7 @@ function CheckoutPage() {
   const eventId = params.get("eventId");
   const tierId = params.get("tierId");
   const qty = Number(params.get("qty") ?? "1");
-  const initialError = !eventId || !tierId ? "Missing params" : "";
+  const initialError = !eventId || !tierId ? "Parameter tidak lengkap" : "";
 
   const [event, setEvent] = useState(null);
   const [tier, setTier] = useState(null);
@@ -224,12 +224,12 @@ function CheckoutPage() {
     api.getEvent(eventId).then((res) => {
       if (cancelled) return;
       if (!res) {
-        setError("Event not found");
+        setError("Event tidak ditemukan");
         return;
       }
       const t = res.tiers.find((x) => x.id === tierId);
       if (!t) {
-        setError("Tier not found");
+        setError("Kategori tiket tidak ditemukan");
         return;
       }
       setEvent(res);
@@ -330,14 +330,14 @@ function CheckoutPage() {
             to={`/event/${event.id}`}
             className="inline-flex cursor-pointer items-center gap-1 text-sm text-gray-600 transition hover:text-brand-600"
           >
-            ← Back
+            ← Kembali
           </Link>
         </div>
       </div>
 
       <div className="mx-auto max-w-[1024px] px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
         <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">
-          Checkout
+          Pembayaran
         </h1>
 
         <form
@@ -347,35 +347,35 @@ function CheckoutPage() {
           <div className="space-y-6">
             <Card>
               <h2 className="mb-5 text-lg font-semibold text-gray-900">
-                Contact Information
+                Informasi Kontak
               </h2>
               <Field
                 label="Email"
                 name="email"
                 type="email"
-                placeholder="your@email.com"
+                placeholder="nama@email.com"
                 value={contact.email}
                 onChange={updateContact("email")}
               />
               <div className="mt-4 grid gap-4 sm:grid-cols-2">
                 <Field
-                  label="First Name"
+                  label="Nama Depan"
                   name="firstName"
-                  placeholder="John"
+                  placeholder="Budi"
                   value={contact.firstName}
                   onChange={updateContact("firstName")}
                 />
                 <Field
-                  label="Last Name"
+                  label="Nama Belakang"
                   name="lastName"
-                  placeholder="Doe"
+                  placeholder="Santoso"
                   value={contact.lastName}
                   onChange={updateContact("lastName")}
                 />
               </div>
               <div className="mt-4">
                 <Field
-                  label="Phone Number"
+                  label="Nomor Telepon"
                   name="phone"
                   type="tel"
                   placeholder="+62 812 3456 7890"
@@ -387,7 +387,7 @@ function CheckoutPage() {
 
             <Card>
               <h2 className="mb-5 text-lg font-semibold text-gray-900">
-                Payment Method
+                Metode Pembayaran
               </h2>
               <div className="space-y-3">
                 {paymentMethods.map((p) => {
@@ -435,7 +435,7 @@ function CheckoutPage() {
           <div className="md:sticky md:top-6 md:self-start">
             <Card>
               <h2 className="mb-5 text-lg font-semibold text-gray-900">
-                Order Summary
+                Ringkasan Pesanan
               </h2>
               <div
                 className={`mb-4 w-full overflow-hidden rounded-lg bg-gradient-to-br ${event.bannerHue ?? "from-brand-400 to-brand-600"
@@ -459,7 +459,7 @@ function CheckoutPage() {
               </div>
               <p className="font-semibold text-gray-900">{event.name}</p>
               <p className="mt-0.5 text-sm text-gray-600">
-                {tier.name} Ticket × {qty}
+                Tiket {tier.name} × {qty}
               </p>
 
               <div className="my-5 space-y-1.5 border-t border-gray-100 pt-5 text-sm">
@@ -484,7 +484,7 @@ function CheckoutPage() {
                   ? "Memproses..."
                   : total <= 0
                     ? "Daftar Gratis"
-                    : "Complete Payment"}
+                    : "Selesaikan Pembayaran"}
               </button>
               {submitError && (
                 <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
@@ -492,17 +492,18 @@ function CheckoutPage() {
                 </p>
               )}
               <p className="mt-3 text-center text-xs text-gray-500">
-                By completing this purchase you agree to our{" "}
+                Dengan menyelesaikan pembelian ini kamu menyetujui{" "}
                 <Link to="/terms" className="text-brand-600 hover:underline">
-                  Terms of Service
-                </Link>
+                  Syarat &amp; Ketentuan
+                </Link>{" "}
+                kami
               </p>
 
               <div className="mt-4 flex items-start gap-2 rounded-lg bg-brand-50 p-3 text-xs text-brand-700">
                 <TicketIcon className="mt-0.5 h-4 w-4 shrink-0" />
                 <span>
-                  Your ticket will be sent to your email after payment
-                  confirmation
+                  Tiket kamu akan dikirim ke email setelah pembayaran
+                  dikonfirmasi
                 </span>
               </div>
             </Card>

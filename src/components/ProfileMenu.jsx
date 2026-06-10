@@ -40,13 +40,13 @@ function ProfileMenu({ user, isAdmin, onLogout, variant = "desktop" }) {
 
   const items = isAdmin
     ? [
-        { label: "Dashboard", to: "/dashboard", icon: FaTachometerAlt },
+        { label: "Dasbor", to: "/dashboard", icon: FaTachometerAlt },
         { label: "Kategori", to: "/admin/kategori", icon: FaReceipt },
         { label: "Kota", to: "/admin/kota", icon: FaReceipt },
-        { label: "Organizer", to: "/admin/organizer", icon: FaCalendarAlt },
-        { label: "User", to: "/admin/users", icon: FaUsers },
-        { label: "Finance", to: "/admin/finance", icon: FaChartLine },
-        { label: "Feedback", to: "/admin/feedback", icon: FaComments },
+        { label: "Penyelenggara", to: "/admin/organizer", icon: FaCalendarAlt },
+        { label: "Pengguna", to: "/admin/users", icon: FaUsers },
+        { label: "Keuangan", to: "/admin/finance", icon: FaChartLine },
+        { label: "Masukan", to: "/admin/feedback", icon: FaComments },
         { label: "Event Dikelola", to: "/event-kamu", icon: FaCalendarAlt },
         { label: "Buat Event", to: "/buat-event", icon: FaTicketAlt },
         { label: "Pengaturan", to: "/pengaturan", icon: FaCog },
@@ -56,7 +56,7 @@ function ProfileMenu({ user, isAdmin, onLogout, variant = "desktop" }) {
         { label: "Transaksi", to: "/transaksi", icon: FaReceipt },
         { label: "Event Saya", to: "/event-kamu", icon: FaCalendarAlt },
         { label: "Buat Event", to: "/buat-event", icon: FaTicketAlt },
-        { label: "Withdraw", to: "/withdraw", icon: FaMoneyBillWave },
+        { label: "Tarik Dana", to: "/withdraw", icon: FaMoneyBillWave },
         { label: "Pengaturan", to: "/pengaturan", icon: FaCog },
       ];
 

@@ -99,7 +99,7 @@ function EventCardPreview({
       >
         <EventImage
           src={imageUrl}
-          alt={name || 'Preview event'}
+          alt={name || 'Pratinjau event'}
           onLoad={() => setImgLoaded(true)}
         />
         {coverEmoji && (
@@ -111,7 +111,7 @@ function EventCardPreview({
         <div className="absolute left-3 top-3 flex flex-wrap gap-1.5">
           {visibility === 'private' && (
             <span className="inline-flex items-center gap-1 rounded-full bg-gray-900/80 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white backdrop-blur">
-              <LockMini /> Private
+              <LockMini /> Privat
             </span>
           )}
           {isOnline && (

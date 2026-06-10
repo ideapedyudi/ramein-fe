@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import AuthLayout from "../components/AuthLayout";
 import GoogleAuthButton from "../components/GoogleAuthButton";
 import { useAuth } from "../context/authContext";
 import brandLogo from "../assets/logobrand2.webp";
@@ -43,17 +42,22 @@ function RegisterPage() {
     } else if (isDeleting && typedText === "") {
       timeoutId = window.setTimeout(() => {
         setIsDeleting(false);
-        setTypingIndex((currentIndex) => (currentIndex + 1) % typingPhrases.length);
+        setTypingIndex(
+          (currentIndex) => (currentIndex + 1) % typingPhrases.length,
+        );
       }, 200);
     } else {
-      timeoutId = window.setTimeout(() => {
-        setTypedText((currentText) => {
-          const targetText = typingPhrases[typingIndex];
-          return isDeleting
-            ? targetText.slice(0, currentText.length - 1)
-            : targetText.slice(0, currentText.length + 1);
-        });
-      }, isDeleting ? 55 : 90);
+      timeoutId = window.setTimeout(
+        () => {
+          setTypedText((currentText) => {
+            const targetText = typingPhrases[typingIndex];
+            return isDeleting
+              ? targetText.slice(0, currentText.length - 1)
+              : targetText.slice(0, currentText.length + 1);
+          });
+        },
+        isDeleting ? 55 : 90,
+      );
     }
 
     return () => window.clearTimeout(timeoutId);
@@ -71,15 +75,15 @@ function RegisterPage() {
     setError("");
 
     if (!form.name || !form.email || !form.phone || !form.password) {
-      setError("Nama, email, nomor telepon, dan password wajib diisi.");
+      setError("Nama, email, nomor telepon, dan kata sandi wajib diisi.");
       return;
     }
     if (form.password.length < 8) {
-      setError("Password minimal 8 karakter.");
+      setError("Kata sandi minimal 8 karakter.");
       return;
     }
     if (form.password !== form.confirmPassword) {
-      setError("Konfirmasi password tidak sama.");
+      setError("Konfirmasi kata sandi tidak sama.");
       return;
     }
     if (!form.agree) {
@@ -119,7 +123,7 @@ function RegisterPage() {
           replace: true,
         });
       } catch (err) {
-        setError(err || "Registrasi Google gagal.");
+        setError(err || "Daftar dengan Google gagal.");
       }
     },
     [googleAuth, navigate],
@@ -147,12 +151,15 @@ function RegisterPage() {
                   <span className="bg-gradient-to-r from-white via-white to-amber-300 bg-clip-text text-transparent">
                     {typedText}
                   </span>
-                  <span className="inline-block animate-pulse text-amber-200">|</span>
+                  <span className="inline-block animate-pulse text-amber-200">
+                    |
+                  </span>
                 </h1>
               </div>
             </div>
             <p className="mt-6 max-w-xs text-sm leading-relaxed text-white/85 md:text-base">
-              Buat akun untuk mulai eksplor event, tiket, dan pengalaman seru di Ramein.
+              Buat akun untuk mulai eksplor event, tiket, dan pengalaman seru di
+              Ramein.
             </p>
           </div>
         </aside>
@@ -216,7 +223,7 @@ function RegisterPage() {
                 />
               </label>
               <label className="block text-lg font-semibold text-[#2b2b2b] md:text-[16px]">
-                Password
+                Kata Sandi
                 <input
                   type="password"
                   value={form.password}
@@ -226,12 +233,12 @@ function RegisterPage() {
                 />
               </label>
               <label className="block text-lg font-semibold text-[#2b2b2b] md:text-[16px]">
-                Konfirmasi Password
+                Konfirmasi Kata Sandi
                 <input
                   type="password"
                   value={form.confirmPassword}
                   onChange={update("confirmPassword")}
-                  placeholder="Ketik ulang password"
+                  placeholder="Ketik ulang kata sandi"
                   className={inputClass}
                 />
               </label>
