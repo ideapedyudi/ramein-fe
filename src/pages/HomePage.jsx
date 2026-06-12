@@ -129,10 +129,12 @@ function HomePage() {
               title="Kategori"
               subtitle="Temukan event sesuai minatmu"
             />
-            <div className="grid grid-cols-4 gap-4 sm:grid-cols-6 md:grid-cols-9 lg:grid-cols-12">
-              {categories.map((category) => (
-                <CategoryCard key={category.id} category={category} />
-              ))}
+            <div className="scrollbar-hide -mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
+              <div className="flex w-max gap-4 pb-1 sm:grid sm:w-full sm:grid-cols-6 md:grid-cols-9 lg:grid-cols-12">
+                {categories.map((category) => (
+                  <CategoryCard key={category.id} category={category} />
+                ))}
+              </div>
             </div>
           </section>
         </Container>

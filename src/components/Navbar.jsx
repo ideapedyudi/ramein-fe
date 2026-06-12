@@ -118,9 +118,9 @@ function Navbar() {
         </div>
         <div className="bg-[rgb(50,160,140)]">
           <div className="mx-auto flex w-full max-w-370 flex-row items-center justify-between gap-3 px-2 py-3 md:h-16 md:px-3 md:py-0">
-            <Link to="/" className="flex items-center gap-2">
+            <Link to="/" className="flex items-center gap-1.5 sm:gap-2">
               <img src={brandLogo} alt="brand logo" className="w-10" />
-              <span className="text-4xl font-extrabold leading-none text-white">
+              <span className="text-[2rem] font-extrabold leading-none text-white sm:text-4xl">
                 Ramein
               </span>
             </Link>

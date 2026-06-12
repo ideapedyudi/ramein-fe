@@ -31,10 +31,10 @@ const categoryIconMap = {
 function CategoryCard({ category, active = false }) {
   const iconSrc = categoryIconMap[category.icon] ?? kreatif;
 
-  return (
+    return (
     <Link
       to={`/jelajahi?category=${encodeURIComponent(category.name)}`}
-      className="group flex flex-col items-center gap-2"
+      className="group flex w-20 shrink-0 flex-col items-center gap-2 text-center sm:w-auto sm:min-w-0"
     >
       <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white shadow-[0_2px_8px_rgba(0,0,0,0.06)] transition group-hover:-translate-y-0.5 group-hover:shadow-[0_6px_14px_rgba(0,0,0,0.10)] overflow-hidden">
         <img
@@ -45,7 +45,7 @@ function CategoryCard({ category, active = false }) {
         />
       </div>
       <p
-        className={`text-sm font-medium transition ${
+        className={`text-sm leading-tight font-medium transition ${
           active ? "text-brand-600" : "text-[#444] group-hover:text-brand-600"
         }`}
       >

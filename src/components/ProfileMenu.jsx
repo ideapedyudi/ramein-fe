@@ -67,7 +67,7 @@ function ProfileMenu({ user, isAdmin, onLogout, variant = "desktop" }) {
           aria-haspopup="menu"
           aria-expanded={open}
           aria-label="Menu profil"
-          className="group rounded-full"
+          className="group translate-y-1 rounded-full"
         >
           <UserAvatar className="h-10 w-10 ring-2 ring-white/40 transition group-hover:ring-white/70" />
         </button>
