@@ -23,6 +23,7 @@ import OrderSuccessPage from './pages/OrderSuccessPage'
 import PengaturanPage from './pages/PengaturanPage'
 import PricingPage from './pages/PricingPage'
 import PrivacyPage from './pages/PrivacyPage'
+import PublicProfilePage from './pages/PublicProfilePage'
 import RegisterPage from './pages/RegisterPage'
 import TermsPage from './pages/TermsPage'
 import TiketSayaPage from './pages/TiketSayaPage'
@@ -52,6 +53,8 @@ function App() {
           <Route path="/jelajahi" element={<JelajahiPage />} />
           <Route path="/untuk-kamu" element={<UntukKamuPage />} />
           <Route path="/event/:eventId" element={<EventDetailPage />} />
+          <Route path="/organizer/:profileId" element={<PublicProfilePage kind="organizer" />} />
+          <Route path="/u/:profileId" element={<PublicProfilePage kind="user" />} />
 
           <Route path="/about" element={<AboutPage />} />
           <Route path="/pricing" element={<PricingPage />} />

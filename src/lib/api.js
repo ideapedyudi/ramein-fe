@@ -922,6 +922,218 @@ let masterOrganizers = [
   },
 ];
 
+// ──────────────────────────────────────────────────────────────────────────
+// Public profiles & reviews (MOCK ONLY)
+// Profil publik hanya tersedia untuk publisher: penyelenggara (organizer)
+// maupun pengguna yang pernah mempublikasikan event. Ulasan ditujukan ke
+// profil tersebut. Endpoint BE belum tersedia — sesuaikan setelah API rilis.
+// ──────────────────────────────────────────────────────────────────────────
+let publicProfiles = [
+  {
+    id: "org-1",
+    type: "organizer",
+    name: "Java Festival Production",
+    initial: "J",
+    tagline: "Promotor festival musik jazz terbesar di Indonesia",
+    bio: "Sejak 2005 menghadirkan panggung jazz kelas dunia dengan line-up artis lokal dan internasional. Fokus pada pengalaman penonton, kualitas tata suara, dan kenyamanan venue.",
+    location: "Jakarta, Indonesia",
+    joinedAt: "2018-02-10",
+    verified: true,
+    instagram: "@javajazzfestival",
+    website: "https://javajazzfestival.com",
+    bannerHue: "from-amber-400 to-rose-400",
+    eventIds: ["java-jazz-2026"],
+  },
+  {
+    id: "org-2",
+    type: "organizer",
+    name: "Moonton Indonesia",
+    initial: "M",
+    tagline: "Penyelenggara turnamen esports Mobile Legends",
+    bio: "Membawa kompetisi Mobile Legends ke panggung nasional dengan produksi profesional dan total hadiah miliaran rupiah.",
+    location: "Tangerang, Indonesia",
+    joinedAt: "2019-07-22",
+    verified: true,
+    instagram: "@mobilelegendsid",
+    website: "https://mobilelegends.com",
+    bannerHue: "from-indigo-500 to-purple-600",
+    eventIds: ["ml-championship-2026"],
+  },
+  {
+    id: "org-4",
+    type: "organizer",
+    name: "Soundrenaline Indonesia",
+    initial: "S",
+    tagline: "Festival musik tahunan lintas genre",
+    bio: "Festival dua hari yang merayakan musik lintas genre, menghadirkan band lokal dan internasional di panggung megah.",
+    location: "Bandung, Indonesia",
+    joinedAt: "2017-05-30",
+    verified: true,
+    instagram: "@soundrenaline",
+    website: null,
+    bannerHue: "from-rose-500 to-orange-500",
+    eventIds: ["soundrenaline-2026"],
+  },
+  {
+    id: "org-5",
+    type: "organizer",
+    name: "Startup Indonesia",
+    initial: "S",
+    tagline: "Konferensi & summit ekosistem startup",
+    bio: "Mempertemukan founder, investor, dan talenta tech terbaik Indonesia lewat konferensi, panel, dan sesi networking.",
+    location: "Jakarta, Indonesia",
+    joinedAt: "2020-01-12",
+    verified: true,
+    instagram: "@startupindonesia",
+    website: "https://startupindonesia.co",
+    bannerHue: "from-sky-400 to-blue-600",
+    eventIds: ["tech-summit-2026"],
+  },
+  {
+    id: "org-7",
+    type: "organizer",
+    name: "Riot Games Indonesia",
+    initial: "R",
+    tagline: "Publisher VALORANT & penyelenggara VCT",
+    bio: "Menghadirkan rangkaian VALORANT Champions Tour ke Indonesia dengan standar penyelenggaraan internasional.",
+    location: "Jakarta, Indonesia",
+    joinedAt: "2020-06-01",
+    verified: true,
+    instagram: "@valorant_id",
+    website: "https://playvalorant.com",
+    bannerHue: "from-red-500 to-rose-700",
+    eventIds: ["valorant-2026"],
+  },
+  // Pengguna individu yang mempublikasikan event
+  {
+    id: "user-1",
+    type: "user",
+    name: "Andi Pratama",
+    initial: "A",
+    tagline: "Community builder & fasilitator workshop UI/UX",
+    bio: "Rutin mengadakan workshop dan meetup desain untuk pemula. Percaya bahwa belajar paling cepat lewat praktik langsung dan komunitas yang suportif.",
+    location: "Bandung, Indonesia",
+    joinedAt: "2023-06-01",
+    verified: false,
+    instagram: "@andi.designs",
+    website: null,
+    bannerHue: "from-emerald-400 to-teal-500",
+    eventIds: ["uiux-workshop-2026"],
+  },
+  {
+    id: "user-sari",
+    type: "user",
+    name: "Sari Wulandari",
+    initial: "S",
+    tagline: "Penggiat kuliner & kurator street food festival",
+    bio: "Menghubungkan tenant makanan jalanan terbaik dengan ribuan pengunjung lewat festival kuliner yang ramai dan ramah keluarga.",
+    location: "Jakarta, Indonesia",
+    joinedAt: "2024-01-15",
+    verified: false,
+    instagram: "@sari.eats",
+    website: null,
+    bannerHue: "from-orange-400 to-red-500",
+    eventIds: ["street-food-2026"],
+  },
+];
+
+let profileReviews = [
+  {
+    id: "rv-1",
+    profileId: "org-1",
+    authorName: "Budi Santoso",
+    authorInitial: "B",
+    rating: 5,
+    comment:
+      "Penyelenggaraan rapi, sound system jernih, antrian masuk cepat. Tahun depan pasti datang lagi!",
+    createdAt: "2026-05-18T09:30:00Z",
+  },
+  {
+    id: "rv-2",
+    profileId: "org-1",
+    authorName: "Maria Lestari",
+    authorInitial: "M",
+    rating: 4,
+    comment: "Lineup mantap, hanya area makanan agak ramai. Overall puas.",
+    createdAt: "2026-05-19T14:10:00Z",
+  },
+  {
+    id: "rv-3",
+    profileId: "org-2",
+    authorName: "Rizky Hidayat",
+    authorInitial: "R",
+    rating: 5,
+    comment: "Turnamen seru, venue nyaman, jadwal berjalan tepat waktu.",
+    createdAt: "2026-05-21T11:00:00Z",
+  },
+  {
+    id: "rv-4",
+    profileId: "user-1",
+    authorName: "Dewi Anggraini",
+    authorInitial: "D",
+    rating: 5,
+    comment:
+      "Materi workshop jelas dan mentornya sabar. Sangat membantu untuk pemula seperti saya.",
+    createdAt: "2026-04-26T16:45:00Z",
+  },
+  {
+    id: "rv-5",
+    profileId: "user-1",
+    authorName: "Fajar Nugroho",
+    authorInitial: "F",
+    rating: 4,
+    comment: "Bagus, semoga next ada sesi lanjutan yang lebih advanced.",
+    createdAt: "2026-04-27T08:20:00Z",
+  },
+  {
+    id: "rv-6",
+    profileId: "user-sari",
+    authorName: "Putri Ayu",
+    authorInitial: "P",
+    rating: 5,
+    comment: "Tenant makanannya variatif banget, festival paling worth it tahun ini!",
+    createdAt: "2026-06-17T19:05:00Z",
+  },
+];
+
+const initialOf = (name = "") => String(name).trim().charAt(0).toUpperCase() || "?";
+
+const resolveProfileEvents = (profile) =>
+  (profile.eventIds ?? [])
+    .map((eventId) => eventCatalog.find((event) => event.id === eventId))
+    .filter((event) => event && event.visibility === "public");
+
+const summarizeReviews = (profileId) => {
+  const reviews = profileReviews
+    .filter((review) => review.profileId === profileId)
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  const ratingCount = reviews.length;
+  const ratingAverage = ratingCount
+    ? reviews.reduce((sum, review) => sum + (Number(review.rating) || 0), 0) / ratingCount
+    : 0;
+
+  return { reviews, ratingCount, ratingAverage };
+};
+
+const toPublicProfile = (profile) => {
+  const events = resolveProfileEvents(profile);
+  const { reviews, ratingCount, ratingAverage } = summarizeReviews(profile.id);
+  const totalAttendees = events.reduce(
+    (sum, event) => sum + (Number(event.attendees) || 0),
+    0,
+  );
+
+  return {
+    ...profile,
+    events: events.map(toSummary),
+    reviews,
+    totalEvents: events.length,
+    totalAttendees,
+    ratingCount,
+    ratingAverage,
+  };
+};
+
 const toManagedEvent = (event) => {
   const ticketTypes = getEventTicketTypes(event).map((ticket) => ({
     ...ticket,
@@ -1010,6 +1222,56 @@ export const api = {
     }).then((res) => res.data ?? res),
   getFeedbacks: () =>
     apiRequest("/feedback").then((res) => getFeedbackCollection(res).map(toFeedbackFromApi)),
+
+  // Public profiles & reviews (MOCK — wire to BE once endpoints ship)
+  getPublicProfile: (type, id) => {
+    const profile = publicProfiles.find(
+      (item) => item.id === id && (!type || item.type === type),
+    );
+    return delay(profile ? toPublicProfile(profile) : null);
+  },
+  getProfileReviews: (id) => delay(summarizeReviews(id).reviews),
+  createProfileReview: ({ profileId, rating, comment, author }) => {
+    const review = {
+      id: `rv-${Date.now()}`,
+      profileId,
+      authorId: author?.id ?? null,
+      authorName: author?.name ?? "Pengguna",
+      authorInitial: initialOf(author?.name ?? "Pengguna"),
+      rating: Number(rating) || 0,
+      comment: String(comment ?? "").trim(),
+      createdAt: new Date().toISOString(),
+    };
+    profileReviews = [review, ...profileReviews];
+    return delay(review);
+  },
+  getEventPublisher: (eventId, organizerId) => {
+    const host = publicProfiles.find(
+      (item) => item.type === "user" && (item.eventIds ?? []).includes(eventId),
+    );
+    if (host) {
+      return delay({
+        type: "user",
+        id: host.id,
+        name: host.name,
+        initial: host.initial,
+        verified: host.verified,
+      });
+    }
+    const organizer = publicProfiles.find(
+      (item) => item.type === "organizer" && item.id === organizerId,
+    );
+    if (organizer) {
+      return delay({
+        type: "organizer",
+        id: organizer.id,
+        name: organizer.name,
+        initial: organizer.initial,
+        verified: organizer.verified,
+      });
+    }
+    return delay(null);
+  },
   getAdminUsers: () =>
     apiRequest("/users/admin/users").then((res) =>
       getAdminUserCollection(res, "users").map(toAdminUserFromApi),

@@ -10,6 +10,7 @@ import {
   FaSignOutAlt,
   FaTachometerAlt,
   FaTicketAlt,
+  FaUserCircle,
   FaUsers,
 } from "react-icons/fa";
 import UserAvatar from "./UserAvatar";
@@ -48,6 +49,7 @@ function ProfileMenu({ user, isAdmin, onLogout, variant = "desktop" }) {
         { label: "Pengaturan", to: "/pengaturan", icon: FaCog },
       ]
     : [
+        { label: "Profil Publik", to: `/u/${user.id}`, icon: FaUserCircle },
         { label: "Tiket Saya", to: "/tiket-saya", icon: FaTicketAlt },
         { label: "Transaksi", to: "/transaksi", icon: FaReceipt },
         { label: "Event Saya", to: "/event-kamu", icon: FaCalendarAlt },

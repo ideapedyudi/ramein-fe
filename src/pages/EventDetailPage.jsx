@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
+import { FaCheckCircle } from 'react-icons/fa'
 import EventImage from '../components/EventImage'
 import LoginPromptModal from '../components/LoginPromptModal'
 import SiteFooter from '../components/SiteFooter'
@@ -61,6 +62,7 @@ function EventDetailPage() {
   const navigate = useNavigate()
   const { isAuthenticated } = useAuth()
   const [event, setEvent] = useState(null)
+  const [publisher, setPublisher] = useState(null)
   const [selectedTier, setSelectedTier] = useState('')
   const [quantity, setQuantity] = useState(1)
   const [notFound, setNotFound] = useState(false)
@@ -162,6 +164,9 @@ function EventDetailPage() {
       }
       setEvent(res)
       setSelectedTier(res.tiers[0]?.id ?? '')
+      api.getEventPublisher(eventId, res.organizer?.id).then((p) => {
+        if (!cancelled) setPublisher(p)
+      })
     })
     return () => {
       cancelled = true
@@ -229,6 +234,31 @@ function EventDetailPage() {
               <CardHeader title="Tentang Event Ini" />
               <p className="text-sm leading-relaxed text-gray-700">{event.description}</p>
             </Card>
+
+            {publisher && (
+              <Card>
+                <CardHeader title="Penyelenggara" />
+                <Link
+                  to={`/${publisher.type === 'user' ? 'u' : 'organizer'}/${publisher.id}`}
+                  className="group flex items-center gap-3"
+                >
+                  <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-brand-100 text-lg font-bold text-brand-700">
+                    {publisher.initial}
+                  </span>
+                  <div className="min-w-0">
+                    <p className="flex items-center gap-1.5 font-semibold text-gray-900 group-hover:text-brand-600">
+                      {publisher.name}
+                      {publisher.verified && (
+                        <FaCheckCircle className="text-brand-500" title="Terverifikasi" />
+                      )}
+                    </p>
+                    <p className="text-xs text-brand-600 group-hover:underline">
+                      Lihat profil &amp; ulasan →
+                    </p>
+                  </div>
+                </Link>
+              </Card>
+            )}
           </div>
 
           <div className="space-y-5 sm:space-y-6">
