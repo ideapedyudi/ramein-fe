@@ -21,11 +21,7 @@ import {
 } from "react-icons/fa";
 import { useAuth } from "../context/authContext";
 import brandLogo from "../assets/logobrand2.webp";
-
-function initialsOf(name = "") {
-  const parts = name.trim().split(/\s+/).slice(0, 2);
-  return parts.map((p) => p[0]?.toUpperCase() ?? "").join("") || "?";
-}
+import UserAvatar from "./UserAvatar";
 
 // Regular user navigation — buying tickets, hosting RSVP/private events.
 const userNav = [
@@ -111,9 +107,7 @@ function SidebarContent({ user, isAdmin, onLogout, onNavigate }) {
 
       <div className="border-t border-[#eee] p-3">
         <div className="flex items-center gap-3 rounded-lg bg-[#f9fbfa] px-3 py-2.5">
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#2ea387] text-xs font-bold text-white">
-            {initialsOf(user.name)}
-          </span>
+          <UserAvatar className="h-9 w-9 shrink-0 ring-1 ring-black/5" />
           <div className="min-w-0 flex-1">
             <p className="flex items-center gap-1.5 truncate text-sm font-semibold text-[#1f1f1f]">
               {user.name}

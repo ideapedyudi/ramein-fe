@@ -12,11 +12,7 @@ import {
   FaTicketAlt,
   FaUsers,
 } from "react-icons/fa";
-
-function initialsOf(name = "") {
-  const parts = name.trim().split(/\s+/).slice(0, 2);
-  return parts.map((p) => p[0]?.toUpperCase() ?? "").join("") || "?";
-}
+import UserAvatar from "./UserAvatar";
 
 function ProfileMenu({ user, isAdmin, onLogout, variant = "desktop" }) {
   const [open, setOpen] = useState(false);
@@ -71,9 +67,9 @@ function ProfileMenu({ user, isAdmin, onLogout, variant = "desktop" }) {
           aria-haspopup="menu"
           aria-expanded={open}
           aria-label="Menu profil"
-          className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-sm font-bold text-[#2ea387] ring-2 ring-white/40 transition hover:ring-white/70"
+          className="group rounded-full"
         >
-          {initialsOf(user.name)}
+          <UserAvatar className="h-10 w-10 ring-2 ring-white/40 transition group-hover:ring-white/70" />
         </button>
       ) : (
         <button
@@ -83,9 +79,7 @@ function ProfileMenu({ user, isAdmin, onLogout, variant = "desktop" }) {
           aria-expanded={open}
           className="flex items-center gap-2 rounded-full bg-white/10 py-1 pr-3 pl-1 text-sm font-semibold text-white transition hover:bg-white/15"
         >
-          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-xs font-bold text-[#2ea387]">
-            {initialsOf(user.name)}
-          </span>
+          <UserAvatar className="h-8 w-8 shrink-0" />
           <span className="max-w-30 truncate">{user.name}</span>
           <svg
             className={`h-3.5 w-3.5 transition ${open ? "rotate-180" : ""}`}
@@ -108,9 +102,7 @@ function ProfileMenu({ user, isAdmin, onLogout, variant = "desktop" }) {
           className="animate-dropdown absolute right-0 z-50 mt-2 flex max-h-[calc(100vh-5rem)] w-64 origin-top-right flex-col overflow-hidden rounded-xl bg-white shadow-[0_10px_30px_rgba(0,0,0,0.15)] ring-1 ring-black/5"
         >
           <div className="flex shrink-0 items-center gap-3 border-b border-[#f0f0f0] bg-[#f9fbfa] px-4 py-3">
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#2ea387] text-sm font-bold text-white">
-              {initialsOf(user.name)}
-            </span>
+            <UserAvatar className="h-10 w-10 shrink-0 ring-1 ring-black/5" />
             <div className="min-w-0">
               <p className="flex items-center gap-1.5 truncate text-sm font-semibold text-[#1f1f1f]">
                 {user.name}
