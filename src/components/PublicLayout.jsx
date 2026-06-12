@@ -8,7 +8,7 @@ import Navbar from './Navbar'
  */
 function PublicLayout() {
   return (
-    <div className="min-h-screen bg-[#f5f5f5]">
+    <div className="min-h-screen bg-[#f5f5f5] pb-24 md:pb-0">
       <Navbar />
       <Outlet />
     </div>
