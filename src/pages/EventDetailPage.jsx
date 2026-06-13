@@ -241,7 +241,7 @@ function EventDetailPage() {
               <div className="space-y-4">
                 <Link
                   to={`/${event.organizer?.type === "user" ? "u" : "organizer"}/${event.organizer?.id}`}
-                  className="text-brand-600 hover:underline"
+                  className="text-brand-600 hover:underline mb-4"
                 >
                   <Info
                     icon="📢"

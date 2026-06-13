@@ -1294,8 +1294,7 @@ export const api = {
     const profileType = publicProfiles.find(
       (item) => !type || item.type === type,
     );
-    const profile =
-      publicProfiles[Math.floor(Math.random() * profileType.length)];
+    const profile = profileType[Math.floor(Math.random() * profileType.length)];
     return delay(profile ? toPublicProfile(profile) : null);
   },
   getProfileReviews: (id) => delay(summarizeReviews(id).reviews),
