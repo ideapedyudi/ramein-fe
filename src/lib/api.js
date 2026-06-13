@@ -1185,6 +1185,32 @@ const toPublicProfile = (profile) => {
   };
 };
 
+const toCreatorFeedbackFromApi = (entry) => {
+  const rating = Number(entry.rating) || 0;
+
+  return {
+    id: entry.id,
+    rating,
+    comment: entry.review ?? '-',
+    createdAt: entry.createdAt ?? entry.created_at ?? null,
+    updatedAt: entry.updatedAt ?? entry.updated_at ?? null,
+    creatorType: entry.creatorType ?? entry.creator_type ?? entry.creator?.type ?? null,
+    creatorId: entry.creatorId ?? entry.creator_id ?? entry.creator?.id ?? null,
+    authorId: entry.createdBy?.id ?? null,
+    authorName: entry.createdBy?.name ?? 'Pengguna',
+    authorEmail: entry.createdBy?.email ?? null,
+    authorInitial: initialOf(entry.createdBy?.name ?? 'Pengguna'),
+  };
+};
+
+const getCreatorFeedbackCollection = (payload) => {
+  if (Array.isArray(payload)) return payload;
+  if (Array.isArray(payload?.data)) return payload.data;
+  if (payload?.data && typeof payload.data === 'object') return [payload.data];
+  if (payload && typeof payload === 'object') return [payload];
+  return [];
+};
+
 const toCreatorEventSummaryFromApi = (event, creatorProfile) => ({
   id: event.id,
   name: event.title ?? "-",
@@ -1376,6 +1402,20 @@ export const api = {
       })
       .catch(() => null);
   },
+  getCreatorFeedbacks: (creatorId) =>
+    apiRequest(`/feedback-creators/creator/${creatorId}`).then((res) =>
+      getCreatorFeedbackCollection(res).map(toCreatorFeedbackFromApi),
+    ),
+  createCreatorFeedback: ({ rating, review, creatorType, creatorId }) =>
+    apiRequest('/feedback-creators', {
+      method: 'POST',
+      body: JSON.stringify({
+        rating,
+        review,
+        creatorType,
+        creatorId,
+      }),
+    }).then((res) => toCreatorFeedbackFromApi(res.data ?? res)),
   getProfileReviews: (id) => delay(summarizeReviews(id).reviews),
   createProfileReview: ({ profileId, rating, comment, author }) => {
     const review = {

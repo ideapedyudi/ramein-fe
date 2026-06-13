@@ -79,18 +79,25 @@ function PublicProfilePage({ kind = null }) {
         if (cancelled) return null
         setLoading(true)
         setNotFound(false)
-        return api.getPublicProfile(kind, profileId)
+        return Promise.all([
+          api.getPublicProfile(kind, profileId),
+          api.getCreatorFeedbacks(profileId).catch(() => []),
+        ])
       })
       .then((res) => {
-        if (cancelled || res === null) {
+        if (cancelled || !res) return
+
+        const [profileRes, feedbackRes] = res
+
+        if (profileRes === null) {
           if (!cancelled) {
             setNotFound(true)
             setProfile(null)
           }
           return
         }
-        setProfile(res)
-        setReviews(res.reviews ?? [])
+        setProfile(profileRes)
+        setReviews(feedbackRes)
       })
       .finally(() => {
         if (!cancelled) setLoading(false)
@@ -168,11 +175,11 @@ function PublicProfilePage({ kind = null }) {
     setSubmitting(true)
     setFormError('')
     try {
-      const review = await api.createProfileReview({
-        profileId,
+      const review = await api.createCreatorFeedback({
         rating,
-        comment,
-        author: user,
+        review: comment,
+        creatorType: profile?.type ?? resolvedKind,
+        creatorId: profileId,
       })
       setReviews((prev) => [review, ...prev])
       setRating(0)
