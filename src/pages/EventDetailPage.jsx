@@ -9,7 +9,6 @@ import { useAuth } from "../context/authContext";
 import { api } from "../lib/api";
 import { formatIDR, formatNumber } from "../lib/format";
 import { toAbsoluteUrl, usePageSeo } from "../lib/seo";
-import { publicProfiles } from "../lib/api";
 
 function Card({ children }) {
   return (
@@ -43,6 +42,27 @@ function getPublicEventUrl(eventId) {
 
 function getDiscountDisplayPrice(price) {
   return Math.round((price ?? 0) * 1.2);
+}
+
+function initialOf(value) {
+  return String(value ?? "R").trim().charAt(0).toUpperCase() || "R";
+}
+
+function buildPublisherFallback(detail) {
+  const isUserPublisher = detail?.publishedBy === "user";
+  const name = isUserPublisher
+    ? detail?.creator?.name ?? "Pengguna"
+    : detail?.organizer?.name ?? "Ramein";
+
+  return {
+    type: isUserPublisher ? "user" : "organizer",
+    id: isUserPublisher
+      ? detail?.creator?.id ?? null
+      : detail?.organizer?.id ?? null,
+    name,
+    initial: initialOf(name),
+    verified: false,
+  };
 }
 
 async function copyText(value) {
@@ -103,14 +123,6 @@ function EventDetailPage() {
     }
 
     window.setTimeout(() => setShareMessage(""), 2500);
-  }
-
-  function getRandomProfileId(type) {
-    const profileType = publicProfiles.filter(
-      (item) => !type || item.type === type,
-    );
-    const randomIndex = Math.floor(Math.random() * profileType.length);
-    return profileType[randomIndex].id;
   }
 
   const eventJsonLd =
@@ -178,10 +190,21 @@ function EventDetailPage() {
       }
       setEvent(res);
       setSelectedTier(res.tiers[0]?.id ?? "");
-      const dummy = getRandomProfileId("organizer");
-      api.getEventPublisher("organizer", dummy).then((p) => {
-        if (!cancelled) setPublisher(p);
-      });
+      const fallbackPublisher = buildPublisherFallback(res);
+
+      if (!fallbackPublisher.id) {
+        setPublisher(fallbackPublisher);
+        return;
+      }
+
+      api
+        .getEventPublisher(fallbackPublisher.type, fallbackPublisher.id)
+        .then((p) => {
+          if (!cancelled) setPublisher(p ?? fallbackPublisher);
+        })
+        .catch(() => {
+          if (!cancelled) setPublisher(fallbackPublisher);
+        });
     });
     return () => {
       cancelled = true;
@@ -219,6 +242,15 @@ function EventDetailPage() {
 
   const tier = event.tiers.find((t) => t.id === selectedTier);
   const total = (tier?.price ?? 0) * quantity;
+  const showPublisherVerified = String(event.publishedBy ?? "").toLowerCase() === "admin";
+  const publisherLink =
+    String(event.publishedBy ?? "").toLowerCase() === "user"
+      ? event.creator?.id
+        ? `/creator/${event.creator.id}`
+        : null
+      : event.organizer?.id
+        ? `/creator/${event.organizer.id}`
+        : null;
 
   return (
     <SiteLayout>
@@ -266,28 +298,47 @@ function EventDetailPage() {
             {publisher && (
               <Card>
                 <CardHeader title="Penyelenggara" />
-                <Link
-                  to={`/${publisher.type === "user" ? "u" : "organizer"}/${publisher.id}`}
-                  className="group flex items-center gap-3"
-                >
-                  <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-brand-100 text-lg font-bold text-brand-700">
-                    {publisher.initial}
-                  </span>
-                  <div className="min-w-0">
-                    <p className="flex items-center gap-1.5 font-semibold text-gray-900 group-hover:text-brand-600">
-                      {publisher.name}
-                      {publisher.verified && (
-                        <FaCheckCircle
-                          className="text-brand-500"
-                          title="Terverifikasi"
-                        />
-                      )}
-                    </p>
-                    <p className="text-xs text-brand-600 group-hover:underline">
-                      Lihat profil &amp; ulasan →
-                    </p>
+                {publisherLink ? (
+                  <Link
+                    to={publisherLink}
+                    className="group flex items-center gap-3"
+                  >
+                    <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-brand-100 text-lg font-bold text-brand-700">
+                      {publisher.initial}
+                    </span>
+                    <div className="min-w-0">
+                      <p className="flex items-center gap-1.5 font-semibold text-gray-900 group-hover:text-brand-600">
+                        {publisher.name}
+                        {showPublisherVerified && (
+                          <FaCheckCircle
+                            className="text-brand-500"
+                            title="Terverifikasi"
+                          />
+                        )}
+                      </p>
+                      <p className="text-xs text-brand-600 group-hover:underline">
+                        Lihat profil &amp; ulasan →
+                      </p>
+                    </div>
+                  </Link>
+                ) : (
+                  <div className="flex items-center gap-3">
+                    <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-brand-100 text-lg font-bold text-brand-700">
+                      {publisher.initial}
+                    </span>
+                    <div className="min-w-0">
+                      <p className="flex items-center gap-1.5 font-semibold text-gray-900">
+                        {publisher.name}
+                        {showPublisherVerified && (
+                          <FaCheckCircle
+                            className="text-brand-500"
+                            title="Terverifikasi"
+                          />
+                        )}
+                      </p>
+                    </div>
                   </div>
-                </Link>
+                )}
               </Card>
             )}
 
@@ -362,6 +413,7 @@ function EventDetailPage() {
               <div className="space-y-3">
                 {event.tiers.map((t) => {
                   const discountDisplayPrice = getDiscountDisplayPrice(t.price);
+                  const showDiscount = Number(t.price) > 0;
 
                   return (
                     <button
@@ -383,14 +435,16 @@ function EventDetailPage() {
                           </p>
                         </div>
                         <div className="shrink-0 text-right">
-                          <div className="flex flex-wrap items-center justify-end gap-2">
-                            <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold text-emerald-700">
-                              Diskon 20%
-                            </span>
-                            <span className="text-xs font-medium text-gray-400 line-through">
-                              {formatIDR(discountDisplayPrice)}
-                            </span>
-                          </div>
+                          {showDiscount && (
+                            <div className="flex flex-wrap items-center justify-end gap-2">
+                              <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold text-emerald-700">
+                                Diskon 20%
+                              </span>
+                              <span className="text-xs font-medium text-gray-400 line-through">
+                                {formatIDR(discountDisplayPrice)}
+                              </span>
+                            </div>
+                          )}
                           <p className="mt-1 font-bold text-brand-600">
                             {formatIDR(t.price)}
                           </p>

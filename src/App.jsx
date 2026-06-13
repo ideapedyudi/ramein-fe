@@ -53,8 +53,9 @@ function App() {
           <Route path="/jelajahi" element={<JelajahiPage />} />
           <Route path="/untuk-kamu" element={<UntukKamuPage />} />
           <Route path="/event/:eventId" element={<EventDetailPage />} />
-          <Route path="/organizer/:profileId" element={<PublicProfilePage kind="organizer" />} />
-          <Route path="/u/:profileId" element={<PublicProfilePage kind="user" />} />
+          <Route path="/creator/:profileId" element={<PublicProfilePage />} />
+          <Route path="/organizer/:profileId" element={<PublicProfilePage />} />
+          <Route path="/u/:profileId" element={<PublicProfilePage />} />
 
           <Route path="/about" element={<AboutPage />} />
           <Route path="/pricing" element={<PricingPage />} />

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import AdminLayout from '../components/AdminLayout'
 import EventCardPreview from '../components/EventCardPreview'
+import { useAuth } from '../context/authContext'
 import { api } from '../lib/api'
 import { formatIDR } from '../lib/format'
 
@@ -148,6 +149,7 @@ function previewTime(value) {
 
 function BuatEventGatheringPage() {
   const navigate = useNavigate()
+  const { isUser } = useAuth()
   const [submitting, setSubmitting] = useState(false)
   const [loadingMaster, setLoadingMaster] = useState(true)
   const [error, setError] = useState('')
@@ -191,7 +193,7 @@ function BuatEventGatheringPage() {
         setOrganizers(organizerRes)
         setCities(cityRes)
         setCategoryId(categoryRes[0]?.id ?? '')
-        setOrganizerId(organizerRes[0]?.id ?? '')
+        setOrganizerId(isUser ? '' : organizerRes[0]?.id ?? '')
         setCityId(cityRes[0]?.id ?? '')
       })
       .catch((err) => {
@@ -204,7 +206,7 @@ function BuatEventGatheringPage() {
     return () => {
       cancelled = true
     }
-  }, [])
+  }, [isUser])
 
   const selectedCategory = categories.find((category) => category.id === categoryId)
   const selectedCity = cities.find((city) => city.id === cityId)
@@ -244,7 +246,7 @@ function BuatEventGatheringPage() {
         title,
         description,
         categoryId,
-        organizerId,
+        organizerId: isUser ? '00000000-0000-0000-0000-000000000000' : organizerId,
         cityId,
         addressDetail,
         banner,
@@ -313,7 +315,7 @@ function BuatEventGatheringPage() {
 
             <div className="rounded-2xl border border-black/5 bg-white p-5 shadow-sm">
               <p className="mb-3 text-sm font-semibold text-gray-900">Data Master</p>
-              <div className="grid gap-3 sm:grid-cols-3">
+              <div className={`grid gap-3 ${isUser ? 'sm:grid-cols-2' : 'sm:grid-cols-3'}`}>
                 <SmallSelect label="Kategori" name="categoryId" required value={categoryId} onChange={setCategoryId}>
                   {loadingMaster && <option value="">Memuat...</option>}
                   {!loadingMaster && categories.length === 0 && <option value="">Belum ada kategori</option>}
@@ -323,15 +325,17 @@ function BuatEventGatheringPage() {
                     </option>
                   ))}
                 </SmallSelect>
-                <SmallSelect label="Penyelenggara" name="organizerId" required value={organizerId} onChange={setOrganizerId}>
-                  {loadingMaster && <option value="">Memuat...</option>}
-                  {!loadingMaster && organizers.length === 0 && <option value="">Belum ada penyelenggara</option>}
-                  {organizers.map((organizer) => (
-                    <option key={organizer.id} value={organizer.id}>
-                      {organizer.name}
-                    </option>
-                  ))}
-                </SmallSelect>
+                {!isUser && (
+                  <SmallSelect label="Penyelenggara" name="organizerId" required value={organizerId} onChange={setOrganizerId}>
+                    {loadingMaster && <option value="">Memuat...</option>}
+                    {!loadingMaster && organizers.length === 0 && <option value="">Belum ada penyelenggara</option>}
+                    {organizers.map((organizer) => (
+                      <option key={organizer.id} value={organizer.id}>
+                        {organizer.name}
+                      </option>
+                    ))}
+                  </SmallSelect>
+                )}
                 <SmallSelect label="Kota" name="cityId" required value={cityId} onChange={setCityId}>
                   {loadingMaster && <option value="">Memuat...</option>}
                   {!loadingMaster && cities.length === 0 && <option value="">Belum ada kota</option>}

@@ -592,6 +592,14 @@ const toPublicEventDetailFromApi = (event) => {
 
   return {
     ...summary,
+    publishedBy: event.publishedBy ?? event.published_by ?? null,
+    creator: event.creator
+      ? {
+          id: event.creator.id ?? null,
+          name: event.creator.name ?? "-",
+          initial: (event.creator.name ?? "-").charAt(0).toUpperCase(),
+        }
+      : null,
     description: event.description ?? "-",
     timeLabel: formatEventTimeRange(
       event.startDateTime ?? event.start_datetime,
@@ -1171,8 +1179,80 @@ const toPublicProfile = (profile) => {
     reviews,
     totalEvents: events.length,
     totalAttendees,
+    totalParticipants: totalAttendees,
     ratingCount,
     ratingAverage,
+  };
+};
+
+const toCreatorEventSummaryFromApi = (event, creatorProfile) => ({
+  id: event.id,
+  name: event.title ?? "-",
+  category: event.category?.name ?? "-",
+  region: event.city?.provinsi ?? event.city?.name ?? "-",
+  city: event.city?.name ?? "-",
+  date: event.startDateTime ?? event.start_datetime ?? null,
+  dateLabel: formatEventDateLabel(event.startDateTime ?? event.start_datetime),
+  startingPrice: Number(event.startingPrice ?? event.starting_price) || 0,
+  organizer: {
+    id: creatorProfile.id,
+    name: creatorProfile.name,
+    initial: creatorProfile.initial,
+  },
+  badges: [event.category?.name, event.eventType ?? event.event_type]
+    .filter(Boolean)
+    .map((badge) => String(badge)),
+  bannerHue: creatorProfile.bannerHue ?? "from-brand-500 to-brand-600",
+  imageUrl: event.banner ?? null,
+  visibility: event.visibility ?? "public",
+  isOnline: (event.eventType ?? event.event_type) === "online",
+  totalParticipants: Number(event.totalParticipants) || 0,
+});
+
+const toPublicCreatorProfileFromApi = (payload) => {
+  const entry = payload?.data ?? payload;
+
+  if (!entry?.id) return null;
+
+  const fallbackProfile = publicProfiles.find((item) => item.id === entry.id);
+  const profile = {
+    ...fallbackProfile,
+    id: entry.id,
+    type: entry.type ?? fallbackProfile?.type ?? "user",
+    name: entry.name ?? fallbackProfile?.name ?? "-",
+    bio: entry.bio ?? fallbackProfile?.bio ?? null,
+    tagline: entry.tagline ?? fallbackProfile?.tagline ?? null,
+    initial: initialOf(entry.name ?? fallbackProfile?.name ?? "Creator"),
+    verified: Boolean(entry.verified ?? fallbackProfile?.verified),
+    location: entry.location ?? fallbackProfile?.location ?? null,
+    joinedAt: entry.joinedAt ?? entry.joined_at ?? fallbackProfile?.joinedAt ?? null,
+    instagram: entry.instagram ?? fallbackProfile?.instagram ?? null,
+    website: entry.website ?? fallbackProfile?.website ?? null,
+    bannerHue: fallbackProfile?.bannerHue ?? "from-brand-500 to-brand-600",
+    eventIds: Array.isArray(entry.eventIds)
+      ? entry.eventIds
+      : Array.isArray(fallbackProfile?.eventIds)
+        ? fallbackProfile.eventIds
+        : [],
+  };
+  const mappedProfile = toPublicProfile(profile);
+  const apiEvents = Array.isArray(entry.events)
+    ? entry.events.map((event) => toCreatorEventSummaryFromApi(event, profile))
+    : mappedProfile.events;
+  const apiTotalParticipants = apiEvents.reduce(
+    (sum, event) => sum + (Number(event.totalParticipants) || 0),
+    0,
+  );
+
+  return {
+    ...mappedProfile,
+    events: apiEvents,
+    totalEvents:
+      Number(entry.totalEvents) || apiEvents.length || mappedProfile.totalEvents,
+    totalParticipants:
+      Number(entry.totalParticipants) || apiTotalParticipants || mappedProfile.totalParticipants,
+    totalAttendees:
+      Number(entry.totalParticipants) || apiTotalParticipants || mappedProfile.totalAttendees,
   };
 };
 
@@ -1283,12 +1363,16 @@ export const api = {
       getFeedbackCollection(res).map(toFeedbackFromApi),
     ),
 
-  // Public profiles & reviews (MOCK — wire to BE once endpoints ship)
+  // Public creator profile
   getPublicProfile: (type, id) => {
-    const profile = publicProfiles.find(
-      (item) => item.id === id && (!type || item.type === type),
-    );
-    return delay(profile ? toPublicProfile(profile) : null);
+    return apiRequest(`/creators/${id}`)
+      .then((res) => {
+        const profile = toPublicCreatorProfileFromApi(res);
+        if (!profile) return null;
+        if (type && profile.type !== type) return null;
+        return profile;
+      })
+      .catch(() => null);
   },
   getProfileReviews: (id) => delay(summarizeReviews(id).reviews),
   createProfileReview: ({ profileId, rating, comment, author }) => {

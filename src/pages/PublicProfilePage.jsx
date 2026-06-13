@@ -18,7 +18,7 @@ import { api } from '../lib/api'
 import { formatDate, formatDateTime, formatNumber } from '../lib/format'
 import { usePageSeo } from '../lib/seo'
 
-const TYPE_LABEL = { organizer: 'Penyelenggara', user: 'Pengguna' }
+const TYPE_LABEL = { organizer: 'organizer', user: 'user' }
 
 function StatPill({ label, value }) {
   return (
@@ -37,7 +37,7 @@ function Card({ children, className = '' }) {
   )
 }
 
-function PublicProfilePage({ kind }) {
+function PublicProfilePage({ kind = null }) {
   const { profileId } = useParams()
   const { user, isAuthenticated } = useAuth()
   const [profile, setProfile] = useState(null)
@@ -51,8 +51,7 @@ function PublicProfilePage({ kind }) {
   const [formSuccess, setFormSuccess] = useState('')
   const [loginPromptOpen, setLoginPromptOpen] = useState(false)
 
-  const basePath = kind === 'user' ? 'u' : 'organizer'
-  const canonicalPath = `/${basePath}/${profileId}`
+  const canonicalPath = `/creator/${profileId}`
   const isOwnProfile = isAuthenticated && user?.id === profileId
 
   useEffect(() => {
@@ -97,11 +96,13 @@ function PublicProfilePage({ kind }) {
     return { count, average, distribution }
   }, [reviews])
 
+  const resolvedKind = profile?.type ?? kind
+
   const profileJsonLd =
     profile && !notFound
       ? {
           '@context': 'https://schema.org',
-          '@type': kind === 'user' ? 'Person' : 'Organization',
+          '@type': resolvedKind === 'user' ? 'Person' : 'Organization',
           name: profile.name,
           description: profile.tagline ?? profile.bio,
           ...(ratingStats.count > 0
@@ -217,15 +218,19 @@ function PublicProfilePage({ kind }) {
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-2">
                 <h1 className="text-2xl font-bold text-gray-900">{profile.name}</h1>
-                {profile.verified && (
-                  <FaCheckCircle className="text-brand-500" title="Terverifikasi" />
-                )}
                 <span className="rounded-full bg-brand-50 px-2.5 py-0.5 text-xs font-semibold text-brand-700">
-                  {TYPE_LABEL[kind] ?? 'Profil'}
+                  Penyelenggara
                 </span>
+                {resolvedKind === 'organizer' && (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-700">
+                    <FaCheckCircle className="text-[11px]" />
+                    Terverifikasi
+                  </span>
+                )}
               </div>
+              <p className="mt-1 text-sm text-gray-600">{TYPE_LABEL[resolvedKind] ?? '-'}</p>
               {profile.tagline && (
-                <p className="mt-1 text-sm text-gray-600">{profile.tagline}</p>
+                <p className="mt-2 text-sm text-gray-600">{profile.tagline}</p>
               )}
               <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-gray-500">
                 {profile.location && (
@@ -266,23 +271,23 @@ function PublicProfilePage({ kind }) {
           {/* Stats */}
           <div className="mt-5 grid grid-cols-3 gap-3">
             <StatPill label="Event" value={formatNumber(profile.totalEvents)} />
-            <StatPill label="Total peserta" value={`${formatNumber(profile.totalAttendees)}+`} />
+            <StatPill label="Total peserta" value={`${formatNumber(profile.totalParticipants ?? profile.totalAttendees)}+`} />
             <StatPill
               label={`${ratingStats.count} ulasan`}
               value={ratingStats.count ? ratingStats.average.toFixed(1) : '—'}
             />
           </div>
 
-          {profile.bio && (
-            <p className="mt-5 text-sm leading-relaxed text-gray-700">{profile.bio}</p>
-          )}
+          <p className="mt-5 text-sm leading-relaxed text-gray-700">
+            {profile.bio || 'Bio belum tersedia.'}
+          </p>
         </div>
 
         <div className="mt-6 grid gap-6 lg:grid-cols-3">
           {/* Events */}
           <section className="lg:col-span-2">
             <h2 className="mb-3 text-lg font-semibold text-gray-900">
-              Event yang Dipublikasikan
+              {resolvedKind === 'user' ? 'Event Private' : 'Event yang Dipublikasikan'}
             </h2>
             {profile.events.length === 0 ? (
               <Card>
