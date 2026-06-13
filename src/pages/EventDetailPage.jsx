@@ -263,13 +263,6 @@ function EventDetailPage() {
               </div>
             </Card>
 
-            <Card>
-              <CardHeader title="Tentang Event Ini" />
-              <p className="text-sm leading-relaxed text-gray-700">
-                {event.description}
-              </p>
-            </Card>
-
             {publisher && (
               <Card>
                 <CardHeader title="Penyelenggara" />
@@ -297,6 +290,13 @@ function EventDetailPage() {
                 </Link>
               </Card>
             )}
+
+            <Card>
+              <CardHeader title="Tentang Event Ini" />
+              <p className="text-sm leading-relaxed text-gray-700">
+                {event.description}
+              </p>
+            </Card>
           </div>
 
           <div className="space-y-5 sm:space-y-6">
