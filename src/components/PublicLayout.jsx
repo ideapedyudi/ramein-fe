@@ -1,5 +1,6 @@
-import { Outlet } from 'react-router-dom'
-import Navbar from './Navbar'
+import { Outlet } from "react-router-dom";
+import Navbar from "./Navbar";
+import FloatingChat from "./FloatingChat";
 
 /**
  * Layout for the public site. The Navbar is rendered once here and stays
@@ -10,9 +11,10 @@ function PublicLayout() {
   return (
     <div className="min-h-screen bg-[#f5f5f5] pb-24 md:pb-0">
       <Navbar />
+      <FloatingChat />
       <Outlet />
     </div>
-  )
+  );
 }
 
-export default PublicLayout
+export default PublicLayout;
