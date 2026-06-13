@@ -1193,7 +1193,8 @@ const toCreatorEventSummaryFromApi = (event, creatorProfile) => ({
   city: event.city?.name ?? "-",
   date: event.startDateTime ?? event.start_datetime ?? null,
   dateLabel: formatEventDateLabel(event.startDateTime ?? event.start_datetime),
-  startingPrice: Number(event.startingPrice ?? event.starting_price) || 0,
+  startingPrice:
+    Number(event.price ?? event.startingPrice ?? event.starting_price) || 0,
   organizer: {
     id: creatorProfile.id,
     name: creatorProfile.name,
