@@ -178,8 +178,8 @@ function EventDetailPage() {
       }
       setEvent(res);
       setSelectedTier(res.tiers[0]?.id ?? "");
-      const dummy = getRandomProfileId(res.organizer?.type);
-      api.getEventPublisher(res.organizer?.type, dummy).then((p) => {
+      const dummy = getRandomProfileId("organizer");
+      api.getEventPublisher("organizer", dummy).then((p) => {
         if (!cancelled) setPublisher(p);
       });
     });
