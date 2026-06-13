@@ -1228,6 +1228,7 @@ const toPublicCreatorProfileFromApi = (payload) => {
     location: entry.location ?? fallbackProfile?.location ?? null,
     joinedAt: entry.joinedAt ?? entry.joined_at ?? fallbackProfile?.joinedAt ?? null,
     instagram: entry.instagram ?? fallbackProfile?.instagram ?? null,
+    tiktok: entry.tiktok ?? fallbackProfile?.tiktok ?? null,
     website: entry.website ?? fallbackProfile?.website ?? null,
     bannerHue: fallbackProfile?.bannerHue ?? "from-brand-500 to-brand-600",
     eventIds: Array.isArray(entry.eventIds)

@@ -7,6 +7,7 @@ import {
   FaMapMarkerAlt,
   FaRegCalendarAlt,
 } from 'react-icons/fa'
+import { SiTiktok } from 'react-icons/si'
 import Container from '../components/Container'
 import EventListCard from '../components/EventListCard'
 import LoginPromptModal from '../components/LoginPromptModal'
@@ -35,6 +36,22 @@ function Card({ children, className = '' }) {
       {children}
     </div>
   )
+}
+
+function getSocialUrl(platform, value) {
+  if (!value) {
+    return platform === 'tiktok' ? 'https://www.tiktok.com' : 'https://instagram.com'
+  }
+  if (/^https?:\/\//i.test(value)) return value
+
+  const handle = String(value).replace(/^@/, '')
+  if (!handle) {
+    return platform === 'tiktok' ? 'https://www.tiktok.com' : 'https://instagram.com'
+  }
+
+  return platform === 'tiktok'
+    ? `https://www.tiktok.com/@${handle}`
+    : `https://instagram.com/${handle}`
 }
 
 function PublicProfilePage({ kind = null }) {
@@ -229,6 +246,28 @@ function PublicProfilePage({ kind = null }) {
                 )}
               </div>
               <p className="mt-1 text-sm text-gray-600">{TYPE_LABEL[resolvedKind] ?? '-'}</p>
+              <div className="mt-2 flex flex-wrap items-center gap-2 text-gray-500">
+                <a
+                  href={getSocialUrl('instagram', profile.instagram)}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center justify-center rounded-full border border-gray-200 p-2 transition hover:border-brand-300 hover:text-brand-600"
+                  title="Instagram"
+                  aria-label="Instagram"
+                >
+                  <FaInstagram className="text-sm" />
+                </a>
+                <a
+                  href={getSocialUrl('tiktok', profile.tiktok)}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center justify-center rounded-full border border-gray-200 p-2 transition hover:border-brand-300 hover:text-brand-600"
+                  title="TikTok"
+                  aria-label="TikTok"
+                >
+                  <SiTiktok className="text-sm" />
+                </a>
+              </div>
               {profile.tagline && (
                 <p className="mt-2 text-sm text-gray-600">{profile.tagline}</p>
               )}
@@ -243,16 +282,6 @@ function PublicProfilePage({ kind = null }) {
                     <FaRegCalendarAlt className="text-brand-500" /> Bergabung{' '}
                     {formatDate(profile.joinedAt)}
                   </span>
-                )}
-                {profile.instagram && (
-                  <a
-                    href={`https://instagram.com/${profile.instagram.replace(/^@/, '')}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex items-center gap-1.5 hover:text-brand-600"
-                  >
-                    <FaInstagram className="text-brand-500" /> {profile.instagram}
-                  </a>
                 )}
                 {profile.website && (
                   <a
