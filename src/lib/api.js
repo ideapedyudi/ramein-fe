@@ -1305,25 +1305,13 @@ export const api = {
     profileReviews = [review, ...profileReviews];
     return delay(review);
   },
-  getEventPublisher: (eventId, organizerId) => {
-    const host = publicProfiles.find(
-      (item) => item.type === "user" && (item.eventIds ?? []).includes(eventId),
-    );
-    if (host) {
-      return delay({
-        type: "user",
-        id: host.id,
-        name: host.name,
-        initial: host.initial,
-        verified: host.verified,
-      });
-    }
+  getEventPublisher: (type, id) => {
     const organizer = publicProfiles.find(
-      (item) => item.type === "organizer" && item.id === organizerId,
+      (item) => item.type === type && item.id === id,
     );
     if (organizer) {
       return delay({
-        type: "organizer",
+        type: type,
         id: organizer.id,
         name: organizer.name,
         initial: organizer.initial,

@@ -105,7 +105,7 @@ function EventDetailPage() {
     window.setTimeout(() => setShareMessage(""), 2500);
   }
 
-  function getRandomProfile(type) {
+  function getRandomProfileId(type) {
     const profileType = publicProfiles.filter(
       (item) => !type || item.type === type,
     );
@@ -178,7 +178,8 @@ function EventDetailPage() {
       }
       setEvent(res);
       setSelectedTier(res.tiers[0]?.id ?? "");
-      api.getEventPublisher(eventId, res.organizer?.id).then((p) => {
+      const dummy = getRandomProfileId(res.organizer?.type);
+      api.getEventPublisher(res.organizer?.type, dummy).then((p) => {
         if (!cancelled) setPublisher(p);
       });
     });
@@ -248,16 +249,6 @@ function EventDetailPage() {
             <Card>
               <CardHeader title="Informasi Event" />
               <div className="space-y-4">
-                <Link
-                  to={`/${event.organizer?.type === "user" ? "u" : "organizer"}/${getRandomProfile(event.organizer?.type)}`}
-                  className="text-brand-600 hover:underline mb-4 inline-block"
-                >
-                  <Info
-                    icon="📢"
-                    label="Penyelenggara"
-                    value={event.organizer?.name ?? "Ramein"}
-                  />
-                </Link>
                 <Info
                   icon="📅"
                   label="Tanggal & Waktu"
