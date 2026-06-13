@@ -490,10 +490,10 @@ const toSummary = (e) => ({
 });
 
 const formatEventDateLabel = (value) => {
-  if (!value) return "-"
-  const date = new Date(value)
+  if (!value) return "-";
+  const date = new Date(value);
 
-  if (Number.isNaN(date.getTime())) return "-"
+  if (Number.isNaN(date.getTime())) return "-";
 
   return new Intl.DateTimeFormat("id-ID", {
     day: "2-digit",
@@ -501,34 +501,34 @@ const formatEventDateLabel = (value) => {
     year: "numeric",
     hour: "2-digit",
     minute: "2-digit",
-  }).format(date)
-}
+  }).format(date);
+};
 
 const getEventStartingPrice = (ticketTypes = []) => {
   const prices = ticketTypes
     .map((ticket) => Number(ticket.price))
-    .filter((price) => !Number.isNaN(price) && price >= 0)
+    .filter((price) => !Number.isNaN(price) && price >= 0);
 
-  return prices.length ? Math.min(...prices) : 0
-}
+  return prices.length ? Math.min(...prices) : 0;
+};
 
 const getEventTicketTypes = (event) =>
   Array.isArray(event.ticketTypes)
     ? event.ticketTypes
     : Array.isArray(event.ticket_types)
       ? event.ticket_types
-      : []
+      : [];
 
 const formatEventTimeRange = (start, end) => {
-  if (!start) return "-"
+  if (!start) return "-";
 
-  const startDate = new Date(start)
-  if (Number.isNaN(startDate.getTime())) return "-"
+  const startDate = new Date(start);
+  if (Number.isNaN(startDate.getTime())) return "-";
 
   const sameDay =
     end &&
     !Number.isNaN(new Date(end).getTime()) &&
-    startDate.toDateString() === new Date(end).toDateString()
+    startDate.toDateString() === new Date(end).toDateString();
 
   const startText = new Intl.DateTimeFormat("id-ID", {
     day: "2-digit",
@@ -536,28 +536,28 @@ const formatEventTimeRange = (start, end) => {
     year: "numeric",
     hour: "2-digit",
     minute: "2-digit",
-  }).format(startDate)
+  }).format(startDate);
 
-  if (!end) return startText
+  if (!end) return startText;
 
-  const endDate = new Date(end)
-  if (Number.isNaN(endDate.getTime())) return startText
+  const endDate = new Date(end);
+  if (Number.isNaN(endDate.getTime())) return startText;
 
   const endText = sameDay
     ? new Intl.DateTimeFormat("id-ID", {
-      hour: "2-digit",
-      minute: "2-digit",
-    }).format(endDate)
+        hour: "2-digit",
+        minute: "2-digit",
+      }).format(endDate)
     : new Intl.DateTimeFormat("id-ID", {
-      day: "2-digit",
-      month: "long",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    }).format(endDate)
+        day: "2-digit",
+        month: "long",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      }).format(endDate);
 
-  return `${startText} - ${endText}`
-}
+  return `${startText} - ${endText}`;
+};
 
 const toPublicEventSummaryFromApi = (event) => ({
   id: event.id,
@@ -569,7 +569,11 @@ const toPublicEventSummaryFromApi = (event) => ({
   dateLabel: formatEventDateLabel(event.startDateTime ?? event.start_datetime),
   startingPrice: getEventStartingPrice(getEventTicketTypes(event)),
   organizer: {
-    id: event.organizer?.id ?? event.organizerId ?? event.organizer_id ?? "organizer",
+    id:
+      event.organizer?.id ??
+      event.organizerId ??
+      event.organizer_id ??
+      "organizer",
     name: event.organizer?.name ?? "Ramein",
     initial: (event.organizer?.name ?? "Ramein").charAt(0).toUpperCase(),
   },
@@ -580,11 +584,11 @@ const toPublicEventSummaryFromApi = (event) => ({
   imageUrl: event.banner,
   visibility: event.visibility ?? "public",
   isOnline: (event.eventType ?? event.event_type) === "online",
-})
+});
 
 const toPublicEventDetailFromApi = (event) => {
-  const summary = toPublicEventSummaryFromApi(event)
-  const ticketTypes = getEventTicketTypes(event)
+  const summary = toPublicEventSummaryFromApi(event);
+  const ticketTypes = getEventTicketTypes(event);
 
   return {
     ...summary,
@@ -594,44 +598,59 @@ const toPublicEventDetailFromApi = (event) => {
       event.endDateTime ?? event.end_datetime,
     ),
     location: summary.isOnline
-      ? event.labelOnline ?? event.label_online ?? "Online Event"
-      : [event.addressDetail ?? event.address_detail, event.city?.name].filter(Boolean).join(", ") || "-",
-    attendees: ticketTypes.reduce((sum, ticket) => sum + (Number(ticket.sold) || 0), 0),
+      ? (event.labelOnline ?? event.label_online ?? "Online Event")
+      : [event.addressDetail ?? event.address_detail, event.city?.name]
+          .filter(Boolean)
+          .join(", ") || "-",
+    attendees: ticketTypes.reduce(
+      (sum, ticket) => sum + (Number(ticket.sold) || 0),
+      0,
+    ),
     attachmentLabel: summary.isOnline
-      ? event.labelOnline ?? event.label_online ?? "Link event online"
+      ? (event.labelOnline ?? event.label_online ?? "Link event online")
       : null,
-    attachmentUrl: summary.isOnline ? event.urlOnline ?? event.url_online ?? null : null,
+    attachmentUrl: summary.isOnline
+      ? (event.urlOnline ?? event.url_online ?? null)
+      : null,
     tiers: ticketTypes.map((ticket) => ({
       id: ticket.id,
       name: ticket.name,
       price: Number(ticket.price) || 0,
-      quotaAvailable: Math.max((Number(ticket.quota) || 0) - (Number(ticket.sold) || 0), 0),
+      quotaAvailable: Math.max(
+        (Number(ticket.quota) || 0) - (Number(ticket.sold) || 0),
+        0,
+      ),
       perks: [],
     })),
-  }
-}
+  };
+};
 
 const getApiCollection = (payload) => {
-  if (Array.isArray(payload)) return payload
-  if (Array.isArray(payload?.data)) return payload.data
-  return []
-}
+  if (Array.isArray(payload)) return payload;
+  if (Array.isArray(payload?.data)) return payload.data;
+  return [];
+};
 
 const normalizeTransactionStatus = (value) => {
-  const status = String(value ?? "").toLowerCase()
+  const status = String(value ?? "").toLowerCase();
 
-  if (["capture", "settlement", "success", "paid"].includes(status)) return "paid"
-  if (["pending", "authorize"].includes(status)) return "pending"
-  if (["deny", "cancel", "expire", "failure", "failed"].includes(status)) return "failed"
-  if (status === "refund" || status === "refunded") return "refunded"
+  if (["capture", "settlement", "success", "paid"].includes(status))
+    return "paid";
+  if (["pending", "authorize"].includes(status)) return "pending";
+  if (["deny", "cancel", "expire", "failure", "failed"].includes(status))
+    return "failed";
+  if (status === "refund" || status === "refunded") return "refunded";
 
-  return status || "pending"
-}
+  return status || "pending";
+};
 
 const toMyTransactionSummaryFromApi = (transaction) => {
-  const items = Array.isArray(transaction?.items) ? transaction.items : []
-  const firstItem = items[0]
-  const quantity = items.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0)
+  const items = Array.isArray(transaction?.items) ? transaction.items : [];
+  const firstItem = items[0];
+  const quantity = items.reduce(
+    (sum, item) => sum + (Number(item.quantity) || 0),
+    0,
+  );
 
   return {
     id: transaction.id,
@@ -651,67 +670,71 @@ const toMyTransactionSummaryFromApi = (transaction) => {
     paidAt: transaction.paidAt ?? null,
     redirectUrl: transaction.redirectUrl ?? null,
     items,
-  }
-}
+  };
+};
 
 const getTransactionCollection = (payload) => {
-  if (Array.isArray(payload)) return payload
-  if (Array.isArray(payload?.data)) return payload.data
-  if (payload?.data && typeof payload.data === "object") return [payload.data]
-  if (payload && typeof payload === "object") return [payload]
-  return []
-}
+  if (Array.isArray(payload)) return payload;
+  if (Array.isArray(payload?.data)) return payload.data;
+  if (payload?.data && typeof payload.data === "object") return [payload.data];
+  if (payload && typeof payload === "object") return [payload];
+  return [];
+};
 
 const normalizeAttendanceStatus = (value) => {
-  const status = String(value ?? "").toLowerCase()
+  const status = String(value ?? "").toLowerCase();
 
-  if (status === "attended") return "used"
-  if (["not_attended", "paid", "active"].includes(status)) return "active"
-  if (status === "refunded") return "refunded"
+  if (status === "attended") return "used";
+  if (["not_attended", "paid", "active"].includes(status)) return "active";
+  if (status === "refunded") return "refunded";
 
-  return status || "active"
-}
+  return status || "active";
+};
 
 const toMyPaidTicketFromApi = (entry) => {
-  const items = Array.isArray(entry?.transaction?.items) ? entry.transaction.items : []
-  const firstItem = items[0]
-  const eventType = String(entry?.event?.eventType ?? entry?.event?.event_type ?? "").toLowerCase()
-  const isOnlineEvent = eventType === "online"
+  const items = Array.isArray(entry?.transaction?.items)
+    ? entry.transaction.items
+    : [];
+  const firstItem = items[0];
+  const eventType = String(
+    entry?.event?.eventType ?? entry?.event?.event_type ?? "",
+  ).toLowerCase();
+  const isOnlineEvent = eventType === "online";
   const rawTickets = Array.isArray(entry?.tickets)
     ? entry.tickets
     : Array.isArray(entry?.transaction?.tickets)
       ? entry.transaction.tickets
-      : []
+      : [];
   const quantity =
     rawTickets.length > 0
       ? rawTickets.length
-      : items.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0)
-  const total = Number(entry?.transaction?.grossAmount) || 0
+      : items.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0);
+  const total = Number(entry?.transaction?.grossAmount) || 0;
   const tickets =
     rawTickets.length > 0
       ? rawTickets.map((ticket, index) => ({
-        id: ticket.id,
-        qrCode: ticket.qrCode ?? null,
-        status: normalizeAttendanceStatus(ticket.attendanceStatus),
-        attendanceStatus: ticket.attendanceStatus ?? "not_attended",
-        attendedAt: ticket.attendedAt ?? null,
-        createdAt: ticket.createdAt ?? null,
-        number: index + 1,
-      }))
+          id: ticket.id,
+          qrCode: ticket.qrCode ?? null,
+          status: normalizeAttendanceStatus(ticket.attendanceStatus),
+          attendanceStatus: ticket.attendanceStatus ?? "not_attended",
+          attendedAt: ticket.attendedAt ?? null,
+          createdAt: ticket.createdAt ?? null,
+          number: index + 1,
+        }))
       : [
-        {
-          id: entry.id,
-          qrCode: entry.qrCode ?? null,
-          status: normalizeAttendanceStatus(entry.attendanceStatus),
-          attendanceStatus: entry.attendanceStatus ?? "not_attended",
-          attendedAt: entry.attendedAt ?? null,
-          createdAt: entry.createdAt ?? null,
-          number: 1,
-        },
-      ]
+          {
+            id: entry.id,
+            qrCode: entry.qrCode ?? null,
+            status: normalizeAttendanceStatus(entry.attendanceStatus),
+            attendanceStatus: entry.attendanceStatus ?? "not_attended",
+            attendedAt: entry.attendedAt ?? null,
+            createdAt: entry.createdAt ?? null,
+            number: 1,
+          },
+        ];
   const cardStatus = tickets.some((ticket) => ticket.status === "active")
     ? "active"
-    : tickets[0]?.status ?? normalizeAttendanceStatus(entry.attendanceStatus)
+    : (tickets[0]?.status ?? normalizeAttendanceStatus(entry.attendanceStatus));
 
   return {
     id: entry.id,
@@ -723,31 +746,44 @@ const toMyPaidTicketFromApi = (entry) => {
     dateLabel: formatEventDateLabel(entry.event?.startDateTime),
     eventType,
     eventOnlineLabel: isOnlineEvent
-      ? entry.event?.labelOnline ?? entry.event?.label_online ?? "Online Event"
+      ? (entry.event?.labelOnline ??
+        entry.event?.label_online ??
+        "Online Event")
       : null,
     eventOnlineUrl: entry.event?.urlOnline ?? entry.event?.url_online ?? null,
-    location:
-      isOnlineEvent
-        ? entry.event?.labelOnline ?? entry.event?.label_online ?? "Online Event"
-        : [entry.event?.city?.name, entry.event?.organizer?.name].filter(Boolean).join(" • ") || "-",
+    location: isOnlineEvent
+      ? (entry.event?.labelOnline ??
+        entry.event?.label_online ??
+        "Online Event")
+      : [entry.event?.city?.name, entry.event?.organizer?.name]
+          .filter(Boolean)
+          .join(" • ") || "-",
     tier: firstItem?.ticketName ?? "-",
     quantity,
     price: quantity > 0 ? total / quantity : total,
     total,
     status: cardStatus,
-    attendanceStatus: tickets[0]?.attendanceStatus ?? entry.attendanceStatus ?? "not_attended",
+    attendanceStatus:
+      tickets[0]?.attendanceStatus ?? entry.attendanceStatus ?? "not_attended",
     attendedAt: tickets[0]?.attendedAt ?? entry.attendedAt ?? null,
     purchasedAt: entry.transaction?.createdAt ?? entry.createdAt ?? null,
     imageUrl: entry.event?.banner ?? null,
     tickets,
-  }
-}
+  };
+};
 
 const toEventAttendeeFromApi = (entry) => {
-  const items = Array.isArray(entry?.transaction?.items) ? entry.transaction.items : []
-  const firstItem = items[0]
-  const quantity = items.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0)
-  const rawStatus = String(entry.attendanceStatus ?? "not_attended").toLowerCase()
+  const items = Array.isArray(entry?.transaction?.items)
+    ? entry.transaction.items
+    : [];
+  const firstItem = items[0];
+  const quantity = items.reduce(
+    (sum, item) => sum + (Number(item.quantity) || 0),
+    0,
+  );
+  const rawStatus = String(
+    entry.attendanceStatus ?? "not_attended",
+  ).toLowerCase();
 
   return {
     id: entry.id,
@@ -762,17 +798,19 @@ const toEventAttendeeFromApi = (entry) => {
     attendanceStatus: rawStatus,
     attendedAt: entry.attendedAt ?? null,
     registeredAt: entry.createdAt ?? null,
-  }
-}
+  };
+};
 
 const normalizeWithdrawStatus = (value) => {
-  const status = String(value ?? "").toLowerCase()
+  const status = String(value ?? "").toLowerCase();
 
-  if (["approved", "success", "paid", "completed"].includes(status)) return "approved"
-  if (["reject", "rejected", "failed", "cancelled"].includes(status)) return "rejected"
+  if (["approved", "success", "paid", "completed"].includes(status))
+    return "approved";
+  if (["reject", "rejected", "failed", "cancelled"].includes(status))
+    return "rejected";
 
-  return status || "pending"
-}
+  return status || "pending";
+};
 
 const toWithdrawFromApi = (entry) => ({
   id: entry.id,
@@ -796,22 +834,23 @@ const toWithdrawFromApi = (entry) => ({
     name: entry.user?.name ?? "-",
     email: entry.user?.email ?? "-",
   },
-})
+});
 
 const getWithdrawCollection = (payload) => {
-  if (Array.isArray(payload)) return payload
-  if (Array.isArray(payload?.data)) return payload.data
-  if (Array.isArray(payload?.data?.withdraws)) return payload.data.withdraws
-  if (Array.isArray(payload?.withdraws)) return payload.withdraws
-  return []
-}
+  if (Array.isArray(payload)) return payload;
+  if (Array.isArray(payload?.data)) return payload.data;
+  if (Array.isArray(payload?.data?.withdraws)) return payload.data.withdraws;
+  if (Array.isArray(payload?.withdraws)) return payload.withdraws;
+  return [];
+};
 
 const toFinanceFromApi = (entry) => ({
   id: entry.id,
   userId: entry.user_id ?? entry.userId ?? entry.user?.id ?? null,
   eventId: entry.event_id ?? entry.eventId ?? entry.event?.id ?? null,
   transactionId: entry.transaksi_id ?? entry.transactionId ?? null,
-  organizerId: entry.organizer_id ?? entry.organizerId ?? entry.organizer?.id ?? null,
+  organizerId:
+    entry.organizer_id ?? entry.organizerId ?? entry.organizer?.id ?? null,
   grossAmount: Number(entry.gross_amount ?? entry.grossAmount) || 0,
   adminIncome: Number(entry.admin_income ?? entry.adminIncome) || 0,
   transactionTime: entry.time_transaksi ?? entry.transactionTime ?? null,
@@ -831,17 +870,17 @@ const toFinanceFromApi = (entry) => ({
     id: entry.organizer?.id ?? entry.organizer_id ?? entry.organizerId ?? null,
     name: entry.organizer?.name ?? "-",
   },
-})
+});
 
 const getFinanceCollection = (payload) => {
-  if (Array.isArray(payload)) return payload
-  if (Array.isArray(payload?.data)) return payload.data
-  if (Array.isArray(payload?.data?.finance)) return payload.data.finance
-  if (Array.isArray(payload?.data?.items)) return payload.data.items
-  if (Array.isArray(payload?.finance)) return payload.finance
-  if (Array.isArray(payload?.items)) return payload.items
-  return []
-}
+  if (Array.isArray(payload)) return payload;
+  if (Array.isArray(payload?.data)) return payload.data;
+  if (Array.isArray(payload?.data?.finance)) return payload.data.finance;
+  if (Array.isArray(payload?.data?.items)) return payload.data.items;
+  if (Array.isArray(payload?.finance)) return payload.finance;
+  if (Array.isArray(payload?.items)) return payload.items;
+  return [];
+};
 
 const toFeedbackFromApi = (entry) => ({
   id: entry.id,
@@ -849,17 +888,17 @@ const toFeedbackFromApi = (entry) => ({
   review: entry.review ?? "-",
   createdAt: entry.createdAt ?? entry.created_at ?? null,
   updatedAt: entry.updatedAt ?? entry.updated_at ?? null,
-})
+});
 
 const getFeedbackCollection = (payload) => {
-  if (Array.isArray(payload)) return payload
-  if (Array.isArray(payload?.data)) return payload.data
-  if (Array.isArray(payload?.data?.feedback)) return payload.data.feedback
-  if (Array.isArray(payload?.data?.feedbacks)) return payload.data.feedbacks
-  if (Array.isArray(payload?.feedback)) return payload.feedback
-  if (Array.isArray(payload?.feedbacks)) return payload.feedbacks
-  return []
-}
+  if (Array.isArray(payload)) return payload;
+  if (Array.isArray(payload?.data)) return payload.data;
+  if (Array.isArray(payload?.data?.feedback)) return payload.data.feedback;
+  if (Array.isArray(payload?.data?.feedbacks)) return payload.data.feedbacks;
+  if (Array.isArray(payload?.feedback)) return payload.feedback;
+  if (Array.isArray(payload?.feedbacks)) return payload.feedbacks;
+  return [];
+};
 
 const toAdminUserFromApi = (entry) => ({
   id: entry.id,
@@ -870,15 +909,15 @@ const toAdminUserFromApi = (entry) => ({
   isActive: Boolean(entry.isActive ?? entry.is_active),
   createdAt: entry.createdAt ?? entry.created_at ?? null,
   updatedAt: entry.updatedAt ?? entry.updated_at ?? null,
-})
+});
 
 const getAdminUserCollection = (payload, key) => {
-  if (Array.isArray(payload)) return payload
-  if (Array.isArray(payload?.data)) return payload.data
-  if (Array.isArray(payload?.data?.[key])) return payload.data[key]
-  if (Array.isArray(payload?.[key])) return payload[key]
-  return []
-}
+  if (Array.isArray(payload)) return payload;
+  if (Array.isArray(payload?.data)) return payload.data;
+  if (Array.isArray(payload?.data?.[key])) return payload.data[key];
+  if (Array.isArray(payload?.[key])) return payload[key];
+  return [];
+};
 
 const publicCatalog = () =>
   eventCatalog.filter((e) => e.visibility === "public");
@@ -1091,12 +1130,14 @@ let profileReviews = [
     authorName: "Putri Ayu",
     authorInitial: "P",
     rating: 5,
-    comment: "Tenant makanannya variatif banget, festival paling worth it tahun ini!",
+    comment:
+      "Tenant makanannya variatif banget, festival paling worth it tahun ini!",
     createdAt: "2026-06-17T19:05:00Z",
   },
 ];
 
-const initialOf = (name = "") => String(name).trim().charAt(0).toUpperCase() || "?";
+const initialOf = (name = "") =>
+  String(name).trim().charAt(0).toUpperCase() || "?";
 
 const resolveProfileEvents = (profile) =>
   (profile.eventIds ?? [])
@@ -1109,7 +1150,8 @@ const summarizeReviews = (profileId) => {
     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
   const ratingCount = reviews.length;
   const ratingAverage = ratingCount
-    ? reviews.reduce((sum, review) => sum + (Number(review.rating) || 0), 0) / ratingCount
+    ? reviews.reduce((sum, review) => sum + (Number(review.rating) || 0), 0) /
+      ratingCount
     : 0;
 
   return { reviews, ratingCount, ratingAverage };
@@ -1143,10 +1185,17 @@ const toManagedEvent = (event) => {
     createdAt: ticket.createdAt ?? ticket.created_at ?? null,
     updatedAt: ticket.updatedAt ?? ticket.updated_at ?? null,
   }));
-  const totalQuota = ticketTypes.reduce((sum, ticket) => sum + (Number(ticket.quota) || 0), 0);
-  const sold = ticketTypes.reduce((sum, ticket) => sum + (Number(ticket.sold) || 0), 0);
+  const totalQuota = ticketTypes.reduce(
+    (sum, ticket) => sum + (Number(ticket.quota) || 0),
+    0,
+  );
+  const sold = ticketTypes.reduce(
+    (sum, ticket) => sum + (Number(ticket.sold) || 0),
+    0,
+  );
   const revenue = ticketTypes.reduce(
-    (sum, ticket) => sum + (Number(ticket.price) || 0) * (Number(ticket.sold) || 0),
+    (sum, ticket) =>
+      sum + (Number(ticket.price) || 0) * (Number(ticket.sold) || 0),
     0,
   );
   const prices = ticketTypes
@@ -1181,18 +1230,27 @@ const toManagedEvent = (event) => {
     ticketTypes,
     organizer: event.organizer
       ? {
-        ...event.organizer,
-        contactName: event.organizer.contactName ?? event.organizer.contact_name ?? null,
-        contactEmail: event.organizer.contactEmail ?? event.organizer.contact_email ?? null,
-        contactPhone: event.organizer.contactPhone ?? event.organizer.contact_phone ?? null,
-      }
+          ...event.organizer,
+          contactName:
+            event.organizer.contactName ?? event.organizer.contact_name ?? null,
+          contactEmail:
+            event.organizer.contactEmail ??
+            event.organizer.contact_email ??
+            null,
+          contactPhone:
+            event.organizer.contactPhone ??
+            event.organizer.contact_phone ??
+            null,
+        }
       : null,
     registered: sold,
     attended: 0,
     revenue,
     totalQuota,
     startingPrice: prices.length ? Math.min(...prices) : 0,
-    status: event.status ?? (event.isPublished ?? event.is_published ? "active" : "draft"),
+    status:
+      event.status ??
+      ((event.isPublished ?? event.is_published) ? "active" : "draft"),
     isWithdraw: Boolean(event.is_withdraw ?? event.isWithdraw),
   };
 };
@@ -1221,13 +1279,23 @@ export const api = {
       }),
     }).then((res) => res.data ?? res),
   getFeedbacks: () =>
-    apiRequest("/feedback").then((res) => getFeedbackCollection(res).map(toFeedbackFromApi)),
+    apiRequest("/feedback").then((res) =>
+      getFeedbackCollection(res).map(toFeedbackFromApi),
+    ),
 
   // Public profiles & reviews (MOCK — wire to BE once endpoints ship)
+  // getPublicProfile: (type, id) => {
+  //   const profile = publicProfiles.find(
+  //     (item) => item.id === id && (!type || item.type === type),
+  //   );
+  //   return delay(profile ? toPublicProfile(profile) : null);
+  // },
   getPublicProfile: (type, id) => {
-    const profile = publicProfiles.find(
-      (item) => item.id === id && (!type || item.type === type),
+    const profileType = publicProfiles.find(
+      (item) => !type || item.type === type,
     );
+    const profile =
+      publicProfiles[Math.floor(Math.random() * profileType.length)];
     return delay(profile ? toPublicProfile(profile) : null);
   },
   getProfileReviews: (id) => delay(summarizeReviews(id).reviews),
@@ -1284,22 +1352,24 @@ export const api = {
     apiRequest("/users/admin/admins", {
       method: "POST",
       body: JSON.stringify({ name, email, password, phone }),
-    }).then((res) => (res.data ? toAdminUserFromApi(res.data) : toAdminUserFromApi(res))),
+    }).then((res) =>
+      res.data ? toAdminUserFromApi(res.data) : toAdminUserFromApi(res),
+    ),
   getCategories: () => delay(apiCategories),
   getRegions: () => delay(apiRegions),
   searchEvents: ({ search, category, wilayah, kota, date }) => {
-    const params = new URLSearchParams()
+    const params = new URLSearchParams();
 
-    if (search) params.set("search", search)
-    if (category) params.set("category", category)
-    if (wilayah) params.set("wilayah", wilayah)
-    if (kota) params.set("kota", kota)
-    if (date) params.set("date", date)
+    if (search) params.set("search", search);
+    if (category) params.set("category", category);
+    if (wilayah) params.set("wilayah", wilayah);
+    if (kota) params.set("kota", kota);
+    if (date) params.set("date", date);
 
-    const query = params.toString()
-    return apiRequest(`/events/explore${query ? `?${query}` : ""}`).then((res) =>
-      getApiCollection(res).map(toPublicEventSummaryFromApi),
-    )
+    const query = params.toString();
+    return apiRequest(`/events/explore${query ? `?${query}` : ""}`).then(
+      (res) => getApiCollection(res).map(toPublicEventSummaryFromApi),
+    );
   },
   getEvent: (id) =>
     apiRequest(`/events/${id}`)
@@ -1313,20 +1383,26 @@ export const api = {
       trendingInCity: [publicCatalog()[0], publicCatalog()[1]].map(toSummary),
     }),
   getEventsByInterest: (categories = []) => {
-    const selected = Array.isArray(categories) ? categories.filter(Boolean) : [categories].filter(Boolean)
-    const params = new URLSearchParams()
+    const selected = Array.isArray(categories)
+      ? categories.filter(Boolean)
+      : [categories].filter(Boolean);
+    const params = new URLSearchParams();
 
-    if (selected.length > 0) params.set("categories", selected.join(","))
+    if (selected.length > 0) params.set("categories", selected.join(","));
 
-    const query = params.toString()
-    return apiRequest(`/events/interest${query ? `?${query}` : ""}`).then((res) =>
-      getApiCollection(res).map(toPublicEventSummaryFromApi),
-    )
+    const query = params.toString();
+    return apiRequest(`/events/interest${query ? `?${query}` : ""}`).then(
+      (res) => getApiCollection(res).map(toPublicEventSummaryFromApi),
+    );
   },
   getMyEvents: () =>
-    apiRequest("/events?createdBy=me").then((res) => (res.data ?? []).map(toManagedEvent)),
+    apiRequest("/events?createdBy=me").then((res) =>
+      (res.data ?? []).map(toManagedEvent),
+    ),
   getMyEvent: (id) =>
-    apiRequest(`/events/${id}`).then((res) => (res.data ? toManagedEvent(res.data) : null)),
+    apiRequest(`/events/${id}`).then((res) =>
+      res.data ? toManagedEvent(res.data) : null,
+    ),
   updateEvent: (id, payload) =>
     apiRequest(`/events/${id}`, {
       method: "PUT",
@@ -1361,15 +1437,17 @@ export const api = {
       method: "DELETE",
     }).then((res) => res.data ?? res),
   getMyTickets: () =>
-    apiRequest("/ticket").then((res) => (res.data ?? []).map(toMyPaidTicketFromApi)),
+    apiRequest("/ticket").then((res) =>
+      (res.data ?? []).map(toMyPaidTicketFromApi),
+    ),
   getMyTicket: (id) =>
     apiRequest("/ticket").then((res) => {
-      const tickets = (res.data ?? []).map(toMyPaidTicketFromApi)
-      return tickets.find((ticket) => ticket.id === id) ?? null
+      const tickets = (res.data ?? []).map(toMyPaidTicketFromApi);
+      return tickets.find((ticket) => ticket.id === id) ?? null;
     }),
   getEventAttendees: (eventId, attendanceFilter = "all") =>
-    apiRequest(`/ticket/event-ticket/${eventId}/${attendanceFilter}`).then((res) =>
-      (res.data ?? []).map(toEventAttendeeFromApi),
+    apiRequest(`/ticket/event-ticket/${eventId}/${attendanceFilter}`).then(
+      (res) => (res.data ?? []).map(toEventAttendeeFromApi),
     ),
   getEventStatistic: (eventId) =>
     apiRequest(`/transactions/statistic/event/${eventId}`).then((res) => {
@@ -1387,9 +1465,13 @@ export const api = {
       body: JSON.stringify(payload),
     }).then((res) => res.data ?? res),
   getMyWithdraws: () =>
-    apiRequest("/withdraw/me").then((res) => getWithdrawCollection(res).map(toWithdrawFromApi)),
+    apiRequest("/withdraw/me").then((res) =>
+      getWithdrawCollection(res).map(toWithdrawFromApi),
+    ),
   getAllWithdraws: () =>
-    apiRequest("/withdraw/all").then((res) => getWithdrawCollection(res).map(toWithdrawFromApi)),
+    apiRequest("/withdraw/all").then((res) =>
+      getWithdrawCollection(res).map(toWithdrawFromApi),
+    ),
   updateWithdrawStatus: (id, status) =>
     apiRequest("/withdraw/status", {
       method: "POST",
@@ -1490,10 +1572,10 @@ export const api = {
       : null;
     const organizer = partner
       ? {
-        id: partner.id,
-        name: partner.name,
-        initial: partner.name.charAt(0).toUpperCase(),
-      }
+          id: partner.id,
+          name: partner.name,
+          initial: partner.name.charAt(0).toUpperCase(),
+        }
       : { id: "me", name: "Kamu", initial: "K" };
     const newEvent = {
       id: `evt-${Date.now()}`,
