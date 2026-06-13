@@ -66,7 +66,13 @@ function PublicProfilePage({ kind = null }) {
   const [submitting, setSubmitting] = useState(false)
   const [formError, setFormError] = useState('')
   const [formSuccess, setFormSuccess] = useState('')
+  const [reviewActionError, setReviewActionError] = useState('')
   const [loginPromptOpen, setLoginPromptOpen] = useState(false)
+  const [editingReviewId, setEditingReviewId] = useState('')
+  const [editRating, setEditRating] = useState(0)
+  const [editComment, setEditComment] = useState('')
+  const [savingReviewId, setSavingReviewId] = useState('')
+  const [deletingReviewId, setDeletingReviewId] = useState('')
 
   const canonicalPath = `/creator/${profileId}`
   const isOwnProfile = isAuthenticated && user?.id === profileId
@@ -158,6 +164,7 @@ function PublicProfilePage({ kind = null }) {
   async function handleSubmit(event) {
     event.preventDefault()
     setFormSuccess('')
+    setReviewActionError('')
 
     if (!isAuthenticated) {
       setLoginPromptOpen(true)
@@ -189,6 +196,62 @@ function PublicProfilePage({ kind = null }) {
       setFormError(err.message || 'Gagal mengirim ulasan. Coba lagi.')
     } finally {
       setSubmitting(false)
+    }
+  }
+
+  function handleStartEdit(review) {
+    setReviewActionError('')
+    setEditingReviewId(review.id)
+    setEditRating(Number(review.rating) || 0)
+    setEditComment(review.comment ?? '')
+  }
+
+  function handleCancelEdit() {
+    setEditingReviewId('')
+    setEditRating(0)
+    setEditComment('')
+    setReviewActionError('')
+  }
+
+  async function handleUpdateReview(reviewId) {
+    if (!editRating) {
+      setReviewActionError('Pilih rating bintang terlebih dahulu.')
+      return
+    }
+    if (editComment.trim().length < 3) {
+      setReviewActionError('Tulis ulasan minimal 3 karakter.')
+      return
+    }
+
+    setSavingReviewId(reviewId)
+    setReviewActionError('')
+    try {
+      const updatedReview = await api.updateCreatorFeedback(reviewId, {
+        rating: editRating,
+        review: editComment,
+        creatorType: profile?.type ?? resolvedKind,
+        creatorId: profileId,
+      })
+      setReviews((prev) => prev.map((review) => (review.id === reviewId ? updatedReview : review)))
+      handleCancelEdit()
+    } catch (err) {
+      setReviewActionError(err.message || 'Gagal mengubah ulasan. Coba lagi.')
+    } finally {
+      setSavingReviewId('')
+    }
+  }
+
+  async function handleDeleteReview(reviewId) {
+    setDeletingReviewId(reviewId)
+    setReviewActionError('')
+    try {
+      await api.deleteCreatorFeedback(reviewId)
+      setReviews((prev) => prev.filter((review) => review.id !== reviewId))
+      if (editingReviewId === reviewId) handleCancelEdit()
+    } catch (err) {
+      setReviewActionError(err.message || 'Gagal menghapus ulasan. Coba lagi.')
+    } finally {
+      setDeletingReviewId('')
     }
   }
 
@@ -419,6 +482,11 @@ function PublicProfilePage({ kind = null }) {
 
             {/* Review list */}
             <div className="space-y-3">
+              {reviewActionError && (
+                <Card>
+                  <p className="text-sm text-red-600">{reviewActionError}</p>
+                </Card>
+              )}
               {reviews.length === 0 ? (
                 <Card>
                   <p className="text-sm text-gray-500">
@@ -433,16 +501,74 @@ function PublicProfilePage({ kind = null }) {
                         {review.authorInitial ?? (review.authorName ?? '?').charAt(0)}
                       </span>
                       <div className="min-w-0 flex-1">
-                        <div className="flex flex-wrap items-center justify-between gap-1">
-                          <p className="text-sm font-semibold text-gray-900">
-                            {review.authorName}
-                          </p>
-                          <StarRating value={review.rating} size="sm" />
-                        </div>
-                        <p className="mt-1 text-sm text-gray-700">{review.comment}</p>
-                        <p className="mt-1 text-[11px] text-gray-400">
-                          {formatDateTime(review.createdAt)}
-                        </p>
+                        {editingReviewId === review.id ? (
+                          <div className="space-y-3">
+                            <div className="flex flex-wrap items-center justify-between gap-2">
+                              <p className="text-sm font-semibold text-gray-900">
+                                {review.authorName}
+                              </p>
+                              <StarRating value={editRating} onChange={setEditRating} readOnly={false} size="sm" />
+                            </div>
+                            <textarea
+                              value={editComment}
+                              onChange={(e) => setEditComment(e.target.value)}
+                              rows={3}
+                              maxLength={500}
+                              className="w-full resize-none rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
+                            />
+                            <div className="flex flex-wrap items-center gap-2">
+                              <button
+                                type="button"
+                                onClick={() => handleUpdateReview(review.id)}
+                                disabled={savingReviewId === review.id}
+                                className="rounded-lg bg-brand-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-brand-700 disabled:opacity-60"
+                              >
+                                {savingReviewId === review.id ? 'Menyimpan...' : 'Simpan'}
+                              </button>
+                              <button
+                                type="button"
+                                onClick={handleCancelEdit}
+                                className="rounded-lg border border-gray-200 px-3 py-2 text-xs font-semibold text-gray-600 transition hover:border-gray-300 hover:text-gray-900"
+                              >
+                                Batal
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <>
+                            <div className="flex flex-wrap items-center justify-between gap-1">
+                              <p className="text-sm font-semibold text-gray-900">
+                                {review.authorName}
+                              </p>
+                              <StarRating value={review.rating} size="sm" />
+                            </div>
+                            <p className="mt-1 text-sm text-gray-700">{review.comment}</p>
+                            <div className="mt-1 flex flex-wrap items-center justify-between gap-2">
+                              <p className="text-[11px] text-gray-400">
+                                {formatDateTime(review.createdAt)}
+                              </p>
+                              {isAuthenticated && review.authorId === user?.id && (
+                                <div className="flex items-center gap-2">
+                                  <button
+                                    type="button"
+                                    onClick={() => handleStartEdit(review)}
+                                    className="text-xs font-medium text-brand-600 hover:underline"
+                                  >
+                                    Ubah
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleDeleteReview(review.id)}
+                                    disabled={deletingReviewId === review.id}
+                                    className="text-xs font-medium text-red-600 hover:underline disabled:opacity-60"
+                                  >
+                                    {deletingReviewId === review.id ? 'Menghapus...' : 'Hapus'}
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                          </>
+                        )}
                       </div>
                     </div>
                   </Card>

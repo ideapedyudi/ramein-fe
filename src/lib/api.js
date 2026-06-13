@@ -1416,6 +1416,20 @@ export const api = {
         creatorId,
       }),
     }).then((res) => toCreatorFeedbackFromApi(res.data ?? res)),
+  updateCreatorFeedback: (id, { rating, review, creatorType, creatorId }) =>
+    apiRequest(`/feedback-creators/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify({
+        rating,
+        review,
+        creatorType,
+        creatorId,
+      }),
+    }).then((res) => toCreatorFeedbackFromApi(res.data ?? res)),
+  deleteCreatorFeedback: (id) =>
+    apiRequest(`/feedback-creators/${id}`, {
+      method: 'DELETE',
+    }).then((res) => res.data ?? res),
   getProfileReviews: (id) => delay(summarizeReviews(id).reviews),
   createProfileReview: ({ profileId, rating, comment, author }) => {
     const review = {
