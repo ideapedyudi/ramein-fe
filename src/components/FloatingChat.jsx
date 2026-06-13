@@ -105,7 +105,7 @@ export default function FloatingChat() {
               type="text"
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
-              placeholder="Type your message..."
+              placeholder="Ketik pesan..."
               className="flex-1 rounded-xl bg-gray-100 px-4 py-2 text-sm text-gray-800 placeholder-gray-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
             />
             <button
