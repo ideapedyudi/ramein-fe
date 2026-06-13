@@ -967,7 +967,7 @@ let masterOrganizers = [
 // maupun pengguna yang pernah mempublikasikan event. Ulasan ditujukan ke
 // profil tersebut. Endpoint BE belum tersedia — sesuaikan setelah API rilis.
 // ──────────────────────────────────────────────────────────────────────────
-let publicProfiles = [
+export let publicProfiles = [
   {
     id: "org-1",
     type: "organizer",
@@ -1284,17 +1284,10 @@ export const api = {
     ),
 
   // Public profiles & reviews (MOCK — wire to BE once endpoints ship)
-  // getPublicProfile: (type, id) => {
-  //   const profile = publicProfiles.find(
-  //     (item) => item.id === id && (!type || item.type === type),
-  //   );
-  //   return delay(profile ? toPublicProfile(profile) : null);
-  // },
   getPublicProfile: (type, id) => {
-    const profileType = publicProfiles.find(
-      (item) => !type || item.type === type,
+    const profile = publicProfiles.find(
+      (item) => item.id === id && (!type || item.type === type),
     );
-    const profile = profileType[Math.floor(Math.random() * profileType.length)];
     return delay(profile ? toPublicProfile(profile) : null);
   },
   getProfileReviews: (id) => delay(summarizeReviews(id).reviews),

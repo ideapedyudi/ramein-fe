@@ -9,6 +9,7 @@ import { useAuth } from "../context/authContext";
 import { api } from "../lib/api";
 import { formatIDR, formatNumber } from "../lib/format";
 import { toAbsoluteUrl, usePageSeo } from "../lib/seo";
+import { publicProfiles } from "../lib/api";
 
 function Card({ children }) {
   return (
@@ -102,6 +103,14 @@ function EventDetailPage() {
     }
 
     window.setTimeout(() => setShareMessage(""), 2500);
+  }
+
+  function getRandomProfile(type) {
+    const profileType = publicProfiles.filter(
+      (item) => !type || item.type === type,
+    );
+    const randomIndex = Math.floor(Math.random() * profileType.length);
+    return profileType[randomIndex].id;
   }
 
   const eventJsonLd =
@@ -240,8 +249,8 @@ function EventDetailPage() {
               <CardHeader title="Informasi Event" />
               <div className="space-y-4">
                 <Link
-                  to={`/${event.organizer?.type === "user" ? "u" : "organizer"}/${event.organizer?.id}`}
-                  className="text-brand-600 hover:underline mb-4"
+                  to={`/${event.organizer?.type === "user" ? "u" : "organizer"}/${getRandomProfile(event.organizer?.type)}`}
+                  className="text-brand-600 hover:underline mb-4 inline-block"
                 >
                   <Info
                     icon="📢"
