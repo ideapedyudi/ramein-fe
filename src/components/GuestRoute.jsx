@@ -1,5 +1,6 @@
 import { Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/authContext'
+import RouteLoadingFallback from './RouteLoadingFallback'
 
 /**
  * Guest guard — the inverse of ProtectedRoute. Blocks already-authenticated
@@ -7,11 +8,11 @@ import { useAuth } from '../context/authContext'
  * they came from, or to a sensible role-based default.
  */
 function GuestRoute({ children }) {
-  const { hasCheckedSession, isAuthenticated, isAdmin, isLoading } = useAuth()
+  const { hasCheckedSession, isAuthenticated, isAdmin } = useAuth()
   const location = useLocation()
 
-  if (isLoading || !hasCheckedSession) {
-    return null
+  if (!hasCheckedSession) {
+    return <RouteLoadingFallback message="Mengecek sesi akun..." />
   }
 
   if (isAuthenticated) {

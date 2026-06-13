@@ -1,12 +1,13 @@
 import { Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/authContext'
+import RouteLoadingFallback from './RouteLoadingFallback'
 
 function ProtectedRoute({ children, requireAdmin = false, userOnly = false }) {
   const { hasCheckedSession, isAuthenticated, isAdmin, isLoading } = useAuth()
   const location = useLocation()
 
   if (isLoading || !hasCheckedSession) {
-    return null
+    return <RouteLoadingFallback message="Menyiapkan halaman..." />
   }
 
   if (!isAuthenticated) {
