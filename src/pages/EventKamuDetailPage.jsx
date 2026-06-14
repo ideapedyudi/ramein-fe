@@ -689,7 +689,7 @@ function EventKamuDetailPage() {
           <h2 className="text-xl font-bold text-gray-900">{error || 'Event tidak ditemukan.'}</h2>
           <Link to="/event-kamu" className="mt-4 inline-block text-brand-600 hover:underline">
             <FiChevronLeft className="inline-block" />
-            <span>Kembali</span>
+            <span className='ml-4'>Kembali</span>
           </Link>
         </div>
       </AdminLayout>
@@ -727,7 +727,7 @@ function EventKamuDetailPage() {
     >
       <Link to="/event-kamu" className="mb-4 inline-block text-sm text-gray-600 hover:text-brand-600">
         <FiChevronLeft className="inline-block" />
-        <span>Kembali</span>
+        <span className='ml-4'>Kembali</span>
       </Link>
 
       <div>
