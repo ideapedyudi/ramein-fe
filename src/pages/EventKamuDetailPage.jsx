@@ -762,19 +762,22 @@ function EventKamuDetailPage() {
                   <EventImage src={event.imageUrl} alt={event.name} />
                   <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-black/30 to-transparent" />
                 </div>
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <Info label="Mulai" value={formatDateTime(event.startDateTime)} />
-                  <Info label="Selesai" value={formatDateTime(event.endDateTime)} />
-                  <Info label="Kota" value={event.city} />
-                  <Info label="Alamat" value={event.addressDetail} />
-                  <Info label="Kategori" value={event.category} />
-                  <Info label="Penyelenggara" value={event.organizer?.name} />
-                  <Info label="Status">
-                    <span className="inline-flex rounded-full bg-amber-50 px-2 py-0.5 text-xs font-semibold uppercase text-amber-700">
-                      {event.status ?? '-'}
-                    </span>
-                  </Info>
-                  <Info label="Dipublikasikan" value={event.isPublished ? 'Ya' : 'Belum'} />
+                <div className="gap-4">
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <Info label="Mulai" value={formatDateTime(event.startDateTime)} />
+                    <Info label="Selesai" value={formatDateTime(event.endDateTime)} />
+                    <Info label="Kota" value={event.city} />
+                    <Info label="Alamat" value={event.addressDetail} />
+                    <Info label="Kategori" value={event.category} />
+                    <Info label="Penyelenggara" value={event.organizer?.name} />
+                    <Info label="Status">
+                      <span className="inline-flex rounded-full bg-amber-50 px-2 py-0.5 text-xs font-semibold uppercase text-amber-700">
+                        {event.status ?? '-'}
+                      </span>
+                    </Info>
+                    <Info label="Dipublikasikan" value={event.isPublished ? 'Ya' : 'Belum'} />
+                  </div>
+                  <Info label="Link Event" value={event.url_online ?? '-'} />
                 </div>
               </div>
               <div className="mt-5 border-t border-gray-100 pt-4">

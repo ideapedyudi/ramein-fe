@@ -240,7 +240,6 @@ function EditEventPage() {
                   placeholder="Konser Akhir Tahun Terbaru"
                 />
               </div>
-
               <Select
                 label="Kategori"
                 value={form.categoryId}
@@ -254,19 +253,21 @@ function EditEventPage() {
                   </option>
                 ))}
               </Select>
-              <Select
-                label="Penyelenggara"
-                value={form.organizerId}
-                onChange={(value) => updateForm('organizerId', value)}
-                required
-              >
-                <option value="">Pilih penyelenggara</option>
-                {organizers.map((organizer) => (
-                  <option key={organizer.id} value={organizer.id}>
-                    {organizer.name}
-                  </option>
-                ))}
-              </Select>
+              {form.eventType === 'offline' && (
+                <Select
+                  label="Penyelenggara"
+                  value={form.organizerId}
+                  onChange={(value) => updateForm('organizerId', value)}
+                  required
+                >
+                  <option value="">Pilih penyelenggara</option>
+                  {organizers.map((organizer) => (
+                    <option key={organizer.id} value={organizer.id}>
+                      {organizer.name}
+                    </option>
+                  ))}
+                </Select>
+              )}
               <Select
                 label="Kota"
                 value={form.cityId}
