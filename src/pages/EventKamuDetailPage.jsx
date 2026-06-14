@@ -726,7 +726,8 @@ function EventKamuDetailPage() {
       }
     >
       <Link to="/event-kamu" className="mb-4 inline-block text-sm text-gray-600 hover:text-brand-600">
-        Kembali ke Event Kamu
+        <FiChevronLeft className="inline-block" />
+        <span>Kembali</span>
       </Link>
 
       <div>
