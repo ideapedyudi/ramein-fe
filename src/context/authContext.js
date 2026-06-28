@@ -8,6 +8,10 @@ export function useAuth() {
   return ctx
 }
 
-export const SAMPLE_CREDENTIALS = {
+export const USER_CREDENTIALS = {
   user: { email: 'usertest@ramein.fun', password: 'password123' },
+}
+
+export const ADMIN_CREDENTIALS = {
+  user: { email: 'firstadmin@demo.com', password: 'password123' },
 }

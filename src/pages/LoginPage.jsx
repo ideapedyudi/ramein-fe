@@ -2,7 +2,7 @@ import confetti from "canvas-confetti";
 import { useCallback, useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import GoogleAuthButton from "../components/GoogleAuthButton";
-import { SAMPLE_CREDENTIALS, useAuth } from "../context/authContext";
+import { USER_CREDENTIALS, ADMIN_CREDENTIALS, useAuth } from "../context/authContext";
 import brandLogo from "../assets/logobrand2.webp";
 
 const inputClass =
@@ -278,12 +278,27 @@ function LoginPage() {
                 <div className="flex items-center justify-between gap-2">
                   <span>
                     <span className="font-semibold">Pengguna</span> ·{" "}
-                    {SAMPLE_CREDENTIALS.user.email} /{" "}
-                    {SAMPLE_CREDENTIALS.user.password}
+                    {USER_CREDENTIALS.user.email} /{" "}
+                    {USER_CREDENTIALS.user.password}
                   </span>
                   <button
                     type="button"
-                    onClick={() => fillWith(SAMPLE_CREDENTIALS.user)}
+                    onClick={() => fillWith(USER_CREDENTIALS.user)}
+                    className="rounded-md bg-emerald-600 px-2 py-1 text-xs font-semibold text-white hover:bg-emerald-700"
+                  >
+                    Isi
+                  </button>
+                </div>
+
+                <div className="flex items-center justify-between gap-2">
+                  <span>
+                    <span className="font-semibold">Admin</span> ·{" "}
+                    {ADMIN_CREDENTIALS.user.email} /{" "}
+                    {ADMIN_CREDENTIALS.user.password}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => fillWith(ADMIN_CREDENTIALS.user)}
                     className="rounded-md bg-emerald-600 px-2 py-1 text-xs font-semibold text-white hover:bg-emerald-700"
                   >
                     Isi
