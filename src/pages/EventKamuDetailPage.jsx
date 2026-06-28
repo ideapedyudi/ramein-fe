@@ -7,6 +7,7 @@ import EventImage from '../components/EventImage'
 import { useAuth } from '../context/authContext'
 import { api } from '../lib/api'
 import { formatDateTime, formatIDR, formatNumber } from '../lib/format'
+import { FiChevronLeft } from 'react-icons/fi'
 
 const attendeeTabs = [
   { value: 'all', label: 'Semua' },
@@ -687,7 +688,8 @@ function EventKamuDetailPage() {
         <div className="rounded-2xl border border-dashed border-gray-300 bg-white p-12 text-center">
           <h2 className="text-xl font-bold text-gray-900">{error || 'Event tidak ditemukan.'}</h2>
           <Link to="/event-kamu" className="mt-4 inline-block text-brand-600 hover:underline">
-            Kembali ke Event Kamu
+            <FiChevronLeft className="inline-block" />
+            <span className='ml-2'>Kembali</span>
           </Link>
         </div>
       </AdminLayout>
@@ -724,7 +726,8 @@ function EventKamuDetailPage() {
       }
     >
       <Link to="/event-kamu" className="mb-4 inline-block text-sm text-gray-600 hover:text-brand-600">
-        Kembali ke Event Kamu
+        <FiChevronLeft className="inline-block" />
+        <span className='ml-4'>Kembali</span>
       </Link>
 
       <div>
@@ -762,19 +765,22 @@ function EventKamuDetailPage() {
                   <EventImage src={event.imageUrl} alt={event.name} />
                   <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-black/30 to-transparent" />
                 </div>
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <Info label="Mulai" value={formatDateTime(event.startDateTime)} />
-                  <Info label="Selesai" value={formatDateTime(event.endDateTime)} />
-                  <Info label="Kota" value={event.city} />
-                  <Info label="Alamat" value={event.addressDetail} />
-                  <Info label="Kategori" value={event.category} />
-                  <Info label="Penyelenggara" value={event.organizer?.name} />
-                  <Info label="Status">
-                    <span className="inline-flex rounded-full bg-amber-50 px-2 py-0.5 text-xs font-semibold uppercase text-amber-700">
-                      {event.status ?? '-'}
-                    </span>
-                  </Info>
-                  <Info label="Dipublikasikan" value={event.isPublished ? 'Ya' : 'Belum'} />
+                <div className="space-y-4">
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <Info label="Mulai" value={formatDateTime(event.startDateTime)} />
+                    <Info label="Selesai" value={formatDateTime(event.endDateTime)} />
+                    <Info label="Kota" value={event.city} />
+                    <Info label="Alamat" value={event.addressDetail} />
+                    <Info label="Kategori" value={event.category} />
+                    <Info label="Penyelenggara" value={event.organizer?.name} />
+                    <Info label="Status">
+                      <span className="inline-flex rounded-full bg-amber-50 px-2 py-0.5 text-xs font-semibold uppercase text-amber-700">
+                        {event.status ?? '-'}
+                      </span>
+                    </Info>
+                    <Info label="Dipublikasikan" value={event.isPublished ? 'Ya' : 'Belum'} />
+                  </div>
+                  <Info label="Link Event" value={event.url_online ?? '-'} />
                 </div>
               </div>
               <div className="mt-5 border-t border-gray-100 pt-4">

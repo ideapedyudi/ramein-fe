@@ -5,6 +5,7 @@ import EventCardPreview from '../components/EventCardPreview'
 import { useAuth } from '../context/authContext'
 import { api } from '../lib/api'
 import { formatIDR } from '../lib/format'
+import { FiChevronLeft } from 'react-icons/fi'
 
 function BigField({ label, name, value, onChange, placeholder, required, big }) {
   return (
@@ -285,7 +286,8 @@ function BuatEventGatheringPage() {
       }
     >
       <Link to="/buat-event" className="mb-4 inline-block text-sm text-gray-600 hover:text-brand-600">
-        Pilih tipe event lain
+        <FiChevronLeft className="inline-block" />
+        <span className='ml-2'>Kembali</span>
       </Link>
 
       <form onSubmit={handleSubmit}>

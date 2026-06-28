@@ -1,7 +1,9 @@
 import banner1 from "../assets/banner1.webp";
-import banner2 from "../assets/banner2.webp";
-import banner3 from "../assets/banner3.jpg";
-import banner4 from "../assets/banner4.jpg";
+// import banner2 from "../assets/banner2.webp";
+import banner3 from "../assets/banner3.webp";
+import banner4 from "../assets/banner4.webp";
+import banner5 from "../assets/banner5.webp";
+import banner6 from "../assets/banner6.webp";
 
 import { apiCategories, apiRegions, eventCatalog } from "../lib/api";
 
@@ -15,9 +17,11 @@ export const navMenus = [
 
 export const heroSlides = [
   { id: "hero-1", image: banner1 },
-  { id: "hero-2", image: banner2 },
+  // { id: "hero-2", image: banner2 },
   { id: "hero-3", image: banner3 },
   { id: "hero-4", image: banner4 },
+  { id: "hero-5", image: banner5 },
+  { id: "hero-6", image: banner6 },
 ];
 
 const formatPrice = (value) =>

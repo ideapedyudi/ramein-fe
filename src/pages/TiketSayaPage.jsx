@@ -131,6 +131,12 @@ function TicketQrModal({ open, ticket, onClose }) {
             </p>
           </div>
         </div>
+        <div className="rounded-xl border border-[#efefef] p-3 mt-3">
+          <p className="text-[10px] uppercase text-[#9a9a9a]">QR Code</p>
+          <p className="mt-1 font-semibold text-[#1f1f1f]">
+            {activeTicket.qrCode ?? 'Tidak tersedia'}
+          </p>
+        </div>
       </div>
     </div>
   )

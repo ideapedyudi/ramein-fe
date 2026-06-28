@@ -4,6 +4,7 @@ import AdminLayout from '../components/AdminLayout'
 import EventCardPreview from '../components/EventCardPreview'
 import { api } from '../lib/api'
 import { formatIDR } from '../lib/format'
+import { FiChevronLeft } from 'react-icons/fi'
 
 function Card({ children }) {
   return (
@@ -255,7 +256,8 @@ function BuatEventFestivalPage() {
       }
     >
       <Link to="/buat-event" className="mb-4 inline-block text-sm text-gray-600 hover:text-brand-600">
-        Pilih tipe event lain
+        <FiChevronLeft className="inline-block" />
+        <span className='ml-2'>Kembali</span>
       </Link>
 
       <form onSubmit={handleSubmit} className="grid gap-6 md:grid-cols-[1fr_320px]">
